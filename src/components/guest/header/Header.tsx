@@ -20,7 +20,7 @@ export default function GuestHeader() {
 
   return (
     <header className="bg-gradient-to-r from-red-500 to-red-900 text-gray-300  py-4 shadow-lg relative">
-      <div className="container mx-auto px-4 flex items-center justify-between">
+      <div className="container mx-auto px-2 flex items-center justify-between">
         <div
           className="flex items-center space-x-2 cursor-pointer"
           onClick={toggleDropdown}
@@ -59,7 +59,7 @@ export default function GuestHeader() {
                   transition={{ type: "linear", duration: 0.2 }}
                 >
                   <IconDroplet size={18} className="mr-2" />
-                  Máu
+                  Dịch Vụ Hiến Máu
                 </motion.h3>
                 <motion.p
                   whileHover={{ scale: 1.05, color: "#ff0000" }}
@@ -102,10 +102,7 @@ export default function GuestHeader() {
                   Tài Liệu Về Máu
                 </motion.p>
                 <motion.p whileHover={{ scale: 1.05, color: "#ff0000" }}>
-                  Tin Tức Về Máu
-                </motion.p>
-                <motion.p whileHover={{ scale: 1.05, color: "#ff0000" }}>
-                  Blogs
+                  Tin Tức Về Hiến Máu
                 </motion.p>
                 <motion.p whileHover={{ scale: 1.05, color: "#ff0000" }}>
                   Chia Sẽ Kinh Nghiệm
@@ -130,7 +127,7 @@ export default function GuestHeader() {
 
               <motion.div
                 whileHover={{
-                  scale: 1.05,
+                  scale: 1.2,
                   boxShadow: "0 10px 20px rgba(0, 0, 0, 0.3)",
                 }}
                 className="rounded-md overflow-hidden"
