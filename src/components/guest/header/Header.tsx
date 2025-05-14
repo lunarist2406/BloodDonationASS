@@ -16,8 +16,7 @@ export default function GuestHeader() {
   const [showDropdown, setShowDropdown] = useState(false);
 
   const toggleModal = () => setShowModal(!showModal);
-  const toggleDropdown = () => setShowDropdown(!showDropdown);       // dropdown menu megas menu
-
+  const toggleDropdown = () => setShowDropdown(!showDropdown); // dropdown menu megas menu
 
   return (
     <header className="bg-gradient-to-r from-red-500 to-red-900 text-gray-300  py-4 shadow-lg relative">
@@ -31,8 +30,8 @@ export default function GuestHeader() {
           <IconChevronDown size={24} className="cursor-pointer" />
         </div>
 
-        <motion.div
-          className="hidden md:flex items-center space-x-4"
+        <motion.button
+          className="mt-1  px-4 py-2 bg-red-700 text-white text-3xs rounded-lg font-bold flex items-center hover:bg-red-500 gap-2"
           style={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
           whileHover={{
             y: -5,
@@ -40,16 +39,9 @@ export default function GuestHeader() {
             backgroundColor: "rgba(255, 0, 0, 0.2)",
           }}
         >
-          <Button
-            type="primary"
-            className="bg-black flex items-center space-x-2 hover:bg-red-500"
-            onClick={toggleModal}
-            style={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
-          >
-            <IconLogin size={18} className="text-white" />
-            <span>Sign in</span>
-          </Button>
-        </motion.div>
+          <IconLogin size={18} className="text-white" />
+          <span>Sign in</span>
+        </motion.button>
       </div>
       <AnimatePresence>
         {showDropdown && (

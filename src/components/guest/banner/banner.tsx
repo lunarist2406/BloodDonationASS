@@ -43,7 +43,8 @@ export default function GuestBanner() {
             className="mt-6 px-5 py-3 bg-red-700 text-white rounded-lg font-bold flex items-center hover:bg-red-500"
             whileHover={{ scale: 1.05 }}
           >
-            <IconArrowRightCircle className="mr-2" size={24} /> Đăng Ký Ngay
+            <IconArrowRightCircle className="mr-2" size={24} /> Đăng Ký Hiến Máu
+            Ngay
           </motion.button>
         </motion.div>
 
