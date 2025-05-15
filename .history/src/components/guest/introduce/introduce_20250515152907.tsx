@@ -27,8 +27,8 @@ export default function GuestIntroduce() {
         Thống Hỗ Trợ Hiến Máu
       </motion.h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 px-10 mt-8">
-        <div className="bg-white p-6 rounded-lg shadow-md ">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-10 px-10 mt-8">
+        <div className="bg-white p-6 rounded-lg shadow-md">
           <motion.h3
             initial="hidden"
             animate="visible"

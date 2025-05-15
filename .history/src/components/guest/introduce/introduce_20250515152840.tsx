@@ -27,8 +27,8 @@ export default function GuestIntroduce() {
         Thống Hỗ Trợ Hiến Máu
       </motion.h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 px-10 mt-8">
-        <div className="bg-white p-6 rounded-lg shadow-md ">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-10 px-10 mt-8">
+        <div className="bg-white p-6 rounded-lg shadow-md">
           <motion.h3
             initial="hidden"
             animate="visible"
@@ -77,9 +77,12 @@ export default function GuestIntroduce() {
           </motion.button>
         </div>
         <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2>Quy Trình Đăng Ký Hiến máu:</h2>
-          <h4>Đăng ký Hiến máu</h4>
-          <h4>Đăng Ký Hiến Máu Khẩn cấp</h4>
+            <h2>
+              Đăng ký Hiến máu 
+            </h2>
+            <h2>
+              
+            </h2>
         </div>
       </div>
     </div>

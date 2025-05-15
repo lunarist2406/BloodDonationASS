@@ -25,13 +25,13 @@ export default function GuestHeader() {
           className="flex items-center space-x-2 cursor-pointer"
           onClick={toggleDropdown}
         >
-          <img src={logo} alt="logo" width={40} height={40} />
+          <img src={logo} alt="logo" width={50} height={50} />
           <span className="font-bold text-xl">LUNARIST</span>
           <IconChevronDown size={24} className="cursor-pointer" />
         </div>
 
         <motion.button
-          className="px-4 py-2 bg-red-700 text-white text-3xs rounded-lg font-bold flex items-center hover:bg-red-500 gap-2"
+          className="mt-1  px-4 py-2 bg-red-700 text-white text-3xs rounded-lg font-bold flex items-center hover:bg-red-500 gap-2"
           style={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
           whileHover={{
             y: -5,
