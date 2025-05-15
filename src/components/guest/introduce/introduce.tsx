@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import {
   IconHeart,
   IconInfoCircle,
@@ -8,6 +9,12 @@ import {
 } from "@tabler/icons-react";
 
 export default function GuestIntroduce() {
+  const navigate = useNavigate();
+  
+  const handleRegister = () => {
+    navigate('/register');
+  };
+
   // Hiệu ứng xuất hiện từ dưới lên
   const fadeInUp = {
     hidden: { opacity: 0, y: 20 },
@@ -70,6 +77,7 @@ export default function GuestIntroduce() {
             Không bị bệnh tim mạch, huyết áp, hô hấp và dạ dày
           </motion.p>
           <motion.button
+            onClick={handleRegister}
             className="mt-6 px-5 py-3 bg-red-700 text-white rounded-lg font-bold flex items-center hover:bg-red-500"
             whileHover={{ scale: 1.05 }}
           >
