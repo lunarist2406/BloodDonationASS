@@ -132,11 +132,21 @@ export default function GuestHeader() {
                 >
                   Tài Liệu Về Máu
                 </motion.p>
-                <motion.p whileHover={{ scale: 1.05, color: "#ff0000" }}>
+                <motion.p
+                  whileHover={{ scale: 1.05, color: "#ff0000" }}
+                  transition={{ type: "linear", duration: 0.2 }}
+                  onClick={() => navigate('/blood-news')}
+                  className="cursor-pointer"
+                >
                   Tin Tức Về Hiến Máu
                 </motion.p>
-                <motion.p whileHover={{ scale: 1.05, color: "#ff0000" }}>
-                  Chia Sẽ Kinh Nghiệm
+                <motion.p
+                  whileHover={{ scale: 1.05, color: "#ff0000" }}
+                  transition={{ type: "linear", duration: 0.2 }}
+                  onClick={() => navigate('/blood-experience')}
+                  className="cursor-pointer"
+                >
+                  Chia Sẻ Kinh Nghiệm
                 </motion.p>
               </motion.div>
 

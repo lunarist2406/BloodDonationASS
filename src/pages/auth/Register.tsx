@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { IconUserPlus, IconMail, IconLock, IconUser, IconPhone, IconMapPin } from "@tabler/icons-react";
 import logo from "../../assets/logo.png";
-import registerImage from "../../assets/register.png";
+import backgroundImage from "../../assets/background.png";
 import { useNavigate } from "react-router-dom";
 
 export default function Register() {
@@ -40,7 +40,7 @@ export default function Register() {
       >
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/30" />
         <img
-          src={registerImage}
+          src={backgroundImage}
           alt="Register"
           className="w-full h-full object-cover"
         />
@@ -52,7 +52,7 @@ export default function Register() {
           initial={{ opacity: 0, x: 50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="w-full max-w-xl bg-white/95 backdrop-blur-sm p-8 m-8 rounded-2xl shadow-2xl transform -translate-x-1/4"
+          className="w-full max-w-xl bg-white/95 backdrop-blur-sm p-8 m-8 rounded-2xl shadow-2xl mx-auto"
         >
           <motion.div
             initial={{ scale: 0 }}
