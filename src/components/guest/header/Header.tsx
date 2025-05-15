@@ -22,7 +22,7 @@ export default function GuestHeader() {
     <header className="bg-gradient-to-r from-red-500 to-red-900 text-gray-300  py-4 shadow-lg sticky top-0 z-50">
       <div className="container mx-auto px-2 flex items-center justify-between sticky top-0">
         <div
-          className="flex items-center space-x-2 cursor-pointer"
+          className="flex items-center space-x-2 cursor-poi7nter"
           onClick={toggleDropdown}
         >
           <img src={logo} alt="logo" width={40} height={40} />
@@ -65,7 +65,7 @@ export default function GuestHeader() {
                   whileHover={{ scale: 1.05, color: "#ff0000" }}
                   transition={{ type: "linear", duration: 0.2 }}
                 >
-                  Hiến Máu
+                  Đăng Ký Hiến Máu
                 </motion.p>
                 <motion.p
                   whileHover={{ scale: 1.05, color: "#ff0000" }}
@@ -77,7 +77,7 @@ export default function GuestHeader() {
                   whileHover={{ scale: 1.05, color: "#ff0000" }}
                   transition={{ type: "linear", duration: 0.2 }}
                 >
-                  Đăng ký Nhóm Máu Khẩn Cấp
+                  Đăng ký Nhóm Máu Cần Khẩn Cấp
                 </motion.p>
                 <motion.p
                   whileHover={{ scale: 1.05, color: "#ff0000" }}
