@@ -128,20 +128,37 @@ export default function GuestIntroduce() {
                 transition={{ duration: 0.6, delay: index * 0.4 }}
               >
                 {/* Số bước nằm trên đường kẻ, cố định kích thước và căn giữa */}
-                <div className="z-10 w-10 h-10 rounded-full bg-red-500 text-white flex items-center justify-center font-bold text-lg border-4 border-white">
+                <motion.div
+                  className="z-10 w-10 h-10 rounded-full bg-gradient-to-r from-red-300 via-red-800 to-red-400 text-white flex items-center justify-center font-bold text-lg border-4 border-white"
+                  animate={{ backgroundPosition: ["0% 0%", "200% 0%"] }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: "linear",
+                  }}
+                  style={{
+                    backgroundSize: "400% 100%",
+                  }}
+                >
                   {number}
-                </div>
+                </motion.div>
 
                 {/* Nội dung mô tả nằm dưới số */}
-                <div className="mt-3 text-center max-w-[200px]">
+                <motion.div
+                  className="mt-3 text-center max-w-[200px]"
+                  whileHover={{ scale: 1.05, color: "#ff0000" }}
+                >
                   <h3 className="font-semibold text-lg">{title}</h3>
                   <p className="text-gray-700 text-sm mt-1">{description}</p>
-                </div>
+                </motion.div>
               </motion.div>
             ))}
           </div>
-          <div className="mt-5 grid grid-cols-1 md:grid-cols-3 gap-3 px-4">
-            <div className="bg-white p-5 rounded-lg shadow-md">
+          <div className="mt-5 grid grid-cols-1 md:grid-cols-3 gap-5  w-[900px]">
+            <motion.div
+              className="bg-white p-5 rounded-lg shadow-md"
+              whileHover={{ scale: 1.05, color: "#ff0000" }}
+            >
               <h3 className="text-xl font-semibold mb-3 text-red-600">
                 Lợi Ích Hiến Máu
               </h3>
@@ -149,8 +166,11 @@ export default function GuestIntroduce() {
                 Hiến máu giúp cứu sống người bệnh, hỗ trợ cấp cứu và điều trị
                 trong nhiều tình huống khẩn cấp.
               </p>
-            </div>
-            <div className="bg-white p-5 rounded-lg shadow-md">
+            </motion.div>
+            <motion.div
+              className="bg-white p-5 rounded-lg shadow-md"
+              whileHover={{ scale: 1.05, color: "#ff0000" }}
+            >
               <h3 className="text-xl font-semibold mb-3 text-red-600">
                 Lưu Ý Sau Khi Hiến Máu
               </h3>
@@ -158,8 +178,11 @@ export default function GuestIntroduce() {
                 Nghỉ ngơi hợp lý, uống nhiều nước, tránh vận động mạnh và các
                 hoạt động nặng trong vài giờ sau hiến máu.
               </p>
-            </div>
-            <div className="bg-white p-5 rounded-lg shadow-md">
+            </motion.div>
+            <motion.div
+              className="bg-white p-5 rounded-lg shadow-md"
+              whileHover={{ scale: 1.05, color: "#ff0000" }}
+            >
               <h3 className="text-xl font-semibold mb-3 text-red-600">
                 Thông Tin Hiến Máu Tình Nguyện
               </h3>
@@ -167,7 +190,7 @@ export default function GuestIntroduce() {
                 Hiến máu tình nguyện là hành động nhân đạo, thể hiện tinh thần
                 sẻ chia, giúp đỡ cộng đồng.
               </p>
-            </div>
+            </motion.div>
           </div>
         </div>
       </div>
