@@ -3,6 +3,8 @@ import { motion } from "framer-motion";
 import { IconMapPin, IconPhone, IconClock, IconMail, IconSearch } from "@tabler/icons-react";
 import GuestHeader from "../header/Header";
 import GuestFooter from "../footer/GuestFooter";
+import { IconBuilding } from "@tabler/icons-react";
+
 // Dữ liệu mẫu cho các cơ sở hiến máu
 const centers = [
   {
@@ -123,14 +125,16 @@ export default function BloodDonationCenter() {
     <div className="min-h-screen bg-gradient-to-br from-red-50 to-red-100">
       <GuestHeader />
        {/* Nội dung giới thiệu */}
-      <div className="max-w-3xl mx-auto text-center mb-10">
-  <p className="text-2xl font-bold text-red-700 drop-shadow-sm ">
-    Tìm kiếm cơ sở hiến máu gần bạn nhất.<br />
-    <span className="text-red-900 font-semibold">
-      Chúng tôi cung cấp thông tin chi tiết về các loại hiến tặng trung tâm trên toàn quốc.
-    </span>
-  </p>
-</div>
+       <div className="flex-1 container mx-auto px-4 py-12">
+       <div className="max-w-2xl mx-auto text-center mb-10">
+          <h1 className="text-3xl font-bold text-red-700 flex items-center justify-center gap-2 mb-2">
+            <IconBuilding size={32} className="text-red-700" />
+          Tìm kiếm cơ sở hiến máu gần bạn nhất
+         </h1>
+          <p className="text-gray-700 text-lg">
+          Chúng tôi cung cấp thông tin chi tiết về các loại hiến tặng trung tâm trên toàn quốc
+        </p>
+      </div>
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-12">
@@ -211,6 +215,7 @@ export default function BloodDonationCenter() {
               </div>
             </motion.div>
           ))}
+        </div>  
         </div>
       </div>
       <GuestFooter />
