@@ -31,7 +31,7 @@ export default function GuestHeader() {
   };
 
   return (
-    <header className="bg-gradient-to-r from-red-500 to-red-900 text-gray-300 py-2 shadow-lg sticky top-0 z-20">
+    <header className="bg-gradient-to-r from-red-500 to-red-900 text-gray-300  py-4 shadow-lg sticky top-0 z-20">
       <div className="container mx-auto px-2 flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <div
@@ -46,7 +46,7 @@ export default function GuestHeader() {
             onClick={toggleDropdown}
           >
             <span className="font-bold text-xl">LUNARIST</span>
-            <IconChevronDown size={25} className="cursor-pointer" />
+            <IconChevronDown size={22} className="cursor-pointer" />
           </div>
         </div>
 
@@ -82,7 +82,12 @@ export default function GuestHeader() {
                   <IconDroplet size={18} className="mr-2" />
                   Dịch Vụ Hiến Máu
                 </motion.h3>
-
+                <motion.p
+                  whileHover={{ scale: 1.05, color: "#ff0000" }}
+                  transition={{ type: "linear", duration: 0.2 }}
+                >
+                  Hiến Máu
+                </motion.p>
                 <motion.p
                   whileHover={{ scale: 1.05, color: "#ff0000" }}
                   transition={{ type: "linear", duration: 0.2 }}
@@ -94,12 +99,6 @@ export default function GuestHeader() {
                   transition={{ type: "linear", duration: 0.2 }}
                 >
                   Đăng ký Nhóm Máu Khẩn Cấp
-                </motion.p>
-                <motion.p
-                  whileHover={{ scale: 1.05, color: "#ff0000" }}
-                  transition={{ type: "linear", duration: 0.2 }}
-                >
-                  Hiến Máu
                 </motion.p>
                 <motion.p
                   whileHover={{ scale: 1.05, color: "#ff0000" }}

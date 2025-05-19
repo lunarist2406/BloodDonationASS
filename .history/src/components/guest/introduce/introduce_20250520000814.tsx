@@ -218,7 +218,7 @@ export default function GuestIntroduce() {
         <IconNews className="inline-block mr-2" size={32} /> Thông tin Hệ Thống
         Hỗ Trợ Hiến Máu
       </motion.h2>
-      <div className="grid grid-cols-15 gap-5 px-10 mt-10">
+      <div className="grid grid-cols-15 gap-10 px-10 mt-8">
         <div className="col-span-12 md:col-span-10 bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-xl font-bold mb-4">Tin tức</h2>
           <Carousel autoplay>
@@ -228,7 +228,7 @@ export default function GuestIntroduce() {
                   <img
                     src={news.image}
                     alt={news.title}
-                    className="w-full h-100 object-cover rounded-lg"
+                    className="w-full h-120 object-cover rounded-lg"
                   />
                   <h3 className="text-lg font-semibold mt-2">{news.title}</h3>
                   <p className="text-sm text-gray-600 mt-1">
@@ -250,7 +250,7 @@ export default function GuestIntroduce() {
         </div>
         <div className="col-span-12 md:col-span-5 bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-2xl font-bold mb-4">Kinh Nghiệm Hiến Máu</h2>
-          <div className="mt-8 space-y-4 text-gray-700">
+          <div className="space-y-4 text-gray-700">
             <div>
               <h3 className="font-semibold text-lg">🌿 Trước khi hiến máu:</h3>
               <ul className="list-disc pl-5">

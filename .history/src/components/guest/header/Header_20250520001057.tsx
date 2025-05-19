@@ -22,31 +22,31 @@ export default function GuestHeader() {
 
   const handleLogoClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    navigate("/");
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    navigate('/');
   };
 
   const handleSignIn = () => {
-    navigate("/login");
+    navigate('/login');
   };
 
   return (
-    <header className="bg-gradient-to-r from-red-500 to-red-900 text-gray-300 py-2 shadow-lg sticky top-0 z-20">
+    <header className="bg-gradient-to-r from-red-500 to-red-900 text-gray-300  py-4 shadow-lg sticky top-0 z-20">
       <div className="container mx-auto px-2 flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <div
+          <div 
             onClick={handleLogoClick}
             className="cursor-pointer hover:opacity-80 transition-opacity"
           >
             <img src={logo} alt="logo" width={50} height={50} />
           </div>
-
+          
           <div
             className="flex items-center space-x-2 cursor-pointer"
             onClick={toggleDropdown}
           >
             <span className="font-bold text-xl">LUNARIST</span>
-            <IconChevronDown size={25} className="cursor-pointer" />
+            <IconChevronDown size={24} className="cursor-pointer" />
           </div>
         </div>
 
@@ -82,7 +82,12 @@ export default function GuestHeader() {
                   <IconDroplet size={18} className="mr-2" />
                   Dịch Vụ Hiến Máu
                 </motion.h3>
-
+                <motion.p
+                  whileHover={{ scale: 1.05, color: "#ff0000" }}
+                  transition={{ type: "linear", duration: 0.2 }}
+                >
+                  Hiến Máu
+                </motion.p>
                 <motion.p
                   whileHover={{ scale: 1.05, color: "#ff0000" }}
                   transition={{ type: "linear", duration: 0.2 }}
@@ -94,12 +99,6 @@ export default function GuestHeader() {
                   transition={{ type: "linear", duration: 0.2 }}
                 >
                   Đăng ký Nhóm Máu Khẩn Cấp
-                </motion.p>
-                <motion.p
-                  whileHover={{ scale: 1.05, color: "#ff0000" }}
-                  transition={{ type: "linear", duration: 0.2 }}
-                >
-                  Hiến Máu
                 </motion.p>
                 <motion.p
                   whileHover={{ scale: 1.05, color: "#ff0000" }}
@@ -117,10 +116,10 @@ export default function GuestHeader() {
                   <IconBook size={18} className="mr-2" />
                   Thông tin
                 </motion.h3>
-                <motion.p
+                <motion.p 
                   whileHover={{ scale: 1.05, color: "#ff0000" }}
                   transition={{ type: "linear", duration: 0.2 }}
-                  onClick={() => navigate("/blood-donation-centers")}
+                  onClick={() => navigate('/blood-donation-centers')}
                   className="cursor-pointer"
                 >
                   Cơ sở Hiến Máu
@@ -128,7 +127,7 @@ export default function GuestHeader() {
                 <motion.p
                   whileHover={{ scale: 1.05, color: "#ff0000" }}
                   transition={{ type: "linear", duration: 0.2 }}
-                  onClick={() => navigate("/blood-documents")}
+                  onClick={() => navigate('/blood-documents')}
                   className="cursor-pointer"
                 >
                   Tài Liệu Về Máu
@@ -136,7 +135,7 @@ export default function GuestHeader() {
                 <motion.p
                   whileHover={{ scale: 1.05, color: "#ff0000" }}
                   transition={{ type: "linear", duration: 0.2 }}
-                  onClick={() => navigate("/blood-news")}
+                  onClick={() => navigate('/blood-news')}
                   className="cursor-pointer"
                 >
                   Tin Tức Về Hiến Máu
@@ -144,7 +143,7 @@ export default function GuestHeader() {
                 <motion.p
                   whileHover={{ scale: 1.05, color: "#ff0000" }}
                   transition={{ type: "linear", duration: 0.2 }}
-                  onClick={() => navigate("/blood-experience")}
+                  onClick={() => navigate('/blood-experience')}
                   className="cursor-pointer"
                 >
                   Chia Sẻ Kinh Nghiệm

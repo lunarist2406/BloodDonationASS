@@ -82,7 +82,12 @@ export default function GuestHeader() {
                   <IconDroplet size={18} className="mr-2" />
                   Dịch Vụ Hiến Máu
                 </motion.h3>
-
+                <motion.p
+                  whileHover={{ scale: 1.05, color: "#ff0000" }}
+                  transition={{ type: "linear", duration: 0.2 }}
+                >
+                  Hiến Máu
+                </motion.p>
                 <motion.p
                   whileHover={{ scale: 1.05, color: "#ff0000" }}
                   transition={{ type: "linear", duration: 0.2 }}
@@ -94,12 +99,6 @@ export default function GuestHeader() {
                   transition={{ type: "linear", duration: 0.2 }}
                 >
                   Đăng ký Nhóm Máu Khẩn Cấp
-                </motion.p>
-                <motion.p
-                  whileHover={{ scale: 1.05, color: "#ff0000" }}
-                  transition={{ type: "linear", duration: 0.2 }}
-                >
-                  Hiến Máu
                 </motion.p>
                 <motion.p
                   whileHover={{ scale: 1.05, color: "#ff0000" }}

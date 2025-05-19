@@ -218,7 +218,7 @@ export default function GuestIntroduce() {
         <IconNews className="inline-block mr-2" size={32} /> Thông tin Hệ Thống
         Hỗ Trợ Hiến Máu
       </motion.h2>
-      <div className="grid grid-cols-15 gap-5 px-10 mt-10">
+      <div className="grid grid-cols-15 gap-5 px-5 mt-10">
         <div className="col-span-12 md:col-span-10 bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-xl font-bold mb-4">Tin tức</h2>
           <Carousel autoplay>

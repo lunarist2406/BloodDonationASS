@@ -99,12 +99,6 @@ export default function GuestHeader() {
                   whileHover={{ scale: 1.05, color: "#ff0000" }}
                   transition={{ type: "linear", duration: 0.2 }}
                 >
-                  Hiến Máu
-                </motion.p>
-                <motion.p
-                  whileHover={{ scale: 1.05, color: "#ff0000" }}
-                  transition={{ type: "linear", duration: 0.2 }}
-                >
                   Tra Cứu Thông Tin
                 </motion.p>
               </motion.div>
