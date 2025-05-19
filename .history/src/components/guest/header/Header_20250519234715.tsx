@@ -31,28 +31,19 @@ export default function GuestHeader() {
   };
 
   return (
-    <header className="bg-gradient-to-r from-red-500 to-red-900 text-gray-300  py-4 shadow-lg sticky top-0 z-20">
+    <header className="bg-gradient-to-r from-red-500 to-red-900 text-gray-300  py-4 shadow-lg relative">
       <div className="container mx-auto px-2 flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <div 
-            onClick={handleLogoClick}
-            className="cursor-pointer hover:opacity-80 transition-opacity"
-          >
-            <img src={logo} alt="logo" width={50} height={50} />
-          </div>
-          
-          <div
-            className="flex items-center space-x-2 cursor-pointer"
-            onClick={toggleDropdown}
-          >
-            <span className="font-bold text-xl">LUNARIST</span>
-            <IconChevronDown size={24} className="cursor-pointer" />
-          </div>
+        <div
+          className="flex items-center space-x-2 cursor-pointer"
+          onClick={toggleDropdown}
+        >
+          <img src={logo} alt="logo" width={50} height={50} />
+          <span className="font-bold text-xl">LUNARIST</span>
+          <IconChevronDown size={24} className="cursor-pointer" />
         </div>
 
         <motion.button
-          onClick={handleSignIn}
-          className="mt-1 px-4 py-2 bg-red-700 text-white text-3xs rounded-lg font-bold flex items-center hover:bg-red-500 gap-2"
+          className="mt-1  px-4 py-2 bg-red-700 text-white text-3xs rounded-lg font-bold flex items-center hover:bg-red-500 gap-2"
           style={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
           whileHover={{
             y: -5,
@@ -86,7 +77,7 @@ export default function GuestHeader() {
                   whileHover={{ scale: 1.05, color: "#ff0000" }}
                   transition={{ type: "linear", duration: 0.2 }}
                 >
-                  Hiến Máu
+                  Đăng Ký Hiến Máu
                 </motion.p>
                 <motion.p
                   whileHover={{ scale: 1.05, color: "#ff0000" }}
@@ -98,7 +89,7 @@ export default function GuestHeader() {
                   whileHover={{ scale: 1.05, color: "#ff0000" }}
                   transition={{ type: "linear", duration: 0.2 }}
                 >
-                  Đăng ký Nhóm Máu Khẩn Cấp
+                  Đăng ký Nhóm Máu Cần Khẩn Cấp
                 </motion.p>
                 <motion.p
                   whileHover={{ scale: 1.05, color: "#ff0000" }}

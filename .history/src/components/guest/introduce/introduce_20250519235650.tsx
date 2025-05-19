@@ -224,7 +224,7 @@ export default function GuestIntroduce() {
           <Carousel autoplay>
             {newsList.length > 0 ? (
               newsList.map((news) => (
-                <div key={news.id} className="mt-2 p-4">
+                <div key={news.id} className="p-4">
                   <img
                     src={news.image}
                     alt={news.title}

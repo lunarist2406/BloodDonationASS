@@ -1,5 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import {
   IconUser,
   IconHeart,
@@ -9,6 +10,12 @@ import {
 } from "@tabler/icons-react";
 
 export default function GuestBanner() {
+  const navigate = useNavigate();
+
+  const handleRegister = () => {
+    navigate('/register');
+  };
+
   return (
     <div className="bg-gradient-to-r from-red-200 to-red-400 text-black py-12 shadow-lg relative">
       <div className="container mx-auto px-4 flex flex-col md:flex-row items-start justify-between space-y-8 md:space-y-0 md:space-x-12">
@@ -40,6 +47,7 @@ export default function GuestBanner() {
             </motion.li>
           </ul>
           <motion.button
+            onClick={handleRegister}
             className="mt-6 px-5 py-3 bg-red-700 text-white rounded-lg font-bold flex items-center hover:bg-red-500"
             whileHover={{ scale: 1.05 }}
           >
