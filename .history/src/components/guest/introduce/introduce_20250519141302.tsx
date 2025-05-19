@@ -7,7 +7,6 @@ import {
   IconSettings,
   IconNews,
 } from "@tabler/icons-react";
-// import { Carousel } from "antd";
 
 export default function GuestIntroduce() {
   const fadeInUp = {
@@ -204,69 +203,15 @@ export default function GuestIntroduce() {
         variants={fadeInUp}
         className="mt-10 text-3xl font-bold text-center mb-12 "
       >
-        <IconNews className="inline-block mr-2" size={32} /> Thông tin Hệ Thống Hỗ Trợ Hiến Máu
+        <IconNews className="inline-block mr-2" size={32} /> Giới Thiệu Về Thông
+        tin Hệ Thống Hỗ Trợ Hiến Máu
       </motion.h2>
       <div className="grid grid-cols-15 gap-10 px-10 mt-8">
-    {/* <div className="col-span-12 md:col-span-9 bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-xl font-bold mb-4">Tin tức</h2>
-      <Carousel autoplay>
-        {newsData.length > 0 ? (
-          newsData.map((news) => (
-            <div key={news.id} className="p-4">
-              <img src={news.image} alt={news.title} className="w-full h-48 object-cover rounded" />
-              <h3 className="text-lg font-semibold mt-2">{news.title}</h3>
-              <p className="text-sm text-gray-600 mt-1">{news.description}</p>
-              <p className="text-xs text-gray-500 mt-1">{news.date}</p>
-              <a href={news.link} className="text-blue-500 mt-2 inline-block">Xem thêm</a>
-            </div>
-          ))
-        ) : (
-          <p className="text-sm text-gray-500">Đang tải dữ liệu...</p>
-        )}
-      </Carousel>
-    </div> */}
-        <div className="col-span-12 md:col-span-6 bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-2xl font-bold mb-4">Kinh Nghiệm Hiến Máu</h2>
-          <div className="space-y-4 text-gray-700">
-            <div>
-              <h3 className="font-semibold text-lg">🌿 Trước khi hiến máu:</h3>
-              <ul className="list-disc pl-5">
-                <li>Ăn uống đầy đủ, tránh đồ nhiều dầu mỡ.</li>
-                <li>Uống đủ nước để máu lưu thông tốt hơn.</li>
-                <li>Ngủ đủ giấc, tránh đồ uống có cồn.</li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="font-semibold text-lg">💉 Trong khi hiến máu:</h3>
-              <ul className="list-disc pl-5">
-                <li>Thư giãn, hít thở sâu và giữ bình tĩnh.</li>
-                <li>Thông báo tình trạng sức khỏe nếu có bất thường.</li>
-                <li>Nắm chặt và thả lỏng bàn tay để máu lưu thông.</li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="font-semibold text-lg">🍊 Sau khi hiến máu:</h3>
-              <ul className="list-disc pl-5">
-                <li>Nghỉ ngơi ít nhất 15 phút.</li>
-                <li>Uống nước cam hoặc nước trái cây bổ sung vitamin C.</li>
-                <li>Tránh vận động mạnh trong 24 giờ.</li>
-                <li>Chú ý vùng băng tay nếu có dấu hiệu sưng đỏ.</li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="font-semibold text-lg">
-                🌟 Một số lời khuyên khác:
-              </h3>
-              <ul className="list-disc pl-5">
-                <li>Mặc áo tay ngắn để tiện cho việc lấy máu.</li>
-                <li>Rủ thêm bạn bè nếu bạn lo lắng.</li>
-                <li>Lưu giữ thẻ hiến máu và thông tin trung tâm hiến máu.</li>
-              </ul>
-            </div>
-          </div>
+        <div className="col-span-12 md:col-span-9 bg-white p-6 rounded-lg shadow-md ">
+          <h2>Tin tức</h2>
+        </div>
+        <div className="col-span-12 md:col-span-6 bg-white p-6 rounded-lg shadow-md ">
+          <h2>Kinh Nghiệm hiến máu</h2>
         </div>
       </div>
     </div>

@@ -7,7 +7,6 @@ import {
   IconSettings,
   IconNews,
 } from "@tabler/icons-react";
-// import { Carousel } from "antd";
 
 export default function GuestIntroduce() {
   const fadeInUp = {
@@ -207,7 +206,7 @@ export default function GuestIntroduce() {
         <IconNews className="inline-block mr-2" size={32} /> Thông tin Hệ Thống Hỗ Trợ Hiến Máu
       </motion.h2>
       <div className="grid grid-cols-15 gap-10 px-10 mt-8">
-    {/* <div className="col-span-12 md:col-span-9 bg-white p-6 rounded-lg shadow-md">
+    <div className="col-span-12 md:col-span-9 bg-white p-6 rounded-lg shadow-md">
       <h2 className="text-xl font-bold mb-4">Tin tức</h2>
       <Carousel autoplay>
         {newsData.length > 0 ? (
@@ -224,7 +223,7 @@ export default function GuestIntroduce() {
           <p className="text-sm text-gray-500">Đang tải dữ liệu...</p>
         )}
       </Carousel>
-    </div> */}
+    </div>
         <div className="col-span-12 md:col-span-6 bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-2xl font-bold mb-4">Kinh Nghiệm Hiến Máu</h2>
           <div className="space-y-4 text-gray-700">

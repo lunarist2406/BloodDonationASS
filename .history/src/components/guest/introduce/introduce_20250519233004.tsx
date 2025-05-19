@@ -7,8 +7,11 @@ import {
   IconSettings,
   IconNews,
 } from "@tabler/icons-react";
-// import { Carousel } from "antd";
+import SwiperCore, { Autoplay, Pagination, Navigation } from "swiper";
+import "swiper/swiper-bundle.min.css";
 
+SwiperCore.use([Autoplay, Pagination, Navigation]);
+import { Swiper, SwiperSlide } from "swiper/react";
 export default function GuestIntroduce() {
   const fadeInUp = {
     hidden: { opacity: 0, y: 20 },
@@ -36,6 +39,18 @@ export default function GuestIntroduce() {
       description: "Nghỉ ngơi và nhận giấy chứng nhận.",
     },
   ];
+  const newsData = [
+  {
+    id: 1,
+    title: "KHỞI ĐỘNG THÁNG NHÂN ĐẠO NĂM 2025: HÀNH TRÌNH NHÂN ĐẠO - LAN TỎA YÊU THƯƠNG",
+    description:
+      "Ngày 8-5, tại TPHCM, Trung ương Hội Chữ thập đỏ Việt Nam và UBND TPHCM phối hợp tổ chức lễ phát động Tháng Nhân đạo cấp quốc gia năm 2025 với chủ đề 'Hành trình nhân đạo - Lan tỏa yêu thương'.",
+    date: "08/05/2025",
+    image:
+      "https://giotmauvang.org.vn/assets/images/271b5fe5f864d480023593de2e8aaf3a.png",
+    link: "https://giotmauvang.org.vn/news/khoi-dong-thang-nhan-dao-nam-2025-hanh-trinh-nhan-dao-lan-toa-yeu-thuong"
+  }
+];
   return (
     <div className="bg-gradient-to-r from-red-100 to-white text-black py-16 shadow-lg relative ">
       <motion.h2
@@ -204,27 +219,31 @@ export default function GuestIntroduce() {
         variants={fadeInUp}
         className="mt-10 text-3xl font-bold text-center mb-12 "
       >
-        <IconNews className="inline-block mr-2" size={32} /> Thông tin Hệ Thống Hỗ Trợ Hiến Máu
+        <IconNews className="inline-block mr-2" size={32} /> Thông tin Hệ Thống
+        Hỗ Trợ Hiến Máu
       </motion.h2>
       <div className="grid grid-cols-15 gap-10 px-10 mt-8">
-    {/* <div className="col-span-12 md:col-span-9 bg-white p-6 rounded-lg shadow-md">
+ <div className="col-span-12 md:col-span-9 bg-white p-6 rounded-lg shadow-md">
       <h2 className="text-xl font-bold mb-4">Tin tức</h2>
-      <Carousel autoplay>
-        {newsData.length > 0 ? (
-          newsData.map((news) => (
-            <div key={news.id} className="p-4">
-              <img src={news.image} alt={news.title} className="w-full h-48 object-cover rounded" />
-              <h3 className="text-lg font-semibold mt-2">{news.title}</h3>
-              <p className="text-sm text-gray-600 mt-1">{news.description}</p>
-              <p className="text-xs text-gray-500 mt-1">{news.date}</p>
-              <a href={news.link} className="text-blue-500 mt-2 inline-block">Xem thêm</a>
-            </div>
-          ))
-        ) : (
-          <p className="text-sm text-gray-500">Đang tải dữ liệu...</p>
-        )}
-      </Carousel>
-    </div> */}
+      <Swiper
+        spaceBetween={30}
+        centeredSlides={true}
+        autoplay={{ delay: 5000, disableOnInteraction: false }}
+        pagination={{ clickable: true }}
+        navigation={true}
+        className="mySwiper"
+      >
+        {newsData.map((news) => (
+          <SwiperSlide key={news.id}>
+            <img src={news.image} alt={news.title} className="w-full h-48 object-cover rounded" />
+            <h3 className="text-lg font-semibold mt-2">{news.title}</h3>
+            <p className="text-sm text-gray-600 mt-1">{news.description}</p>
+            <p className="text-xs text-gray-500 mt-1">{news.date}</p>
+            <a href={news.link} className="text-blue-500 mt-2 inline-block">Xem thêm</a>
+          </SwiperSlide>
+        ))}
+      </Swiper>
+    </div>
         <div className="col-span-12 md:col-span-6 bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-2xl font-bold mb-4">Kinh Nghiệm Hiến Máu</h2>
           <div className="space-y-4 text-gray-700">

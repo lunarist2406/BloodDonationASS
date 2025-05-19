@@ -7,7 +7,7 @@ import {
   IconSettings,
   IconNews,
 } from "@tabler/icons-react";
-// import { Carousel } from "antd";
+import { Carousel } from "antd";
 
 export default function GuestIntroduce() {
   const fadeInUp = {
