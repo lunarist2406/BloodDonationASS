@@ -1,13 +1,10 @@
-import React from "react";
-import GuestHeader from "../header/Header";
-import GuestFooter from "../footer/GuestFooter";
+
 import { IconMessage } from "@tabler/icons-react";
 import { experiences } from "./experienceData";
 
 export default function BloodExperience() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 to-red-100 flex flex-col">
-      <GuestHeader />
       <div className="flex-1 container mx-auto px-4 py-12">
         <div className="max-w-2xl mx-auto text-center mb-10">
           <h1 className="text-3xl font-bold text-red-700 flex items-center justify-center gap-2 mb-2">
@@ -33,7 +30,6 @@ export default function BloodExperience() {
           ))}
         </div>
       </div>
-      <GuestFooter />
     </div>
   );
 }

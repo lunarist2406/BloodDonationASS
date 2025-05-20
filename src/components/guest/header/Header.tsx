@@ -86,6 +86,8 @@ export default function GuestHeader() {
                 <motion.p
                   whileHover={{ scale: 1.05, color: "#ff0000" }}
                   transition={{ type: "linear", duration: 0.2 }}
+                  onClick={() => navigate("/register-blood")}
+
                 >
                   Đăng ký Nhóm Máu
                 </motion.p>
