@@ -87,25 +87,31 @@ export default function GuestHeader() {
                   whileHover={{ scale: 1.05, color: "#ff0000" }}
                   transition={{ type: "linear", duration: 0.2 }}
                   onClick={() => navigate("/register-blood")}
-
+                  className="cursor-pointer"
                 >
                   Đăng ký Nhóm Máu
                 </motion.p>
                 <motion.p
                   whileHover={{ scale: 1.05, color: "#ff0000" }}
                   transition={{ type: "linear", duration: 0.2 }}
+                  onClick={() => navigate("/register-blood")}
+                  className="cursor-pointer"
                 >
                   Đăng ký Nhóm Máu Khẩn Cấp
                 </motion.p>
                 <motion.p
                   whileHover={{ scale: 1.05, color: "#ff0000" }}
                   transition={{ type: "linear", duration: 0.2 }}
+                  onClick={() => navigate("/register-blood")}
+                  className="cursor-pointer"
                 >
-                  Hiến Máu
+                  Hiến Máu & Nhận Máu
                 </motion.p>
                 <motion.p
                   whileHover={{ scale: 1.05, color: "#ff0000" }}
                   transition={{ type: "linear", duration: 0.2 }}
+                  onClick={() => navigate("/register-blood")}
+                  className="cursor-pointer"
                 >
                   Tra Cứu Thông Tin
                 </motion.p>
