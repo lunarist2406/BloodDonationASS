@@ -94,7 +94,7 @@ export default function GuestHeader() {
                 <motion.p
                   whileHover={{ scale: 1.05, color: "#ff0000" }}
                   transition={{ type: "linear", duration: 0.2 }}
-                  onClick={() => navigate("/register-blood")}
+                  onClick={() => navigate("/register-blood-emergency")}
                   className="cursor-pointer"
                 >
                   Đăng ký Nhóm Máu Khẩn Cấp
@@ -105,15 +105,15 @@ export default function GuestHeader() {
                   onClick={() => navigate("/register-blood")}
                   className="cursor-pointer"
                 >
-                  Hiến Máu & Nhận Máu
+                  Hiến Máu
                 </motion.p>
                 <motion.p
                   whileHover={{ scale: 1.05, color: "#ff0000" }}
                   transition={{ type: "linear", duration: 0.2 }}
-                  onClick={() => navigate("/register-blood")}
+                  onClick={() => navigate("/seek-information")}
                   className="cursor-pointer"
                 >
-                  Tra Cứu Thông Tin
+                  Nhận Máu
                 </motion.p>
               </motion.div>
 
@@ -168,10 +168,7 @@ export default function GuestHeader() {
                   Tìm Kiếm
                 </motion.h3>
                 <motion.p whileHover={{ scale: 1.05, color: "#ff0000" }}>
-                  Nhóm Máu
-                </motion.p>
-                <motion.p whileHover={{ scale: 1.05, color: "#ff0000" }}>
-                  Người Hiến Máu
+                  Tra Cứu Thông Tin
                 </motion.p>
               </motion.div>
 
@@ -192,7 +189,7 @@ export default function GuestHeader() {
           </motion.div>
         )}
       </AnimatePresence>
-      <AnimatePresence>
+      {/* <AnimatePresence>
         {showModal && (
           <motion.div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
             <motion.div className="bg-white p-6 rounded-lg w-[400px] h-[300px] relative">
@@ -207,7 +204,7 @@ export default function GuestHeader() {
             </motion.div>
           </motion.div>
         )}
-      </AnimatePresence>
+      </AnimatePresence> */}
     </header>
   );
 }

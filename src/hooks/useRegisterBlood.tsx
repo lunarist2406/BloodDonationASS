@@ -8,7 +8,6 @@ export interface StatusHealth {
   medication: string;
   lastDonationDate: string;
   diseases: string[];
-  cccd: string; // link ảnh CCCD
   imgHealth: string; // link ảnh giấy khám sức khỏe
 }
 export interface RegisterBlood {
@@ -23,7 +22,10 @@ export interface RegisterBlood {
   bloodType: string;
   statusHealth: StatusHealth;
   status: string;
+  level : string;
   hospital: string;
+  cccd: string; // link ảnh CCCD
+
 }
 export const registerBlood = [
   {
@@ -51,10 +53,11 @@ export const registerBlood = [
         "Viêm gan B/C",
         "HIV/AIDS",
       ],
-      cccd: "https://example.com/cccd_front.jpg",
       imgHealth: "https://example.com/health.jpg",
     },
+    cccd: "https://example.com/cccd_front.jpg",
     status: "Đang chờ xác nhận",
+    level : "",
     hospital: "",
   },
 ];
@@ -72,6 +75,7 @@ export const useRegisterBlood = () => {
     roleDonation: "",
     location: "",
     bloodType: "",
+    cccd: "",
     statusHealth: {
       height: "",
       weight: "",
@@ -80,10 +84,9 @@ export const useRegisterBlood = () => {
       currentCondition: "",
       medication: "",
       lastDonationDate: "",
-      diseases: [] as string[],
-      cccd: "",
       imgHealth: "",
     },
+    level : "",
     status: "",
     hospital: "",
   });

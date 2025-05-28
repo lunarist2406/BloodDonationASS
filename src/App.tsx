@@ -9,6 +9,8 @@ import BloodExperience from "./components/guest/information/BloodExperience";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import RegisterBlood from "./components/guest/donationblood/RegisterBlood/registerBlood";
 import HomePage from "./page/HomePage";
+import SeekInformation from "./components/guest/donationblood/SearchingInformation/SeekInformation";
+import RegisterBloodEmergency from "./components/guest/donationblood/RegisterBloodEmergency/registerBloodEmergency";
 
 function App() {
   return (
@@ -26,6 +28,8 @@ function App() {
           <Route path="blood-news" element={<BloodNews />} />
           <Route path="blood-experience" element={<BloodExperience />} />
           <Route path="register-blood" element={<RegisterBlood />} />
+          <Route path="register-blood-emergency" element={<RegisterBloodEmergency />} />
+          <Route path="seek-information" element={<SeekInformation />} />
         </Route>
       </Routes>
     </BrowserRouter>

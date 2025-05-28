@@ -11,11 +11,11 @@ import {
 } from "@tabler/icons-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRegisterBlood } from "../../../../hooks/useRegisterBlood";
-import FormRegisterBlood from "./FormRegisterBlood";
-import FormHealth from "./FormHealth";
 import { useState } from "react";
+import FormRegisterBloodEmergency from "./FormRegisterBlood";
+import FormHealthEmergency from "./FormHealth";
 
-export default function RegisterBlood() {
+export default function RegisterBloodEmergency() {
   interface MyProps {
     label: string;
     icon: React.ElementType;
@@ -46,7 +46,7 @@ export default function RegisterBlood() {
     <div className="flex flex-col bg-gradient-to-b from-red-100 to-red-300 min-h-screen">
       <div className="grid grid-cols-20 gap-4 px-5 mt-10 mb-10">
         {/* Form */}
-        <div className="col-span-6">
+        <div className="col-span-7">
           <AnimatePresence mode="wait">
             {currentStep === "health" ? (
               <motion.div
@@ -61,10 +61,13 @@ export default function RegisterBlood() {
                   className="mb-5 px-32 py-2 bg-red-500 text-white rounded items-center gap-2 flex"
                 >
                   {" "}
-                  Đăng ký hiến máu
+                  Đăng ký hiến máu khẩn cấp
                   <IconChevronRight size={20} />
                 </button>
-                <FormHealth formData={formData} setFormData={setFormData} />
+                <FormHealthEmergency
+                  formData={formData}
+                  setFormData={setFormData}
+                />
               </motion.div>
             ) : (
               <motion.div
@@ -76,13 +79,13 @@ export default function RegisterBlood() {
               >
                 <button
                   onClick={() => setCurrentStep("health")}
-                  className="mb-5 px-24.5 py-2 bg-red-500 text-white rounded items-center gap-2 flex"
+                  className="mb-5 px-34 py-2 bg-red-500 text-white rounded items-center gap-2 flex"
                 >
                   {" "}
                   <IconChevronLeft size={20} />
                   Điền Thông Tin Sức Khỏe
                 </button>
-                <FormRegisterBlood
+                <FormRegisterBloodEmergency
                   formData={formData}
                   setFormData={setFormData}
                   setWaitingList={setWaitingList}
@@ -92,7 +95,7 @@ export default function RegisterBlood() {
           </AnimatePresence>
         </div>
         <motion.div
-          className="col-span-14"
+          className="col-span-13"
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}

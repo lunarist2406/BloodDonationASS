@@ -23,7 +23,6 @@ import {
 } from "antd";
 import dayjs from "dayjs";
 import type {
-  RegisterBlood,
   StatusHealth,
 } from "../../../../hooks/useRegisterBlood";
 import type { UploadChangeParam } from "antd/es/upload";
@@ -35,7 +34,7 @@ interface FormHealthProps {
   setStatusHealth: React.Dispatch<React.SetStateAction<StatusHealth>>;
 }
 
-export default function FormHealth({ formData, setFormData }: FormHealthProps) {
+export default function FormHealthEmergency({ formData, setFormData }: FormHealthProps) {
   console.log("📌 Current formData:", formData);
 
   const handleChange = (

@@ -19,6 +19,7 @@ export default function FormRegisterBlood({ formData, setFormData, setWaitingLis
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log("📋 Form Submitted:", formData);
     if (
       !formData.fullName ||
       !formData.dob ||
@@ -40,12 +41,25 @@ export default function FormRegisterBlood({ formData, setFormData, setWaitingLis
     ]);
 
     setFormData({
-      fullName: "",
-      dob: "",
-      phone: "",
-      roleDonation: "",
-      bloodType: "",
-      location: "",
+      fullName: formData.fullName,
+      dob: formData.dob,
+      phone:formData.phone,
+      roleDonation: formData.roleDonation,
+      bloodType: formData.bloodType,
+      location: formData.location,
+        statusHealth: {
+        height: "",
+        weight: "",
+        bloodPressure: "",
+        medicalHistory: "",
+        currentCondition: "",
+        medication: "",
+        lastDonationDate: "",
+        cccd: "",
+        imgHealth: "",
+        },
+        status: "",
+        hospital: "",
     });
   };
 
