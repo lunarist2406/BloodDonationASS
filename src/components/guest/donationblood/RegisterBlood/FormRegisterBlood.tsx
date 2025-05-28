@@ -5,10 +5,22 @@ import {
   IconMapPin,
   IconDroplet,
   IconUserHeart,
+  IconGenderMale,
+  IconGenderFemale,
+  IconMail,
+  IconNumbers,
+  IconBuildingHospital,
+  IconListDetails,
 } from "@tabler/icons-react";
-import { notification } from "antd";
+import { Input, notification, Select } from "antd";
+import { Option } from "antd/es/mentions";
+import { motion } from "framer-motion";
 
-export default function FormRegisterBlood({ formData, setFormData, setWaitingList }) {
+export default function FormRegisterBlood({
+  formData,
+  setFormData,
+  setWaitingList,
+}) {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -43,11 +55,11 @@ export default function FormRegisterBlood({ formData, setFormData, setWaitingLis
     setFormData({
       fullName: formData.fullName,
       dob: formData.dob,
-      phone:formData.phone,
+      phone: formData.phone,
       roleDonation: formData.roleDonation,
       bloodType: formData.bloodType,
       location: formData.location,
-        statusHealth: {
+      statusHealth: {
         height: "",
         weight: "",
         bloodPressure: "",
@@ -57,26 +69,40 @@ export default function FormRegisterBlood({ formData, setFormData, setWaitingLis
         lastDonationDate: "",
         cccd: "",
         imgHealth: "",
-        },
-        status: "",
-        hospital: "",
+      },
+      status: "",
+      hospital: "",
     });
   };
-
+  const handleSelectChange = (value, fieldName) => {
+    setFormData((prev) => ({
+      ...prev,
+      [fieldName]: value,
+    }));
+  };
   const inputStyle =
     "w-full px-3 py-2 border rounded pl-10 bg-white text-gray-800";
   const inputWrapper = "relative mb-4";
-
+  const iconMotion = {
+    initial: { opacity: 0, y: -4 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.3 },
+  };
+  const iconClass = "absolute top-2.5 left-3 text-red-400 w-4 h-4";
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6">
-      <h2 className="text-2xl font-bold mb-4 text-red-600">Đăng Ký Hiến Máu</h2>
+    <div className="bg-white rounded-xl shadow-lg p-6 text-sm">
+      <h2 className="text-lg font-bold mb-4 text-red-600 flex items-center justify-center gap-2">
+        Đăng Ký Nhóm Máu
+      </h2>
       <form onSubmit={handleSubmit}>
         {/* Họ và tên */}
         <div className={inputWrapper}>
           <label className="block font-semibold mb-1">Họ và tên</label>
           <div className="relative">
-            <IconUser className="absolute top-3 left-3 text-gray-400 w-4 h-4" />
-            <input
+            <motion.div {...iconMotion}>
+              <IconUser className={iconClass} />
+            </motion.div>
+            <Input
               type="text"
               name="fullName"
               value={formData.fullName}
@@ -87,76 +113,214 @@ export default function FormRegisterBlood({ formData, setFormData, setWaitingLis
           </div>
         </div>
 
-        {/* Ngày sinh */}
-        <div className={inputWrapper}>
-          <label className="block font-semibold mb-1">Ngày sinh</label>
-          <div className="relative">
-            <IconCalendar className="absolute top-3 left-3 text-gray-400 w-4 h-4" />
-            <input
-              type="date"
-              name="dob"
-              value={formData.dob}
-              onChange={handleChange}
-              className={inputStyle}
-            />
+        {/* Ngày sinh và Giới tính */}
+        <div className="flex gap-4">
+          <div className={inputWrapper + " w-1/2"}>
+            <label className="block font-semibold mb-1">Ngày sinh</label>
+            <div className="relative">
+              <motion.div {...iconMotion}>
+                <IconCalendar className={iconClass} />
+              </motion.div>
+              <Input
+                type="date"
+                name="dob"
+                value={formData.dob}
+                onChange={handleChange}
+                className={inputStyle}
+              />
+            </div>
+          </div>
+
+          <div className={inputWrapper + " w-1/2"}>
+            <label className="block font-semibold mb-1">Giới tính</label>
+
+            <Select
+              value={formData.gender}
+              onChange={(value) => handleSelectChange(value, "gender")}
+              className="w-full text-sm pl-10"
+              styles={{ popup: { root: { fontSize: "12px" } } }}
+              placeholder="Lựa chọn"
+            >
+              <Option value="male">
+                <IconGenderMale className="inline mr-1 text-red-400 w-4 h-4" />
+                Nam
+              </Option>
+              <Option value="female">
+                <IconGenderFemale className="inline mr-1 text-red-400 w-4 h-4" />
+                Nữ
+              </Option>
+            </Select>
           </div>
         </div>
-
-        {/* Số điện thoại */}
-        <div className={inputWrapper}>
-          <label className="block font-semibold mb-1">Số điện thoại</label>
-          <div className="relative">
-            <IconPhone className="absolute top-3 left-3 text-gray-400 w-4 h-4" />
-            <input
-              type="tel"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              className={inputStyle}
-              placeholder="Nhập số điện thoại"
-            />
-          </div>
-        </div>
-
-        {/* Vai trò & nhóm máu */}
         <div className="mb-4 flex gap-4">
-          <div className="w-1/2 relative items-center">
-            <label className="block font-semibold mb-1">Vai trò</label>
-            <IconUserHeart className="absolute top-9 left-3 text-gray-400 w-5 h-5" />
-            <select
-              name="roleDonation"
-              value={formData.roleDonation}
-              onChange={handleChange}
-              className={inputStyle}
-            >
-              <option value="">Lựa Chọn</option>
-              <option value="Người Hiến Máu">Người Hiến Máu</option>
-              <option value="Người Cần Máu">Người Cần Máu</option>
-            </select>
+          {/* Số điện thoại */}
+          <div className="w-1/2">
+            <label className="block font-semibold mb-1">Số điện thoại</label>
+            <div className="relative">
+              <motion.div {...iconMotion}>
+                <IconPhone className={iconClass} />
+              </motion.div>
+              <Input
+                type="tel"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                className={inputStyle}
+                placeholder="Nhập số điện thoại liện hệ"
+              />
+            </div>
           </div>
-          <div className="w-1/2 relative">
-            <label className="block font-semibold mb-1">Nhóm máu</label>
-            <IconDroplet className="absolute top-9 left-3 text-gray-400 w-5 h-5" />
-            <select
-              name="bloodType"
-              value={formData.bloodType}
-              onChange={handleChange}
-              className={inputStyle}
-            >
-              <option value="">Lựa Chọn</option>
-              <option value="A">A</option>
-              <option value="B">B</option>
-              <option value="AB">AB</option>
-              <option value="O">O</option>
-            </select>
+
+          {/* Email */}
+          <div className="w-1/2">
+            <label className="block font-semibold mb-1">Email</label>
+            <div className="relative">
+              <motion.div {...iconMotion}>
+                <IconMail className={iconClass} />
+              </motion.div>
+              <Input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                className={inputStyle}
+                placeholder="Nhập email liên hệ"
+              />
+            </div>
           </div>
         </div>
 
-        {/* Địa điểm */}
+        {/* Vai trò & thời gian cần máu */}
+        <div className="mb-4 flex gap-4">
+          <div className="w-1/2 relative">
+            <label className="block font-semibold mb-1">Vai trò</label>
+            <Select
+              value={formData.roleDonation}
+              onChange={(value) => handleSelectChange(value, "roleDonation")}
+              className="w-full text-sm pl-10"
+              placeholder="Lựa chọn"
+              suffixIcon={<IconUserHeart className="text-red-400 w-4 h-4 " />}
+            >
+              <Option value="">Chọn Vai Trò</Option>
+
+              <Option value="Người Hiến Máu">
+                <span className="flex items-center gap-1">
+                  <IconUserHeart className="text-red-400 w-4 h-4 " />
+                  Người Hiến Máu
+                </span>
+              </Option>
+              <Option value="Người Cần Máu">
+                <span className="flex items-center gap-1">
+                  <IconUserHeart className="text-red-400 w-4 h-4 " />
+                  Người Cần Cần Máu
+                </span>
+              </Option>
+            </Select>
+          </div>
+
+          <div className="w-1/2 relative">
+            <label className="block font-semibold mb-1">
+              Thời gian thực hiện
+            </label>
+            <motion.div {...iconMotion}></motion.div>
+            <Input
+              type="datetime-local"
+              name="neededTime"
+              value={formData.neededTime}
+              onChange={handleChange}
+              className={inputStyle}
+              placeholder="Giờ"
+            />
+          </div>
+        </div>
+
+        {/* Nhóm máu & số lượng */}
+        <div className="mb-4 flex gap-4">
+          <div className="w-3/8 relative">
+            <label className="block font-semibold mb-1 ">Nhóm máu</label>
+            <Select
+              value={formData.bloodType}
+              onChange={(value) => handleSelectChange(value, "bloodType")}
+              className="w-full text-sm pl-10"
+              placeholder="Chọn nhóm máu"
+              suffixIcon={<IconDroplet className="text-red-400 w-4 h-4" />}
+            >
+              <Option value="">Chọn nhóm máu</Option>
+
+              <Option value="A">
+                <span className="flex items-center gap-1">
+                  <IconDroplet className="text-red-400 w-4 h-4" />
+                  Máu (A)
+                </span>
+              </Option>
+              <Option value="B">
+                <span className="flex items-center gap-1">
+                  <IconDroplet className="text-red-400 w-4 h-4" />
+                  Máu (B)
+                </span>
+              </Option>
+              <Option value="AB">
+                <span className="flex items-center gap-1">
+                  <IconDroplet className="text-red-400 w-4 h-4" />
+                  Máu (AB)
+                </span>
+              </Option>
+              <Option value="O">
+                <span className="flex items-center gap-1">
+                  <IconDroplet className="text-red-400 w-4 h-4" />
+                  Máu (O)
+                </span>
+              </Option>
+            </Select>
+          </div>
+          <div className="w-3/8 relative">
+            <label className="block font-semibold mb-1 ">Loại Rh</label>
+            <Select
+              value={formData.rh}
+              onChange={(value) => handleSelectChange(value, "bloodType")}
+              className="w-full text-sm pl-10"
+              placeholder="Chọn nhóm máu"
+              suffixIcon={<IconDroplet className="text-red-400 w-4 h-4" />}
+            >
+              <Option value="">Chọn Rh</Option>
+
+              <Option value="Rh+">
+                <span className="flex items-center gap-1">
+                  <IconDroplet className="text-red-400 w-4 h-4" />
+                  RH (+)
+                </span>
+              </Option>
+              <Option value="Rh-">
+                <span className="flex items-center gap-1">
+                  <IconDroplet className="text-red-400 w-4 h-4" />
+                  RH (-)
+                </span>
+              </Option>
+            </Select>
+          </div>
+          <div className="w-2/8 relative">
+            <label className="block font-semibold mb-1">Số lượng (ml)</label>
+
+            <Input
+              type="number"
+              name="quantity"
+              value={formData.quantity}
+              onChange={handleChange}
+              className={inputStyle}
+              placeholder="ml"
+              min="150"
+              suffix={<IconNumbers className="text-red-400 w-4 h-4" />}
+            />
+          </div>
+        </div>
+
+        {/* Địa điểm hiến máu */}
         <div className={inputWrapper}>
-          <label className="block font-semibold mb-1">Địa điểm hiến máu</label>
+          <label className="block font-semibold mb-1">Địa điểm</label>
           <div className="relative">
-            <IconMapPin className="absolute top-3 left-3 text-gray-400 w-4 h-4" />
+            <motion.div {...iconMotion}>
+              <IconMapPin className={iconClass} />
+            </motion.div>
             <input
               type="text"
               name="location"
@@ -168,9 +332,53 @@ export default function FormRegisterBlood({ formData, setFormData, setWaitingLis
           </div>
         </div>
 
+        {/* Bệnh viện */}
+        <div className="flex gap-4">
+          {/* Bệnh viện */}
+          <div className="w-5/8">
+            <label className="block font-semibold mb-1">Bệnh viện</label>
+            <div className="relative">
+              <motion.div {...iconMotion}>
+                <IconBuildingHospital className={iconClass} />
+              </motion.div>
+              <Input
+                type="text"
+                name="hospital"
+                value={formData.hospital}
+                onChange={handleChange}
+                className={inputStyle}
+                placeholder="Tên bệnh viện"
+              />
+            </div>
+          </div>
+
+          {/* Khoa */}
+          <div className="w-3/8">
+            <label className="block font-semibold mb-1">
+              Mức độ thực hiện{" "}
+            </label>
+            <div className="relative">
+              <motion.div {...iconMotion}>
+                <IconListDetails className={iconClass} />
+              </motion.div>
+              <Select
+                value={formData.department}
+                onChange={(value) => handleSelectChange(value, "department")}
+                className="w-full"
+                placeholder="Chọn mức độ"
+              >
+                <Option value="1">Gấp</Option>
+                <Option value="2">Thông thường</Option>
+                <Option value="3">Dự phòng</Option>
+              </Select>
+            </div>
+          </div>
+        </div>
+
+        {/* Submit */}
         <button
           type="submit"
-          className="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 transition-all"
+          className="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 transition-all mt-4 text-sm"
         >
           Gửi đăng ký
         </button>

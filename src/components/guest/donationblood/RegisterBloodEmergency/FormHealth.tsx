@@ -23,6 +23,7 @@ import {
 } from "antd";
 import dayjs from "dayjs";
 import type {
+  RegisterBlood,
   StatusHealth,
 } from "../../../../hooks/useRegisterBlood";
 import type { UploadChangeParam } from "antd/es/upload";
@@ -34,7 +35,10 @@ interface FormHealthProps {
   setStatusHealth: React.Dispatch<React.SetStateAction<StatusHealth>>;
 }
 
-export default function FormHealthEmergency({ formData, setFormData }: FormHealthProps) {
+export default function FormHealthEmergency({
+  formData,
+  setFormData,
+}: FormHealthProps) {
   console.log("📌 Current formData:", formData);
 
   const handleChange = (
@@ -195,26 +199,6 @@ export default function FormHealthEmergency({ formData, setFormData }: FormHealt
         </Form.Item>
 
         {/* Tình trạng hiện tại: chọn 1 */}
-        <Form.Item
-          label={
-            <span className={inputClass}>
-              <IconHeartRateMonitor size={20} /> Tình trạng hiện tại
-            </span>
-          }
-        >
-          <Select
-            value={formData.statusHealth?.currentCondition}
-            onChange={(value) =>
-              setFormData((prev) => ({ ...prev, currentCondition: value }))
-            }
-            options={[
-              { label: "Tốt", value: "Tốt" },
-              { label: "Bình thường", value: "Bình thường" },
-              { label: "Không khỏe", value: "Không khỏe" },
-            ]}
-            placeholder="Chọn tình trạng"
-          />
-        </Form.Item>
 
         {/* Thuốc đang dùng */}
         <Form.Item
@@ -231,24 +215,48 @@ export default function FormHealthEmergency({ formData, setFormData }: FormHealt
             placeholder="VD: Paracetamol"
           />
         </Form.Item>
-
-        {/* Ngày hiến máu gần nhất */}
-        <Form.Item
-          label={
-            <span className={inputClass}>
-              <IconCalendar size={20} /> Ngày hiến máu gần nhất
-            </span>
-          }
-        >
-          <DatePicker
-            style={{ width: "100%" }}
-            value={
-              formData.statusHealth?.lastDonationDate
-                ? dayjs(formData.statusHealth.lastDonationDate)
-                : null
-            }
-          />
-        </Form.Item>
+        <div className="flex gap-4">
+          <div className="w-1/2 relative">
+            <Form.Item
+              label={
+                <span className={inputClass}>
+                  <IconCalendar size={20} /> Ngày hiến máu gần nhất
+                </span>
+              }
+            >
+              <DatePicker
+                style={{ width: "100%" }}
+                value={
+                  formData.statusHealth?.lastDonationDate
+                    ? dayjs(formData.statusHealth.lastDonationDate)
+                    : null
+                }
+              />
+            </Form.Item>
+          </div>
+          <div className="w-1/2 relative">
+            <Form.Item
+              label={
+                <span className={inputClass}>
+                  <IconHeartRateMonitor size={20} /> Tình trạng hiện tại
+                </span>
+              }
+            >
+              <Select
+                value={formData.statusHealth?.currentCondition}
+                onChange={(value) =>
+                  setFormData((prev) => ({ ...prev, currentCondition: value }))
+                }
+                options={[
+                  { label: "Tốt", value: "Tốt" },
+                  { label: "Bình thường", value: "Bình thường" },
+                  { label: "Không khỏe", value: "Không khỏe" },
+                ]}
+                placeholder="Chọn tình trạng"
+              />
+            </Form.Item>
+          </div>
+        </div>
 
         {/* Ảnh CCCD
         <Form.Item

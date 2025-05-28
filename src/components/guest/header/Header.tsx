@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../../../assets/logo.png";
-import { Button } from "antd";
 import {
   IconLogin,
   IconChevronDown,
@@ -13,13 +12,29 @@ import {
 import img1 from "../../../assets/Blood-Donation-1.webp";
 
 export default function GuestHeader() {
-  const [showModal, setShowModal] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
 
-  const toggleModal = () => setShowModal(!showModal);
   const toggleDropdown = () => setShowDropdown(!showDropdown);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setShowDropdown(false);
+      }
+    }
 
+    if (showDropdown) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showDropdown]);
   const handleLogoClick = (e: React.MouseEvent) => {
     e.preventDefault();
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -32,7 +47,7 @@ export default function GuestHeader() {
 
   return (
     <header className="bg-gradient-to-r from-red-500 to-red-900 text-gray-300 py-2 shadow-lg sticky top-0 z-20">
-      <div className="container mx-auto px-2 flex items-center justify-between">
+      <div className="container mx-auto px-2 flex items-center justify-between ">
         <div className="flex items-center space-x-4">
           <div
             onClick={handleLogoClick}
@@ -67,6 +82,7 @@ export default function GuestHeader() {
       <AnimatePresence>
         {showDropdown && (
           <motion.div
+            ref={dropdownRef}
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}

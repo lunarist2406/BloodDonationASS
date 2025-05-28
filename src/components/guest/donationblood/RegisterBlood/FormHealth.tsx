@@ -196,26 +196,6 @@ export default function FormHealth({ formData, setFormData }: FormHealthProps) {
         </Form.Item>
 
         {/* Tình trạng hiện tại: chọn 1 */}
-        <Form.Item
-          label={
-            <span className={inputClass}>
-              <IconHeartRateMonitor size={20} /> Tình trạng hiện tại
-            </span>
-          }
-        >
-          <Select
-            value={formData.statusHealth?.currentCondition}
-            onChange={(value) =>
-              setFormData((prev) => ({ ...prev, currentCondition: value }))
-            }
-            options={[
-              { label: "Tốt", value: "Tốt" },
-              { label: "Bình thường", value: "Bình thường" },
-              { label: "Không khỏe", value: "Không khỏe" },
-            ]}
-            placeholder="Chọn tình trạng"
-          />
-        </Form.Item>
 
         {/* Thuốc đang dùng */}
         <Form.Item
@@ -232,50 +212,74 @@ export default function FormHealth({ formData, setFormData }: FormHealthProps) {
             placeholder="VD: Paracetamol"
           />
         </Form.Item>
-
-        {/* Ngày hiến máu gần nhất */}
-        <Form.Item
-          label={
-            <span className={inputClass}>
-              <IconCalendar size={20} /> Ngày hiến máu gần nhất
-            </span>
-          }
-        >
-          <DatePicker
-            style={{ width: "100%" }}
-            value={
-              formData.statusHealth?.lastDonationDate
-                ? dayjs(formData.statusHealth.lastDonationDate)
-                : null
-            }
-          />
-        </Form.Item>
+        <div className="flex gap-4">
+          <div className="w-1/2 relative">
+            <Form.Item
+              label={
+                <span className={inputClass}>
+                  <IconCalendar size={20} /> Ngày hiến máu gần nhất
+                </span>
+              }
+            >
+              <DatePicker
+                style={{ width: "100%" }}
+                value={
+                  formData.statusHealth?.lastDonationDate
+                    ? dayjs(formData.statusHealth.lastDonationDate)
+                    : null
+                }
+              />
+            </Form.Item>
+          </div>
+          <div className="w-1/2 relative">
+            <Form.Item
+              label={
+                <span className={inputClass}>
+                  <IconHeartRateMonitor size={20} /> Tình trạng hiện tại
+                </span>
+              }
+            >
+              <Select
+                value={formData.statusHealth?.currentCondition}
+                onChange={(value) =>
+                  setFormData((prev) => ({ ...prev, currentCondition: value }))
+                }
+                options={[
+                  { label: "Tốt", value: "Tốt" },
+                  { label: "Bình thường", value: "Bình thường" },
+                  { label: "Không khỏe", value: "Không khỏe" },
+                ]}
+                placeholder="Chọn tình trạng"
+              />
+            </Form.Item>
+          </div>
+        </div>
 
         {/* Ảnh CCCD
-        <Form.Item
-          label={
-            <span className={inputClass}>
-              <IconId size={20} /> Ảnh CCCD
-            </span>
-          }
-        >
-          <Upload
-            accept="image/*"
-            showUploadList={false}
-            beforeUpload={() => false}
-            onChange={(info) => handleUpload(info, "cccd")}
+          <Form.Item
+            label={
+              <span className={inputClass}>
+                <IconId size={20} /> Ảnh CCCD
+              </span>
+            }
           >
-            <Button icon={<IconUpload />}>Tải ảnh lên</Button>
-          </Upload>
-          {formData.statusHealth?.cccd && (
-            <Image
-              src={formData.statusHealth?.cccd}
-              alt="Ảnh CCCD"
-              height={150}
-              className="mt-2 rounded-lg shadow"
-            />
-          )}
-        </Form.Item> */}
+            <Upload
+              accept="image/*"
+              showUploadList={false}
+              beforeUpload={() => false}
+              onChange={(info) => handleUpload(info, "cccd")}
+            >
+              <Button icon={<IconUpload />}>Tải ảnh lên</Button>
+            </Upload>
+            {formData.statusHealth?.cccd && (
+              <Image
+                src={formData.statusHealth?.cccd}
+                alt="Ảnh CCCD"
+                height={150}
+                className="mt-2 rounded-lg shadow"
+              />
+            )}
+          </Form.Item> */}
 
         {/* Giấy khám sức khỏe */}
         <Form.Item

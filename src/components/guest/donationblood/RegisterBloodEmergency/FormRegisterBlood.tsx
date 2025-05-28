@@ -89,6 +89,7 @@ export default function FormRegisterBloodEmergency({
         imgHealth: "",
       },
       status: "",
+      rh: "",
     });
   };
 
@@ -214,7 +215,7 @@ export default function FormRegisterBloodEmergency({
               placeholder="Lựa chọn"
               suffixIcon={<IconUserHeart className="text-red-400 w-4 h-4 " />}
             >
-              <Option value="">Chọn nhóm máu</Option>
+              <Option value="">Chọn Vai Trò</Option>
 
               <Option value="Người Hiến Máu">
                 <span className="flex items-center gap-1">
@@ -233,7 +234,7 @@ export default function FormRegisterBloodEmergency({
 
           <div className="w-1/2 relative">
             <label className="block font-semibold mb-1">
-              Thời gian cần máu
+              Thời gian 
             </label>
             <motion.div {...iconMotion}></motion.div>
             <Input
@@ -249,7 +250,7 @@ export default function FormRegisterBloodEmergency({
 
         {/* Nhóm máu & số lượng */}
         <div className="mb-4 flex gap-4">
-          <div className="w-1/2 relative">
+          <div className="w-3/8 relative">
             <label className="block font-semibold mb-1 ">Nhóm máu</label>
             <Select
               value={formData.bloodType}
@@ -286,8 +287,32 @@ export default function FormRegisterBloodEmergency({
               </Option>
             </Select>
           </div>
+          <div className="w-3/8 relative">
+            <label className="block font-semibold mb-1 ">Loại Rh</label>
+            <Select
+              value={formData.rh}
+              onChange={(value) => handleSelectChange(value, "bloodType")}
+              className="w-full text-sm pl-10"
+              placeholder="Chọn nhóm máu"
+              suffixIcon={<IconDroplet className="text-red-400 w-4 h-4" />}
+            >
+              <Option value="">Chọn Rh</Option>
 
-          <div className="w-1/2 relative">
+              <Option value="Rh+">
+                <span className="flex items-center gap-1">
+                  <IconDroplet className="text-red-400 w-4 h-4" />
+                  RH (+)
+                </span>
+              </Option>
+              <Option value="Rh-">
+                <span className="flex items-center gap-1">
+                  <IconDroplet className="text-red-400 w-4 h-4" />
+                  RH (-)
+                </span>
+              </Option>
+            </Select>
+          </div>
+          <div className="w-2/8 relative">
             <label className="block font-semibold mb-1">Số lượng (ml)</label>
 
             <Input
