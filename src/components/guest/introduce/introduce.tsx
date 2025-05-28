@@ -8,7 +8,7 @@ import {
   IconSettings,
   IconNews,
 } from "@tabler/icons-react";
-import { newsList } from "../../../hooks/newsData";
+import { newsList } from "../information/newsData";
 
 import { Carousel } from "antd";
 
