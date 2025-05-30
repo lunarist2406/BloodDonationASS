@@ -226,7 +226,7 @@ export default function FormRegisterBloodEmergency({
               <Option value="Người Cần Máu">
                 <span className="flex items-center gap-1">
                   <IconUserHeart className="text-red-400 w-4 h-4 " />
-                  Người Cần Cần Máu
+                  Người Cần Máu
                 </span>
               </Option>
             </Select>
@@ -234,7 +234,7 @@ export default function FormRegisterBloodEmergency({
 
           <div className="w-1/2 relative">
             <label className="block font-semibold mb-1">
-              Thời gian 
+              Thời gian thực hiện
             </label>
             <motion.div {...iconMotion}></motion.div>
             <Input

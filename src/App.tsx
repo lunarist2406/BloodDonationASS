@@ -11,6 +11,7 @@ import RegisterBlood from "./components/guest/donationblood/RegisterBlood/regist
 import HomePage from "./page/HomePage";
 import SeekInformation from "./components/guest/donationblood/SearchingInformation/SeekInformation";
 import RegisterBloodEmergency from "./components/guest/donationblood/RegisterBloodEmergency/registerBloodEmergency";
+import DonateBlood from "./components/guest/donationblood/DonateBlood/DonateBlood";
 
 function App() {
   return (
@@ -29,6 +30,8 @@ function App() {
           <Route path="blood-experience" element={<BloodExperience />} />
           <Route path="register-blood" element={<RegisterBlood />} />
           <Route path="register-blood-emergency" element={<RegisterBloodEmergency />} />
+          <Route path="donation-blood" element={<DonateBlood />} />
+
           <Route path="seek-information" element={<SeekInformation />} />
         </Route>
       </Routes>

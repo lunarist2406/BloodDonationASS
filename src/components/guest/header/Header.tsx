@@ -88,7 +88,7 @@ export default function GuestHeader() {
             exit={{ height: 0, opacity: 0 }}
             className="absolute top-full left-0 w-full bg-white text-black shadow-lg z-50 px-20 rounded-md"
           >
-            <div className="grid grid-cols-4 gap-2 p-10">
+            <div className="grid grid-cols-4 gap-2 p-5">
               <motion.div className="space-y-2">
                 <motion.h3
                   className="font-bold flex items-center"
@@ -118,7 +118,7 @@ export default function GuestHeader() {
                 <motion.p
                   whileHover={{ scale: 1.05, color: "#ff0000" }}
                   transition={{ type: "linear", duration: 0.2 }}
-                  onClick={() => navigate("/register-blood")}
+                  onClick={() => navigate("/donation-blood")}
                   className="cursor-pointer"
                 >
                   Hiến Máu
@@ -190,7 +190,7 @@ export default function GuestHeader() {
 
               <motion.div
                 whileHover={{
-                  scale: 1.2,
+                  scale: 1.05,
                   boxShadow: "0 10px 20px rgba(0, 0, 0, 0.3)",
                 }}
                 className="rounded-md overflow-hidden"
