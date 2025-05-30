@@ -126,7 +126,7 @@ export default function GuestHeader() {
                 <motion.p
                   whileHover={{ scale: 1.05, color: "#ff0000" }}
                   transition={{ type: "linear", duration: 0.2 }}
-                  onClick={() => navigate("/receiver-blood")}
+                  onClick={() => navigate("/seek-information")}
                   className="cursor-pointer"
                 >
                   Nhận Máu

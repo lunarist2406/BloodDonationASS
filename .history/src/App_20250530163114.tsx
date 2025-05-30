@@ -32,7 +32,7 @@ function App() {
           <Route path="register-blood" element={<RegisterBlood />} />
           <Route path="register-blood-emergency" element={<RegisterBloodEmergency />} />
           <Route path="donation-blood" element={<DonateBlood />} />
-          <Route path="receiver-blood" element={<ReceiverBlood />} />
+          <Route path="receiver-blood" element={<ReceiverBloodBlood />} />
 
           <Route path="seek-information" element={<SeekInformation />} />
         </Route>

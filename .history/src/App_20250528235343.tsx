@@ -12,7 +12,6 @@ import HomePage from "./page/HomePage";
 import SeekInformation from "./components/guest/donationblood/SearchingInformation/SeekInformation";
 import RegisterBloodEmergency from "./components/guest/donationblood/RegisterBloodEmergency/registerBloodEmergency";
 import DonateBlood from "./components/guest/donationblood/DonateBlood/DonateBlood";
-import ReceiverBlood from "./components/guest/donationblood/ReceiverBlood/ReceiverBlood";
 
 function App() {
   return (
@@ -32,7 +31,6 @@ function App() {
           <Route path="register-blood" element={<RegisterBlood />} />
           <Route path="register-blood-emergency" element={<RegisterBloodEmergency />} />
           <Route path="donation-blood" element={<DonateBlood />} />
-          <Route path="receiver-blood" element={<ReceiverBlood />} />
 
           <Route path="seek-information" element={<SeekInformation />} />
         </Route>
