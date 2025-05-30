@@ -183,7 +183,12 @@ export default function GuestHeader() {
                   <IconSearch size={18} className="mr-2" />
                   Tìm Kiếm
                 </motion.h3>
-                <motion.p whileHover={{ scale: 1.05, color: "#ff0000" }}>
+                <motion.p
+                  whileHover={{ scale: 1.05, color: "#ff0000" }}
+                  transition={{ type: "linear", duration: 0.2 }}
+                  onClick={() => navigate("/seek-information")}
+                  className="cursor-pointer"
+                >
                   Tra Cứu Thông Tin
                 </motion.p>
               </motion.div>
