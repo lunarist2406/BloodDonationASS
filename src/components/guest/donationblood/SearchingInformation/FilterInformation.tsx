@@ -1,56 +1,62 @@
-import { useState } from "react";
-import { Checkbox, Divider } from "antd";
-import { motion, AnimatePresence } from "framer-motion";
+// FilterInformation.jsx
+import { useState, useEffect } from "react";
+import { Checkbox, Divider, Select, Slider } from "antd";
 
-const data = [
-  { id: 1, type: "hien", name: "Nguyễn Văn A - Đăng ký hiến máu" },
-  { id: 2, type: "can", name: "Trần Thị B - Cần máu khẩn cấp" },
-  { id: 3, type: "lichsu", name: "Lê Văn C - Đã hiến và cần máu" },
-  { id: 4, type: "hien", name: "Phạm Thị D - Đăng ký hiến máu" },
-];
-
-export default function FilterInformation() {
+export default function FilterInformation({ onFilter }) {
   const [selectedTypes, setSelectedTypes] = useState([]);
+const [distanceKm, setDistanceKm] = useState(10); // thêm dòng này
 
   const handleChange = (checkedValues) => {
     setSelectedTypes(checkedValues);
   };
+  const handleSliderChange = (value) => {
+    setDistanceKm(value);
+  };
 
-  const filteredData = data.filter((item) =>
-    selectedTypes.length === 0 ? true : selectedTypes.includes(item.type)
-  );
+
+
+  useEffect(() => {
+    // Gọi callback khi selectedTypes thay đổi
+    onFilter(selectedTypes, distanceKm);
+  }, [selectedTypes,distanceKm, onFilter]);
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-3xl mx-auto ">
-      <h2 className="text-xl font-semibold text-red-600 mb-4">
+    <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-3xl mx-auto h-[100%]">
+      <h2 className="text-xl font-semibold text-center text-red-600 mb-4">
         Bộ lọc thông tin
       </h2>
-
-      <Checkbox.Group
-        style={{ display: "flex", gap: "1rem", marginBottom: "1rem" }}
-        onChange={handleChange}
-      >
-        <Checkbox value="hien">Đã đăng ký hiến máu</Checkbox>
-        <Checkbox value="can">Đăng ký cần máu</Checkbox>
-        <Checkbox value="lichsu">Đã hiến & cần máu</Checkbox>
-      </Checkbox.Group>
+      <div className="text-2xs font-semibold text-red-600">
+        <h4>Vai Trò</h4>
+        <Checkbox.Group
+          style={{ display: "flex", gap: "1rem", marginBottom: "1rem" }}
+          onChange={handleChange}
+        >
+          <Checkbox value="hien">Hiến máu</Checkbox>
+          <Checkbox value="can">Nhận Máu</Checkbox>
+        </Checkbox.Group>
+      </div>
+      <div className="text-2xs font-semibold text-red-600 ">
+        <h4>Trung Tâm </h4>
+        <Select
+          style={{ display: "flex", gap: "1rem", marginBottom: "1rem" }}
+          onChange={handleChange}
+        >
+          <Checkbox value="hien">Hiến máu</Checkbox>
+          <Checkbox value="can">Nhận Máu</Checkbox>
+        </Select>
+      </div>
+      <div className="font-semibold text-red-600 mb-4">
+        <h4>Khoảng cách (tối đa): {distanceKm} km</h4>
+        <Slider
+          min={1}
+          max={20}
+          step={1}
+          value={distanceKm}
+          onChange={handleSliderChange}
+        />
+      </div>
 
       <Divider />
-
-      <AnimatePresence>
-        {filteredData.map((item) => (
-          <motion.div
-            key={item.id}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
-            transition={{ duration: 0.3 }}
-            className="bg-red-50 p-4 rounded-md mb-3 shadow-sm border border-red-200"
-          >
-            {item.name}
-          </motion.div>
-        ))}
-      </AnimatePresence>
     </div>
   );
 }
