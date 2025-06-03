@@ -1,32 +1,135 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { IconUserPlus, IconMail, IconLock, IconUser, IconPhone, IconMapPin } from "@tabler/icons-react";
 import logo from "../../../assets/logo.png";
 import backgroundImage from "../../../assets/background.png";
 import { useNavigate } from "react-router-dom";
+import {api} from "../../../components/config/axios/axiosInstance";
+import axios from "axios";
 
 export default function Register() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
-    phone: "",
-    address: "",
     password: "",
     confirmPassword: "",
+    gender: "",
+    role_name: "MEMBER",
+    location: {
+      ipAddress: "",
+      country: "Việt Nam",
+      district: "",
+      road: ""
+    }
   });
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  useEffect(() => {
+    // Lấy IP address khi component mount
+    const fetchIP = async () => {
+      try {
+        const response = await fetch('https://api.ipify.org?format=json');
+        const data = await response.json();
+        setFormData(prev => ({
+          ...prev,
+          location: {
+            ...prev.location,
+            ipAddress: data.ip
+          }
+        }));
+      } catch (error) {
+        console.error('Không thể lấy IP address:', error);
+        // Nếu không lấy được IP, set một giá trị mặc định
+        setFormData(prev => ({
+          ...prev,
+          location: {
+            ...prev.location,
+            ipAddress: '127.0.0.1'
+          }
+        }));
+      }
+    };
+
+    fetchIP();
+  }, []);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    if (name.startsWith('location.')) {
+      const locationField = name.split('.')[1];
+      setFormData(prev => ({
+        ...prev,
+        location: {
+          ...prev.location,
+          [locationField]: value
+        }
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Register attempt:", formData);
+    setError("");
+    setIsLoading(true);
+
+    // Kiểm tra mật khẩu
+    if (formData.password !== formData.confirmPassword) {
+      setError("Mật khẩu xác nhận không khớp");
+      setIsLoading(false);
+      return;
+    }
+
+    // Kiểm tra gender
+    if (!formData.gender) {
+      setError("Vui lòng chọn giới tính");
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const response = await api.post('/api/v1/auth/register', {
+        email: formData.email,
+        password: formData.password,
+        fullname: formData.fullName,
+        role_name: formData.role_name,
+        gender: formData.gender,
+        location: {
+          ipAddress: formData.location.ipAddress,
+          country: formData.location.country,
+          district: formData.location.district,
+          road: formData.location.road
+        }
+      });
+
+      navigate('/login');
+    } catch (err) {
+      console.error('Lỗi đăng ký:', err);
+      if (axios.isAxiosError(err)) {
+        if (err.code === 'ECONNABORTED') {
+          setError('Không thể kết nối đến server. Vui lòng thử lại sau.');
+        } else {
+          console.error('Response data:', err.response?.data);
+          console.error('Response status:', err.response?.status);
+          // Hiển thị lỗi chi tiết từ API
+          if (Array.isArray(err.response?.data?.message)) {
+            setError(err.response?.data?.message.join(', '));
+          } else {
+            setError(err.response?.data?.message || 'Đăng ký thất bại');
+          }
+        }
+      } else {
+        setError('Có lỗi xảy ra khi đăng ký');
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -105,34 +208,20 @@ export default function Register() {
 
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700 flex items-center">
-                  <IconPhone size={18} className="mr-2" />
-                  Số điện thoại
+                  <IconUser size={18} className="mr-2" />
+                  Giới tính
                 </label>
-                <input
-                  type="tel"
-                  name="phone"
-                  value={formData.phone}
+                <select
+                  name="gender"
+                  value={formData.gender}
                   onChange={handleChange}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
-                  placeholder="Nhập số điện thoại"
                   required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700 flex items-center">
-                  <IconMapPin size={18} className="mr-2" />
-                  Địa chỉ
-                </label>
-                <input
-                  type="text"
-                  name="address"
-                  value={formData.address}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
-                  placeholder="Nhập địa chỉ"
-                  required
-                />
+                >
+                  <option value="">Chọn giới tính</option>
+                  <option value="Male">Nam</option>
+                  <option value="Female">Nữ</option>
+                </select>
               </div>
 
               <div className="space-y-2">
@@ -166,16 +255,59 @@ export default function Register() {
                   required
                 />
               </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700 flex items-center">
+                  <IconMapPin size={18} className="mr-2" />
+                  Quận/Huyện
+                </label>
+                <input
+                  type="text"
+                  name="location.district"
+                  value={formData.location.district}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                  placeholder="Nhập quận/huyện"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700 flex items-center">
+                  <IconMapPin size={18} className="mr-2" />
+                  Đường/Phố
+                </label>
+                <input
+                  type="text"
+                  name="location.road"
+                  value={formData.location.road}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                  placeholder="Nhập đường/phố"
+                  required
+                />
+              </div>
             </div>
+
+            {error && (
+              <div className="text-red-600 text-sm text-center">
+                {error}
+              </div>
+            )}
 
             <motion.button
               type="submit"
-              className="w-full bg-gradient-to-r from-red-500 to-red-900 text-white py-3 rounded-lg font-semibold flex items-center justify-center gap-2"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              disabled={isLoading}
+              className="w-full bg-gradient-to-r from-red-500 to-red-900 text-white py-3 rounded-lg font-semibold flex items-center justify-center gap-2 disabled:opacity-50"
+              whileHover={{ scale: isLoading ? 1 : 1.02 }}
+              whileTap={{ scale: isLoading ? 1 : 0.98 }}
             >
-              <IconUserPlus size={20} />
-              Đăng Ký
+              {isLoading ? (
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <IconUserPlus size={20} />
+              )}
+              {isLoading ? 'Đang đăng ký...' : 'Đăng Ký'}
             </motion.button>
 
             <div className="text-center text-sm text-gray-600">

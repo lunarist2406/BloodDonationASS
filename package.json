@@ -12,6 +12,7 @@
   "dependencies": {
     "@tabler/icons-react": "^3.31.0",
     "@tailwindcss/vite": "^4.1.6",
+    "@types/axios": "^0.9.36",
     "antd": "^5.25.1",
     "axios": "^1.9.0",
     "blooddonationssa": "file:",
@@ -22,7 +23,8 @@
     "react-icons": "^5.5.0",
     "react-router-dom": "^7.6.0",
     "swiper": "^11.2.6",
-    "tailwindcss": "^4.1.6"
+    "tailwindcss": "^4.1.6",
+    "zustand": "^5.0.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",

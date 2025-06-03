@@ -13,6 +13,7 @@ import SeekInformation from "./components/guest/donationblood/SearchingInformati
 import RegisterBloodEmergency from "./components/guest/donationblood/RegisterBloodEmergency/registerBloodEmergency";
 import DonateBlood from "./components/guest/donationblood/DonateBlood/DonateBlood";
 import ReceiverBlood from "./components/guest/donationblood/ReceiverBlood/ReceiverBlood";
+import { ProtectedRoute } from './components/auth/ProtectedRoute';
 
 function App() {
   return (
@@ -29,12 +30,46 @@ function App() {
           <Route path="blood-documents" element={<BloodDocuments />} />
           <Route path="blood-news" element={<BloodNews />} />
           <Route path="blood-experience" element={<BloodExperience />} />
-          <Route path="register-blood" element={<RegisterBlood />} />
-          <Route path="register-blood-emergency" element={<RegisterBloodEmergency />} />
-          <Route path="donation-blood" element={<DonateBlood />} />
-          <Route path="receiver-blood" element={<ReceiverBlood />} />
-
-          <Route path="seek-information" element={<SeekInformation />} />
+          <Route
+            path="register-blood"
+            element={
+              <ProtectedRoute>
+                <RegisterBlood />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="register-blood-emergency"
+            element={
+              <ProtectedRoute>
+                <RegisterBloodEmergency />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="donation-blood"
+            element={
+              <ProtectedRoute>
+                <DonateBlood />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="receiver-blood"
+            element={
+              <ProtectedRoute>
+                <ReceiverBlood />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="seek-information"
+            element={
+              <ProtectedRoute>
+                <SeekInformation />
+              </ProtectedRoute>
+            }
+          />
         </Route>
       </Routes>
     </BrowserRouter>

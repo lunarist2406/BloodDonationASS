@@ -1,5 +1,5 @@
 import { IconNews } from "@tabler/icons-react";
-import { newsList } from '../../../hooks/newsData';
+import { newsList } from "./newsData";
 
 export default function BloodNews() {
   return (
@@ -19,13 +19,15 @@ export default function BloodNews() {
             <a
               key={news.id}
               href={news.link}
-              className="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow overflow-hidden cursor-pointer block"
+              className="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow overflow-hidden cursor-pointer block group"
             >
-              <img
-                src={news.image}
-                alt={news.title}
-                className="w-full h-48 object-cover"
-              />
+              <div className="h-48 overflow-hidden relative">
+                <img
+                  src={news.image}
+                  alt={news.title}
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                />
+              </div>
               <div className="p-6">
                 <h2
                   className="text-xl font-bold text-red-800 mb-2"

@@ -7,8 +7,8 @@ import {
   IconMail,
   IconSearch,
 } from "@tabler/icons-react";
-import GuestHeader from "../header/Header";
-import GuestFooter from "../footer/GuestFooter";
+// import GuestHeader from "../header/Header";
+// import GuestFooter from "../footer/GuestFooter";
 import { IconBuilding } from "@tabler/icons-react";
 
 // Import centers data from the new file
@@ -82,11 +82,11 @@ export default function BloodDonationCenter() {
                 transition={{ duration: 0.3 }}
                 className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
               >
-                <div className="h-48 overflow-hidden">
+                <div className="h-40 overflow-hidden relative group">
                   <img
                     src={center.image}
                     alt={center.name}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-110"
                   />
                 </div>
                 <div className="p-6">
@@ -113,13 +113,13 @@ export default function BloodDonationCenter() {
                       </span>
                     </div>
                   </div>
-                  <motion.button
+                  {/* <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     className="mt-4 w-full bg-gradient-to-r from-red-500 to-red-900 text-white py-2 rounded-lg font-semibold"
                   >
                     Xem chi tiết
-                  </motion.button>
+                  </motion.button> */}
                 </div>
               </motion.div>
             ))}

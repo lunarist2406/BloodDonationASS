@@ -4,16 +4,92 @@ import { useNavigate } from "react-router-dom";
 import { IconLogin, IconMail, IconLock } from "@tabler/icons-react";
 import logo from "../../../assets/logo.png";
 import backgroundImage from "../../../assets/background.png";
+import { api } from "../../../components/config/axios/axiosInstance";
+import { useUser } from '../../../hooks/useUser';
+
+interface LoginResponse {
+  statusCode: number;
+  message: string;
+  data: {
+    access_token: string;
+    user: {
+      user_id: string;
+      fullname: string;
+      email: string;
+      role_name: string;
+    }
+  }
+}
 
 export default function Login() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("")
+  const { setAuthToken, setUser } = useUser();
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    if (name === 'email') {
+      setEmail(value);
+    } else if (name === 'password') {
+      setPassword(value);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Xử lý logic đăng nhập ở đây
-    console.log("Login attempt:", { email, password });
+    setError("");
+    setIsLoading(true);
+
+    if (!email || !password) {
+      setError('Vui lòng nhập đầy đủ email và mật khẩu');
+      setIsLoading(false);
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError('Email không hợp lệ');
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const loginData = {
+        username: email.trim(),
+        password: password.trim()
+      };
+      
+      console.log('Sending login request with data:', loginData);
+      
+      const response = await api.post<LoginResponse>('/api/v1/auth/login', loginData);
+      
+      console.log('Full login response:', response);
+      console.log('Login response data:', response.data);
+      console.log('Data object:', response.data.data);
+
+      if (response.data?.data?.access_token) {
+        console.log('Token found:', response.data.data.access_token);
+        setAuthToken(response.data.data.access_token);
+        setUser(response.data.data.user);
+        navigate('/');
+      } else {
+        console.error('Token not found in response:', response.data);
+        setError('Không nhận được token từ server');
+      }
+    } catch (err: unknown) {
+      console.error('Login error:', err);
+      
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('Email hoặc mật khẩu không chính xác');
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleRegister = () => {
@@ -68,8 +144,9 @@ export default function Login() {
               </label>
               <input
                 type="email"
+                name="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={handleChange}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
                 placeholder="Nhập email của bạn"
                 required
@@ -83,8 +160,9 @@ export default function Login() {
               </label>
               <input
                 type="password"
+                name="password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={handleChange}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
                 placeholder="Nhập mật khẩu của bạn"
                 required
@@ -101,14 +179,25 @@ export default function Login() {
               </a>
             </div>
 
+            {error && (
+              <div className="text-red-600 text-sm text-center">
+                {error}
+              </div>
+            )}
+
             <motion.button
               type="submit"
-              className="w-full bg-gradient-to-r from-red-500 to-red-900 text-white py-3 rounded-lg font-semibold flex items-center justify-center gap-2"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              disabled={isLoading}
+              className="w-full bg-gradient-to-r from-red-500 to-red-900 text-white py-3 rounded-lg font-semibold flex items-center justify-center gap-2 disabled:opacity-50"
+              whileHover={{ scale: isLoading ? 1 : 1.02 }}
+              whileTap={{ scale: isLoading ? 1 : 0.98 }}
             >
-              <IconLogin size={20} />
-              Đăng Nhập
+              {isLoading ? (
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <IconLogin size={20} />
+              )}
+              {isLoading ? 'Đang đăng nhập...' : 'Đăng Nhập'}
             </motion.button>
 
             <div className="text-center text-sm text-gray-600">
