@@ -5,7 +5,7 @@ import { IconLogin, IconMail, IconLock } from "@tabler/icons-react";
 import logo from "../../../assets/logo.png";
 import backgroundImage from "../../../assets/background.png";
 import { api } from "../../../components/config/axios/axiosInstance";
-import { useUser } from '../../../hooks/useUser';
+import { useAuth } from "../../../hooks/useAuth";
 
 interface LoginResponse {
   statusCode: number;
@@ -23,7 +23,7 @@ interface LoginResponse {
 
 export default function Login() {
   const navigate = useNavigate();
-  const { setAuthToken, setUser } = useUser();
+  const { setAuthToken, setUser } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -74,7 +74,7 @@ export default function Login() {
         console.log('Token found:', response.data.data.access_token);
         setAuthToken(response.data.data.access_token);
         setUser(response.data.data.user);
-        navigate('/');
+        navigate('/homepage');
       } else {
         console.error('Token not found in response:', response.data);
         setError('Không nhận được token từ server');

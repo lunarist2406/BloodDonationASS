@@ -1,6 +1,7 @@
-import GuestBanner from "../components/guest/banner/banner";
-import GuestIntroduce from "../components/guest/introduce/introduce";
+
 import { motion } from "framer-motion";
+import GuestBanner from "../components/member/banner/banner";
+import GuestIntroduce from "../components/member/introduce/introduce";
 
 export default function HomePage(){
     return (

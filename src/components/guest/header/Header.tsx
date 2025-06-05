@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../../../assets/logo.png";
 import {
-  IconLogin,
+  // IconLogin,
   IconChevronDown,
   IconDroplet,
   IconBook,
@@ -11,10 +11,10 @@ import {
   IconLogout,
 } from "@tabler/icons-react";
 import img1 from "../../../assets/Blood-Donation-1.webp";
-import { useUser } from '../../../hooks/useUser';
+import { useAuth } from "../../../hooks/useAuth";
 
 export default function GuestHeader() {
-  const { isAuthenticated, user, clearAuth } = useUser();
+  const { isAuthenticated, user, clearAuth } = useAuth();
   const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
 
@@ -41,16 +41,16 @@ export default function GuestHeader() {
   const handleLogoClick = (e: React.MouseEvent) => {
     e.preventDefault();
     window.scrollTo({ top: 0, behavior: "smooth" });
-    navigate("/");
+    navigate("/homepage");
   };
 
-  const handleSignIn = () => {
-    navigate("/login");
-  };
+  // const handleSignIn = () => {
+  //   navigate("/login");
+  // };
 
   const handleSignOut = () => {
     clearAuth();
-    navigate('/login');
+    navigate("/");
   };
 
   return (
@@ -69,15 +69,15 @@ export default function GuestHeader() {
             onClick={toggleDropdown}
           >
             <span className="font-bold text-xl">LUNARIST</span>
-            <IconChevronDown size={25} className="cursor-pointer" />
+            {isAuthenticated() && (
+              <IconChevronDown size={25} className="cursor-pointer" />
+            )}
           </div>
         </div>
 
-        {isAuthenticated() ? (
+        {isAuthenticated() && (
           <div className="flex items-center gap-4">
-            <span className="text-white">
-              Xin chào, {user?.fullname}
-            </span>
+            <span className="text-white">Xin chào, {user?.fullname}</span>
             <motion.button
               onClick={handleSignOut}
               className="px-4 py-2 bg-red-700 text-white text-3xs rounded-lg font-bold flex items-center hover:bg-red-500 gap-2"
@@ -91,24 +91,24 @@ export default function GuestHeader() {
               <span>Đăng xuất</span>
             </motion.button>
           </div>
-        ) : (
-          <motion.button
-            onClick={handleSignIn}
-            className="mt-1 px-4 py-2 bg-red-700 text-white text-3xs rounded-lg font-bold flex items-center hover:bg-red-500 gap-2"
-            style={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
-            whileHover={{
-              y: -5,
-              scale: 1.05,
-              backgroundColor: "rgba(255, 0, 0, 0.2)",
-            }}
-          >
-            <IconLogin size={18} className="text-white" />
-            <span>Đăng nhập</span>
-          </motion.button>
+          // ) : (
+          //   // <motion.button
+          //   //   onClick={handleSignIn}
+          //   //   className="mt-1 px-4 py-2 bg-red-700 text-white text-3xs rounded-lg font-bold flex items-center hover:bg-red-500 gap-2"
+          //   //   style={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
+          //   //   whileHover={{
+          //   //     y: -5,
+          //   //     scale: 1.05,
+          //   //     backgroundColor: "rgba(255, 0, 0, 0.2)",
+          //   //   }}
+          //   // >
+          //   //   <IconLogin size={18} className="text-white" />
+          //   //   <span>Đăng nhập</span>
+          //   // </motion.button>
         )}
       </div>
       <AnimatePresence>
-        {showDropdown && (
+        {isAuthenticated() && showDropdown && (
           <motion.div
             ref={dropdownRef}
             initial={{ height: 0, opacity: 0 }}
@@ -197,24 +197,22 @@ export default function GuestHeader() {
                 </Link>
               </motion.div>
 
-               {isAuthenticated() && (
-                <motion.div className="space-y-2">
-                  <motion.h3
-                    className="font-bold flex items-center"
-                    whileHover={{ y: -5, color: "#ff0000" }}
-                  >
-                    <IconSearch size={18} className="mr-2" />
-                    Tìm Kiếm
-                  </motion.h3>
-                  <Link
-                    to="/seek-information"
-                    className="block hover:scale-105 hover:text-red-500 transition-all duration-200"
-                    onClick={() => setShowDropdown(false)}
-                  >
-                    Tra Cứu Thông Tin
-                  </Link>
-                </motion.div>
-              )}
+              <motion.div className="space-y-2">
+                <motion.h3
+                  className="font-bold flex items-center"
+                  whileHover={{ y: -5, color: "#ff0000" }}
+                >
+                  <IconSearch size={18} className="mr-2" />
+                  Tìm Kiếm
+                </motion.h3>
+                <Link
+                  to="/seek-information"
+                  className="block hover:scale-105 hover:text-red-500 transition-all duration-200"
+                  onClick={() => setShowDropdown(false)}
+                >
+                  Tra Cứu Thông Tin
+                </Link>
+              </motion.div>
 
               <motion.div
                 whileHover={{

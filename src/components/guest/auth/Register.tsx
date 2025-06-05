@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { IconUserPlus, IconMail, IconLock, IconUser, IconPhone, IconMapPin } from "@tabler/icons-react";
+import { IconUserPlus, IconMail, IconLock, IconUser, IconMapPin } from "@tabler/icons-react";
 import logo from "../../../assets/logo.png";
 import backgroundImage from "../../../assets/background.png";
 import { useNavigate } from "react-router-dom";
