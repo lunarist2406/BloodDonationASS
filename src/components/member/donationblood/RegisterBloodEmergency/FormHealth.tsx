@@ -25,7 +25,7 @@ import dayjs from "dayjs";
 import type {
   RegisterBlood,
   StatusHealth,
-} from "../../../../hooks/useRegisterBlood";
+} from "../../../../hooks/RegistrationForm/useRegisterBlood";
 import type { UploadChangeParam } from "antd/es/upload";
 import type { RcFile } from "antd/es/upload/interface";
 // import { form } from "framer-motion/client";

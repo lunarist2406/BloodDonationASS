@@ -3,16 +3,13 @@ import GuestHeader from "../components/guest/header/Header";
 
 import { Outlet } from "react-router-dom";
 
-export default function GuestLayout() {
+export default function LayoutPage() {
   return (
     <div>
       <GuestHeader />
-
-
       <main>
         <Outlet />
       </main>
-
       <GuestFooter />
     </div>
   );

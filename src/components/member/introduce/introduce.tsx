@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import {
-  IconHeart,
   IconInfoCircle,
   IconClipboardList,
   IconClipboardPlus,
@@ -14,9 +13,8 @@ import { Carousel } from "antd";
 
 export default function GuestIntroduce() {
   const navigate = useNavigate();
-
   const handleRegister = () => {
-    navigate("/register");
+    navigate(`/register-blood/`);
   };
 
   // Hiệu ứng xuất hiện từ dưới lên

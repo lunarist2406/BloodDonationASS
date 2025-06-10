@@ -13,7 +13,7 @@ import {
   IconBuildingHospital,
   IconActivityHeartbeat,
 } from "@tabler/icons-react";
-import type { RegisterBlood } from "../../../../hooks/useRegisterBlood";
+import type { RegisterBlood } from "../../../../hooks/RegistrationForm/useRegisterBlood";
 
 interface Props {
   formData: RegisterBlood[];
@@ -141,33 +141,33 @@ export default function FormViewReceiver({ formData }: Props) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-    <div className="bg-white rounded-xl shadow-lg p-4 h-[90%]">
-      <h2 className="text-2xl font-bold mb-4 text-red-700 flex items-center gap-2">
-        <IconClock size={24} className="text-red-700" />
-        Danh Sách Người Đăng Ký Nhận Máu
-      </h2>
-      <Table
-        columns={columns}
-        dataSource={dataSource}
-        pagination={{ pageSize: 10 }}
-        scroll={{ x: "max-content" }}
-        bordered
-        size="middle"
-        style={{
-        minHeight: "590px",
-        }}
-        className="text-center"
-      />
-      <style>
-        {`
+      <div className="bg-white rounded-xl shadow-lg p-4 h-[90%]">
+        <h2 className="text-2xl font-bold mb-4 text-red-700 flex items-center gap-2">
+          <IconClock size={24} className="text-red-700" />
+          Danh Sách Người Đăng Ký Nhận Máu
+        </h2>
+        <Table
+          columns={columns}
+          dataSource={dataSource}
+          pagination={{ pageSize: 10 }}
+          scroll={{ x: "max-content" }}
+          bordered
+          size="middle"
+          style={{
+            minHeight: "590px",
+          }}
+          className="text-center"
+        />
+        <style>
+          {`
         .ant-table-thead > tr > th,
         .ant-table-tbody > tr > td {
           text-align: center !important;
           vertical-align: middle !important;
         }
         `}
-      </style>
-    </div>
+        </style>
+      </div>
     </motion.div>
   );
 }

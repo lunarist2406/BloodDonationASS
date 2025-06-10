@@ -10,7 +10,7 @@ import {
   IconChevronLeft,
 } from "@tabler/icons-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useRegisterBlood } from "../../../../hooks/useRegisterBlood";
+import { useRegisterBlood } from "../../../../hooks/RegistrationForm/useRegisterBlood";
 import FormRegisterBlood from "./FormRegisterBlood";
 import FormHealth from "./FormHealth";
 import { useState } from "react";
@@ -64,7 +64,7 @@ export default function RegisterBlood() {
                   Đăng ký hiến máu
                   <IconChevronRight size={20} />
                 </button>
-                <FormHealth formData={formData} setFormData={setFormData} />
+                <FormHealth/>
               </motion.div>
             ) : (
               <motion.div

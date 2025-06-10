@@ -5,7 +5,7 @@ import { IconLogin, IconMail, IconLock } from "@tabler/icons-react";
 import logo from "../../../assets/logo.png";
 import backgroundImage from "../../../assets/background.png";
 import { api } from "../../../components/config/axios/axiosInstance";
-import { useAuth } from "../../../hooks/useAuth";
+import { useAuth } from "../../../hooks/User/useAuth";
 
 interface LoginResponse {
   statusCode: number;
@@ -17,8 +17,8 @@ interface LoginResponse {
       fullname: string;
       email: string;
       role_name: string;
-    }
-  }
+    };
+  };
 }
 
 export default function Login() {
@@ -31,9 +31,9 @@ export default function Login() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    if (name === 'email') {
+    if (name === "email") {
       setEmail(value);
-    } else if (name === 'password') {
+    } else if (name === "password") {
       setPassword(value);
     }
   };
@@ -44,14 +44,14 @@ export default function Login() {
     setIsLoading(true);
 
     if (!email || !password) {
-      setError('Vui lòng nhập đầy đủ email và mật khẩu');
+      setError("Vui lòng nhập đầy đủ email và mật khẩu");
       setIsLoading(false);
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      setError('Email không hợp lệ');
+      setError("Email không hợp lệ");
       setIsLoading(false);
       return;
     }
@@ -59,33 +59,37 @@ export default function Login() {
     try {
       const loginData = {
         username: email.trim(),
-        password: password.trim()
+        password: password.trim(),
       };
-      
-      console.log('Sending login request with data:', loginData);
-      
-      const response = await api.post<LoginResponse>('/api/v1/auth/login', loginData);
-      
-      console.log('Full login response:', response);
-      console.log('Login response data:', response.data);
-      console.log('Data object:', response.data.data);
 
+      console.log("Sending login request with data:", loginData);
+
+      const response = await api.post<LoginResponse>(
+        "/api/v1/auth/login",
+        loginData
+      );
+
+      console.log("Full login response:", response);
+      console.log("Login response data:", response.data);
+      console.log("Data object:", response.data.data);
       if (response.data?.data?.access_token) {
-        console.log('Token found:', response.data.data.access_token);
+        console.log("Token found:", response.data.data.access_token);
         setAuthToken(response.data.data.access_token);
         setUser(response.data.data.user);
-        navigate('/homepage');
+        const fullname = response.data.data.user.fullname?.trim() || "";
+        const lastWord = fullname.split(" ").pop() || "";
+        navigate(`/${encodeURIComponent(lastWord)}`);
       } else {
-        console.error('Token not found in response:', response.data);
-        setError('Không nhận được token từ server');
+        console.error("Token not found in response:", response.data);
+        setError("Không nhận được token từ server");
       }
     } catch (err: unknown) {
-      console.error('Login error:', err);
-      
+      console.error("Login error:", err);
+
       if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError('Email hoặc mật khẩu không chính xác');
+        setError("Email hoặc mật khẩu không chính xác");
       }
     } finally {
       setIsLoading(false);
@@ -93,7 +97,7 @@ export default function Login() {
   };
 
   const handleRegister = () => {
-    navigate('/register');
+    navigate("/register");
   };
 
   return (
@@ -180,9 +184,7 @@ export default function Login() {
             </div>
 
             {error && (
-              <div className="text-red-600 text-sm text-center">
-                {error}
-              </div>
+              <div className="text-red-600 text-sm text-center">{error}</div>
             )}
 
             <motion.button
@@ -197,7 +199,7 @@ export default function Login() {
               ) : (
                 <IconLogin size={20} />
               )}
-              {isLoading ? 'Đang đăng nhập...' : 'Đăng Nhập'}
+              {isLoading ? "Đang đăng nhập..." : "Đăng Nhập"}
             </motion.button>
 
             <div className="text-center text-sm text-gray-600">
@@ -215,4 +217,4 @@ export default function Login() {
       </div>
     </div>
   );
-} 
+}

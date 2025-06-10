@@ -3,9 +3,7 @@ import {
   IconWeight,
   IconHeartbeat,
   IconHeartRateMonitor,
-  IconPill,
   IconCalendar,
-  IconId,
   IconLineHeight,
   IconFilterHeart,
   IconUser,
@@ -22,37 +20,78 @@ import {
   Select,
 } from "antd";
 import dayjs from "dayjs";
-import type {
-  StatusHealth,
-} from "../../../../hooks/useRegisterBlood";
 import type { UploadChangeParam } from "antd/es/upload";
 import type { RcFile } from "antd/es/upload/interface";
+import useHealthService from "../../../../hooks/HealthInfor/useHealthService";
+import useFormHealth from "../../../../hooks/HealthInfor/useFormHealth";
+import useUser from "../../../../hooks/User/useUser";
+import useBlood, {
+  type DataBlood,
+  type ResultBlood,
+} from "../../../../hooks/Blood/useBlood";
 // import { form } from "framer-motion/client";
 
-interface FormHealthProps {
-  statusHealth: StatusHealth;
-  setStatusHealth: React.Dispatch<React.SetStateAction<StatusHealth>>;
-}
+export default function FormHealth() {
+  const { createHealthInfo } = useHealthService();
+  const { userData } = useUser();
+  console.log("user:", userData);
+  const { formHealth, setFormHealth } = useFormHealth();
+  const { blood } = useBlood();
+  console.log("Blood list:", blood);
+  console.log("Health Form :", formHealth);
+  const onFinish = async () => {
+    try {
+      const payload = {
+        user_id: formHealth.user_id,
+        blood_id: formHealth.blood_id || "",
+        height: formHealth.height,
+        weight_decimal: formHealth.weight,
+        blood_pressure: formHealth.blood_pressure,
+        medical_history: formHealth.medical_history,
+        latest_donate: formHealth.latest_donate,
+        status_health: formHealth.status_health,
+        img_health: formHealth.img_health || "",
+      };
+      console.log("📤 Sending payload:", payload);
+      await createHealthInfo(payload);
+      message.success("Health information submitted successfully!");
+    } catch (error: unknown ) {
+      // Check có phải lỗi từ Axios không
+      if (error.response) {
+        console.error("🚨 Lỗi khi tạo mới thông tin sức khỏe:", error);
 
-export default function FormHealth({ formData, setFormData }: FormHealthProps) {
-  console.log("📌 Current formData:", formData);
+        // Lỗi chi tiết từ backend
+        const messages = error.response.data?.message;
+        if (Array.isArray(messages)) {
+          console.error("🧾 Danh sách lỗi:", messages);
+          throw new Error(messages.join(" | "));
+        } else if (typeof messages === "string") {
+          throw new Error(messages);
+        }
+        message.error(messages)
+      }
+
+      // Nếu không phải lỗi từ response (timeout, network,...)
+      throw new Error(
+        "Đã có lỗi không xác định xảy ra khi tạo thông tin sức khỏe."
+      );
+    }
+  };
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    console.log(`📝 Input Changed: ${name} = ${value}`);
-    console.log("📋 Current formData before change:", formData);
-    setFormData({
-      height: formData.statusHealth?.height || "",
-      weight: formData.statusHealth?.weight || "",
-      bloodPressure: formData.statusHealth?.bloodPressure || "",
-      medicalHistory: formData.statusHealth?.medicalHistory || "",
-      currentCondition: formData.statusHealth?.currentCondition || "",
-      medication: formData.statusHealth?.medication || "",
-      lastDonationDate: formData.statusHealth?.lastDonationDate || "",
-      //   cccd: formData.statusHealth?.cccd || "",
-      imgHealth: formData.statusHealth?.imgHealth || "",
-    });
+
+    // Xử lý ép kiểu number cho các field cần thiết
+    const parsedValue =
+      name === "height" || name === "weight" || name === "blood_pressure"
+        ? Number(value)
+        : value;
+
+    setFormHealth((prev) => ({
+      ...prev,
+      [name]: parsedValue,
+    }));
   };
 
   const handleUpload = (
@@ -64,7 +103,7 @@ export default function FormHealth({ formData, setFormData }: FormHealthProps) {
 
     if (file) {
       const fileURL = URL.createObjectURL(file);
-      setFormData((prev) => ({
+      setFormHealth((prev) => ({
         ...prev,
         [field]: fileURL,
       }));
@@ -85,7 +124,7 @@ export default function FormHealth({ formData, setFormData }: FormHealthProps) {
         Thông Tin Sức Khỏe
       </h2>
 
-      <Form layout="vertical">
+      <Form layout="vertical" onFinish={onFinish}>
         {/* Tên người điền */}
         <Form.Item
           label={
@@ -97,7 +136,7 @@ export default function FormHealth({ formData, setFormData }: FormHealthProps) {
         >
           <Input
             name="fullName"
-            value={formData.fullName}
+            value={userData?.data?.fullname}
             onChange={handleChange}
             placeholder="Nhập tên người điền"
           />
@@ -117,7 +156,7 @@ export default function FormHealth({ formData, setFormData }: FormHealthProps) {
             <Input
               type="number"
               name="height"
-              value={formData.statusHealth?.height}
+              value={formHealth.height}
               onChange={handleChange}
               placeholder="cm"
               min={50}
@@ -137,8 +176,8 @@ export default function FormHealth({ formData, setFormData }: FormHealthProps) {
             <Input
               type="number"
               name="weight"
-              value={formData.statusHealth?.weight}
-              onChange={(value) => handleChange(value)}
+              value={formHealth.weight}
+              onChange={handleChange}
               placeholder="kg"
               min={30}
               max={200}
@@ -155,13 +194,10 @@ export default function FormHealth({ formData, setFormData }: FormHealthProps) {
             rules={[{ required: true, message: "Nhập huyết áp!" }]}
           >
             <Input
-              type="number"
-              name="bloodPressure"
-              value={formData.statusHealth?.bloodPressure}
+              name="blood_pressure"
+              value={formHealth.blood_pressure}
               onChange={handleChange}
               placeholder="VD: 120/80"
-              min={80}
-              max={120}
             />
           </Form.Item>
         </div>
@@ -179,7 +215,7 @@ export default function FormHealth({ formData, setFormData }: FormHealthProps) {
             allowClear
             placeholder="Chọn các bệnh lý đã mắc"
             onChange={(value) =>
-              setFormData((prev) => ({
+              setFormHealth((prev) => ({
                 ...prev,
                 medicalHistory: value.join(", "),
               }))
@@ -196,20 +232,35 @@ export default function FormHealth({ formData, setFormData }: FormHealthProps) {
         {/* Tình trạng hiện tại: chọn 1 */}
 
         {/* Thuốc đang dùng */}
+        {/* Nhóm máu */}
         <Form.Item
           label={
             <span className={inputClass}>
-              <IconPill size={20} /> Thuốc đang dùng
+              <IconFilterHeart size={20} /> Nhóm máu
             </span>
           }
+          rules={[{ required: true, message: "Vui lòng chọn nhóm máu!" }]}
         >
-          <Input
-            name="medication"
-            value={formData.statusHealth?.medication}
-            onChange={handleChange}
-            placeholder="VD: Paracetamol"
+          <Select
+            placeholder="Chọn nhóm máu"
+            value={formHealth.blood_id}
+            onChange={(value) =>
+              setFormHealth((prev) => ({
+                ...prev,
+                blood_id: value,
+              }))
+            }
+            options={
+              blood?.data?.result
+                ?.filter((b) => b.blood_type_id && b.rh_id)
+                .map((b) => ({
+                  label: `${b.blood_type_id.blood_name} (${b.rh_id.blood_Rh})`,
+                  value: b.blood_id,
+                })) || []
+            }
           />
         </Form.Item>
+
         <div className="flex gap-4">
           <div className="w-1/2 relative">
             <Form.Item
@@ -222,10 +273,17 @@ export default function FormHealth({ formData, setFormData }: FormHealthProps) {
               <DatePicker
                 style={{ width: "100%" }}
                 value={
-                  formData.statusHealth?.lastDonationDate
-                    ? dayjs(formData.statusHealth.lastDonationDate)
+                  formHealth.latest_donate
+                    ? dayjs(formHealth.latest_donate)
                     : null
                 }
+                onChange={(date, dateString) =>
+                  setFormHealth((prev) => ({
+                    ...prev,
+                    latest_donate: dateString,
+                  }))
+                }
+                format="YYYY-MM-DD"
               />
             </Form.Item>
           </div>
@@ -238,9 +296,12 @@ export default function FormHealth({ formData, setFormData }: FormHealthProps) {
               }
             >
               <Select
-                value={formData.statusHealth?.currentCondition}
+                value={formHealth.status_health}
                 onChange={(value) =>
-                  setFormData((prev) => ({ ...prev, currentCondition: value }))
+                  setFormHealth((prev) => ({
+                    ...prev,
+                    status_health: value,
+                  }))
                 }
                 options={[
                   { label: "Tốt", value: "Tốt" },
@@ -295,9 +356,9 @@ export default function FormHealth({ formData, setFormData }: FormHealthProps) {
           >
             <Button icon={<IconUpload />}>Tải ảnh lên</Button>
           </Upload>
-          {formData.statusHealth?.imgHealth && (
+          {formHealth.img_health && (
             <Image
-              src={formData.statusHealth?.imgHealth}
+              src={formHealth.img_health}
               alt="Giấy khám sức khỏe"
               height={150}
               className="mt-2 rounded-lg shadow"

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useAuth } from "../User/useAuth";
 export interface StatusHealth {
   height: string;
   weight: string;
@@ -22,10 +23,9 @@ export interface RegisterBlood {
   bloodType: string;
   statusHealth: StatusHealth;
   status: string;
-  level : string;
+  level: string;
   hospital: string;
   cccd: string; // link ảnh CCCD
-
 }
 export const registerBlood = [
   {
@@ -57,18 +57,18 @@ export const registerBlood = [
     },
     cccd: "https://example.com/cccd_front.jpg",
     status: "Đang chờ xác nhận",
-    level : "",
+    level: "",
     hospital: "",
   },
 ];
 
 export const useRegisterBlood = () => {
+  const { user } = useAuth();
   const [waitingList, setWaitingList] =
     useState<RegisterBlood[]>(registerBlood);
   const [formData, setFormData] = useState({
-    id: 0,
-    username: "",
-    fullName: "",
+    id: user?.user_id,
+    fullName: user?.fullname,
     dob: "",
     phone: "",
     email: "",
@@ -86,7 +86,7 @@ export const useRegisterBlood = () => {
       lastDonationDate: "",
       imgHealth: "",
     },
-    level : "",
+    level: "",
     status: "",
     hospital: "",
   });

@@ -32,7 +32,7 @@ import {
 } from "@tabler/icons-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
-import type { RegisterBlood } from "../../../../hooks/useRegisterBlood";
+import type { RegisterBlood } from "../../../../hooks/RegistrationForm/useRegisterBlood";
 
 const { Title } = Typography;
 

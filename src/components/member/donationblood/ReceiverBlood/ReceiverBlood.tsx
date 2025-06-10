@@ -1,4 +1,4 @@
-import { useRegisterBlood } from "../../../../hooks/useRegisterBlood";
+import { useRegisterBlood } from "../../../../hooks/RegistrationForm/useRegisterBlood";
 import TableReceiverBlood from "./TableReceiver";
 import FormViewReceiver from "./FormViewReceiver";
 

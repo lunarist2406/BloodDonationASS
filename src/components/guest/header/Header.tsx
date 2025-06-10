@@ -11,7 +11,7 @@ import {
   IconLogout,
 } from "@tabler/icons-react";
 import img1 from "../../../assets/Blood-Donation-1.webp";
-import { useAuth } from "../../../hooks/useAuth";
+import { useAuth } from "../../../hooks/User/useAuth";
 
 export default function GuestHeader() {
   const { isAuthenticated, user, clearAuth } = useAuth();
@@ -41,7 +41,9 @@ export default function GuestHeader() {
   const handleLogoClick = (e: React.MouseEvent) => {
     e.preventDefault();
     window.scrollTo({ top: 0, behavior: "smooth" });
-    navigate("/homepage");
+    const fullname = user?.fullname?.trim() || "";
+    const lastWord = fullname.split(" ").pop() || "";
+    navigate(`/${encodeURIComponent(lastWord)}`);
   };
 
   // const handleSignIn = () => {

@@ -23,6 +23,7 @@ export const useAuth = create<UserAuthStore>((set, get) => ({
   setAuthToken: (token) => {
     console.log('Đang cài đặt token:', token);
     set({ token });
+    return token;
   },
   setUser: (user) => {
     console.log('Đang cài đặt thông tin người dùng:', user);

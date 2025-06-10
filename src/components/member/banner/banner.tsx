@@ -13,7 +13,7 @@ export default function GuestBanner() {
   const navigate = useNavigate();
 
   const handleRegister = () => {
-    navigate('/register');
+    navigate("/register");
   };
 
   return (
@@ -46,14 +46,14 @@ export default function GuestBanner() {
               thành một phần của cộng đồng nhân ái.
             </motion.li>
           </ul>
-          <motion.button
+          {/* <motion.button
             onClick={handleRegister}
             className="mt-6 px-5 py-3 bg-red-700 text-white rounded-lg font-bold flex items-center hover:bg-red-500"
             whileHover={{ scale: 1.05 }}
           >
             <IconArrowRightCircle className="mr-2" size={24} /> Đăng Ký Hiến Máu
             Ngay
-          </motion.button>
+          </motion.button> */}
         </motion.div>
 
         <motion.div

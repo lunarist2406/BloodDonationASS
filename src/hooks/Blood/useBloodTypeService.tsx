@@ -1,15 +1,25 @@
-import {api} from '../components/config/axios/axiosInstance';
+import { api } from "../../components/config/axios/axiosInstance";
+import { useAuth } from "../User/useAuth";
 
-const API_URL = 'http://localhost:3000/api/v1/blood-types';
+const API_URL = "http://localhost:3000/api/v1/blood-types";
 
-export default function useBloodType() {
+export default function useBloodTypeService() {
+  const { token } = useAuth();
+  const authHeaders = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
   // Lấy tất cả nhóm máu (có phân trang)
-  const getAllBloodTypes = async (current = 1, pageSize = 10) => {
+  const getAllBloodTypes = async (current = 1, pageSize = 14) => {
     try {
-      const response = await api.get(`${API_URL}?current=${current}&pageSize=${pageSize}`);
+      const response = await api.get(
+        `${API_URL}?current=${current}&pageSize=${pageSize}`,
+        authHeaders
+      );
       return response.data;
     } catch (error) {
-      console.error('Lỗi khi lấy danh sách nhóm máu:', error);
+      console.error("Lỗi khi lấy danh sách nhóm máu:", error);
       throw error;
     }
   };
@@ -20,7 +30,7 @@ export default function useBloodType() {
       const response = await api.get(`${API_URL}/${id}`);
       return response.data;
     } catch (error) {
-      console.error('Lỗi khi lấy nhóm máu theo ID:', error);
+      console.error("Lỗi khi lấy nhóm máu theo ID:", error);
       throw error;
     }
   };
@@ -31,7 +41,7 @@ export default function useBloodType() {
       const response = await api.post(API_URL, data);
       return response.data;
     } catch (error) {
-      console.error('Lỗi khi tạo nhóm máu mới:', error);
+      console.error("Lỗi khi tạo nhóm máu mới:", error);
       throw error;
     }
   };
@@ -42,7 +52,7 @@ export default function useBloodType() {
       const response = await api.put(`${API_URL}/${id}`, data);
       return response.data;
     } catch (error) {
-      console.error('Lỗi khi cập nhật nhóm máu:', error);
+      console.error("Lỗi khi cập nhật nhóm máu:", error);
       throw error;
     }
   };
