@@ -9,11 +9,11 @@ import BloodExperience from "./components/member/information/BloodExperience";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import RegisterBlood from "./components/member/donationblood/RegisterBlood/registerBlood";
 import HomePage from "./page/HomePage";
-import SeekInformation from "./components/member/donationblood/SearchingInformation/SeekInformation";
 import RegisterBloodEmergency from "./components/member/donationblood/RegisterBloodEmergency/registerBloodEmergency";
 import DonateBlood from "./components/member/donationblood/DonateBlood/DonateBlood";
 import ReceiverBlood from "./components/member/donationblood/ReceiverBlood/ReceiverBlood";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
+import { SeekInformation } from "./components/member/donationblood/SearchingInformation/SeekInformation";
 
 function App() {
   return (
