@@ -8,7 +8,7 @@ export interface FormHealth {
   weight: number;
   blood_pressure: number;
   medical_history: string;
-  latest_donate: string;
+  latest_donate: string | null;
   status_health: string;
   img_health: string;
 }

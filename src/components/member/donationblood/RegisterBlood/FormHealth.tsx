@@ -25,13 +25,13 @@ import type { RcFile } from "antd/es/upload/interface";
 import useHealthService from "../../../../hooks/HealthInfor/useHealthService";
 import useFormHealth from "../../../../hooks/HealthInfor/useFormHealth";
 import useUser from "../../../../hooks/User/useUser";
-import useBlood, {
-  type DataBlood,
-  type ResultBlood,
-} from "../../../../hooks/Blood/useBlood";
+import useBlood from "../../../../hooks/Blood/useBlood";
+import isAxiosLikeError from "../../../../constraint/typeError";
 // import { form } from "framer-motion/client";
 
 export default function FormHealth() {
+  const [form] = Form.useForm();
+
   const { createHealthInfo } = useHealthService();
   const { userData } = useUser();
   console.log("user:", userData);
@@ -39,44 +39,39 @@ export default function FormHealth() {
   const { blood } = useBlood();
   console.log("Blood list:", blood);
   console.log("Health Form :", formHealth);
+
   const onFinish = async () => {
     try {
       const payload = {
-        user_id: formHealth.user_id,
+        user_id: userData?.data?.user_id || "",
         blood_id: formHealth.blood_id || "",
-        height: formHealth.height,
-        weight_decimal: formHealth.weight,
+        height: Number(formHealth.height),
+        weight_decimal: Number(formHealth.weight),
         blood_pressure: formHealth.blood_pressure,
         medical_history: formHealth.medical_history,
         latest_donate: formHealth.latest_donate,
         status_health: formHealth.status_health,
         img_health: formHealth.img_health || "",
       };
+
       console.log("📤 Sending payload:", payload);
       await createHealthInfo(payload);
       message.success("Health information submitted successfully!");
-    } catch (error: unknown ) {
-      // Check có phải lỗi từ Axios không
-      if (error.response) {
-        console.error("🚨 Lỗi khi tạo mới thông tin sức khỏe:", error);
+    } catch (error: unknown) {
+      if (isAxiosLikeError(error)) {
+        const errMsg = error.response?.data?.message; // ✅ Đổi tên biến
 
-        // Lỗi chi tiết từ backend
-        const messages = error.response.data?.message;
-        if (Array.isArray(messages)) {
-          console.error("🧾 Danh sách lỗi:", messages);
-          throw new Error(messages.join(" | "));
-        } else if (typeof messages === "string") {
-          throw new Error(messages);
+        if (Array.isArray(errMsg)) {
+          message.error(errMsg.join(" | "));
+        } else if (typeof errMsg === "string") {
+          message.error(errMsg);
         }
-        message.error(messages)
+      } else {
+        message.error("Unknown error occurred.");
       }
-
-      // Nếu không phải lỗi từ response (timeout, network,...)
-      throw new Error(
-        "Đã có lỗi không xác định xảy ra khi tạo thông tin sức khỏe."
-      );
     }
   };
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -124,7 +119,16 @@ export default function FormHealth() {
         Thông Tin Sức Khỏe
       </h2>
 
-      <Form layout="vertical" onFinish={onFinish}>
+      <Form
+        layout="vertical"
+        form={form}
+        onFinish={(values) => {
+          // values sẽ chứa toàn bộ form field
+          console.log("✅ Values:", values);
+          setFormHealth(values);
+          onFinish(); // xử lý submit API
+        }}
+      >
         {/* Tên người điền */}
         <Form.Item
           label={
@@ -159,7 +163,7 @@ export default function FormHealth() {
               value={formHealth.height}
               onChange={handleChange}
               placeholder="cm"
-              min={50}
+              min={140}
               max={250}
             />
           </Form.Item>
@@ -179,8 +183,8 @@ export default function FormHealth() {
               value={formHealth.weight}
               onChange={handleChange}
               placeholder="kg"
-              min={30}
-              max={200}
+              min={40}
+              max={100}
             />
           </Form.Item>
 
@@ -194,10 +198,13 @@ export default function FormHealth() {
             rules={[{ required: true, message: "Nhập huyết áp!" }]}
           >
             <Input
+              type="number"
               name="blood_pressure"
               value={formHealth.blood_pressure}
               onChange={handleChange}
               placeholder="VD: 120/80"
+              min={80}
+              max={120}
             />
           </Form.Item>
         </div>
@@ -277,10 +284,10 @@ export default function FormHealth() {
                     ? dayjs(formHealth.latest_donate)
                     : null
                 }
-                onChange={(date, dateString) =>
+                onChange={(date) =>
                   setFormHealth((prev) => ({
                     ...prev,
-                    latest_donate: dateString,
+                    latest_donate: date ? date.format("YYYY-MM-DD") : null,
                   }))
                 }
                 format="YYYY-MM-DD"
@@ -305,10 +312,9 @@ export default function FormHealth() {
                 }
                 options={[
                   { label: "Tốt", value: "Tốt" },
-                  { label: "Bình thường", value: "Bình thường" },
-                  { label: "Không khỏe", value: "Không khỏe" },
+                  { label: "Trung bình", value: "Trung bình" },
+                  { label: "Yếu", value: "Yếu" },
                 ]}
-                placeholder="Chọn tình trạng"
               />
             </Form.Item>
           </div>
@@ -344,27 +350,27 @@ export default function FormHealth() {
         <Form.Item
           label={
             <span className={inputClass}>
-              <IconFilterHeart size={20} /> Giấy khám sức khỏe
+              <IconUpload size={20} /> Ảnh sức khỏe
             </span>
           }
         >
           <Upload
-            accept="image/*"
             showUploadList={false}
-            beforeUpload={() => false}
-            onChange={(info) => handleUpload(info, "imgHealth")}
+            beforeUpload={() => false} // prevent auto upload
+            onChange={(info) => handleUpload(info, "img_health")}
           >
-            <Button icon={<IconUpload />}>Tải ảnh lên</Button>
+            <Button icon={<IconUpload />}>Tải ảnh</Button>
           </Upload>
           {formHealth.img_health && (
             <Image
               src={formHealth.img_health}
-              alt="Giấy khám sức khỏe"
-              height={150}
-              className="mt-2 rounded-lg shadow"
+              alt="Ảnh sức khỏe"
+              style={{ marginTop: 8 }}
+              width={150}
             />
           )}
         </Form.Item>
+
         <Button type="primary" htmlType="submit" size="large">
           Gửi thông tin
         </Button>
