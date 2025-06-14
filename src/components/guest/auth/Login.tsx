@@ -174,8 +174,8 @@ export default function Login() {
             </div>
 
             <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center">
-                <input type="checkbox" className="mr-2" />
+              <label className="flex items-center gap-2">
+                <input type="checkbox" className="mr-6" />
                 Ghi nhớ đăng nhập
               </label>
               <a href="#" className="text-red-600 hover:text-red-800">
@@ -190,16 +190,18 @@ export default function Login() {
             <motion.button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-red-500 to-red-900 text-white py-3 rounded-lg font-semibold flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full bg-gradient-to-r from-red-500 to-red-900 text-white py-3 rounded-lg font-semibold flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
               whileHover={{ scale: isLoading ? 1 : 1.02 }}
               whileTap={{ scale: isLoading ? 1 : 0.98 }}
             >
               {isLoading ? (
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
               ) : (
-                <IconLogin size={20} />
+                <IconLogin size={20} className="text-white" />
               )}
-              {isLoading ? "Đang đăng nhập..." : "Đăng Nhập"}
+              <span className="text-white">
+                {isLoading ? "Đang đăng nhập..." : "Đăng Nhập"}
+              </span>
             </motion.button>
 
             <div className="text-center text-sm text-gray-600">

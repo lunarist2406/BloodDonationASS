@@ -104,10 +104,13 @@ export default function GuestIntroduce() {
           </motion.p>
           <motion.button
             onClick={handleRegister}
-            className="mt-6 px-5 py-3 bg-red-700 text-white rounded-lg font-bold flex items-center hover:bg-red-500"
+            className="mt-6 px-5 py-3 bg-red-700 text-white rounded-lg font-bold flex items-center hover:bg-red-500 cursor-pointer"
             whileHover={{ scale: 1.05 }}
           >
-            <IconClipboardPlus className="mr-2" size={24} /> Đăng Ký Ngay
+            <IconClipboardPlus className="mr-2 text-white" size={24} />
+            <span className="text-white">
+                Đăng Ký Ngay
+              </span>
           </motion.button>
         </div>
 
@@ -213,9 +216,9 @@ export default function GuestIntroduce() {
         animate="visible"
         transition={{ duration: 0.6, ease: "easeOut" }}
         variants={fadeInUp}
-        className="mt-10 text-3xl font-bold text-center mb-12 "
+        className="mt-10 text-3xl font-bold text-center mb-12 leading-relaxed"
       >
-        <IconNews className="inline-block mr-2" size={32} /> Thông tin Hệ Thống
+        <IconNews className="inline-block mr-2 gap-2" size={32} /> Thông tin Hệ Thống
         Hỗ Trợ Hiến Máu
       </motion.h2>
       <div className="grid grid-cols-15 gap-5 px-10 mt-10">
