@@ -15,71 +15,78 @@ import {
 import { Input, notification, Select } from "antd";
 import { Option } from "antd/es/mentions";
 import { motion } from "framer-motion";
+import useUser from "../../../../hooks/User/useUser";
 
-export default function FormRegisterBlood({
-  formData,
-  setFormData,
-  setWaitingList,
-}) {
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+export default function FormRegisterBlood() {
+  const { userData } = useUser();
+  // const {infor}
+  // const handleChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setFormData((prev) => ({
+  //     ...prev,
+  //     [name]: value,
+  //   }));
+  // };
+
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+  //   console.log("📋 Form Submitted:", formData);
+  //   if (
+  //     !formData.fullName ||
+  //     !formData.dob ||
+  //     !formData.phone ||
+  //     !formData.roleDonation ||
+  //     !formData.bloodType ||
+  //     !formData.location
+  //   ) {
+  //     notification.error({
+  //       message: "Lỗi Đăng Ký",
+  //       description: "Vui lòng điền đầy đủ thông tin.",
+  //     });
+  //     return;
+  //   }
+
+  //   setWaitingList((prevList) => [
+  //     ...prevList,
+  //     { ...formData, status: "Đang chờ xác nhận" },
+  //   ]);
+
+  //   setFormData({
+  //     fullName: formData.fullName,
+  //     dob: formData.dob,
+  //     phone: formData.phone,
+  //     roleDonation: formData.roleDonation,
+  //     bloodType: formData.bloodType,
+  //     location: formData.location,
+  //     statusHealth: {
+  //       height: "",
+  //       weight: "",
+  //       bloodPressure: "",
+  //       medicalHistory: "",
+  //       currentCondition: "",
+  //       medication: "",
+  //       lastDonationDate: "",
+  //       cccd: "",
+  //       imgHealth: "",
+  //     },
+  //     status: "",
+  //     hospital: "",
+  //   });
+  // };
+  // const handleSelectChange = (value, fieldName) => {
+  //   setFormData((prev) => ({
+  //     ...prev,
+  //     [fieldName]: value,
+  //   }));
+  // };
+  const handleSubmit = () => {
+    // try {
+    //   const payload = {
+    //     blood_id :
+    //   };
+    // } catch (error) {}
   };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("📋 Form Submitted:", formData);
-    if (
-      !formData.fullName ||
-      !formData.dob ||
-      !formData.phone ||
-      !formData.roleDonation ||
-      !formData.bloodType ||
-      !formData.location
-    ) {
-      notification.error({
-        message: "Lỗi Đăng Ký",
-        description: "Vui lòng điền đầy đủ thông tin.",
-      });
-      return;
-    }
-
-    setWaitingList((prevList) => [
-      ...prevList,
-      { ...formData, status: "Đang chờ xác nhận" },
-    ]);
-
-    setFormData({
-      fullName: formData.fullName,
-      dob: formData.dob,
-      phone: formData.phone,
-      roleDonation: formData.roleDonation,
-      bloodType: formData.bloodType,
-      location: formData.location,
-      statusHealth: {
-        height: "",
-        weight: "",
-        bloodPressure: "",
-        medicalHistory: "",
-        currentCondition: "",
-        medication: "",
-        lastDonationDate: "",
-        cccd: "",
-        imgHealth: "",
-      },
-      status: "",
-      hospital: "",
-    });
-  };
-  const handleSelectChange = (value, fieldName) => {
-    setFormData((prev) => ({
-      ...prev,
-      [fieldName]: value,
-    }));
-  };
+  const handleChange = () => {};
   const inputStyle =
     "w-full px-3 py-2 border rounded pl-10 bg-white text-gray-800";
   const inputWrapper = "relative mb-4";
@@ -99,16 +106,16 @@ export default function FormRegisterBlood({
         <div className={inputWrapper}>
           <label className="block font-semibold mb-1">Họ và tên</label>
           <div className="relative">
-            <motion.div {...iconMotion}>
+            {/* <motion.div {...iconMotion}>
               <IconUser className={iconClass} />
-            </motion.div>
+            </motion.div> */}
             <Input
               type="text"
               name="fullName"
-              value={formData.fullName}
-              onChange={handleChange}
+              value={userData?.data.fullname}
               className={inputStyle}
               placeholder="Nhập họ và tên"
+              disabled
             />
           </div>
         </div>
@@ -124,7 +131,7 @@ export default function FormRegisterBlood({
               <Input
                 type="date"
                 name="dob"
-                value={formData.dob}
+                value={userData?.data.fullname}
                 onChange={handleChange}
                 className={inputStyle}
               />
@@ -135,11 +142,11 @@ export default function FormRegisterBlood({
             <label className="block font-semibold mb-1">Giới tính</label>
 
             <Select
-              value={formData.gender}
-              onChange={(value) => handleSelectChange(value, "gender")}
+              value={userData?.data.gender}
               className="w-full text-sm pl-10"
               styles={{ popup: { root: { fontSize: "12px" } } }}
               placeholder="Lựa chọn"
+              disabled
             >
               <Option value="male">
                 <IconGenderMale className="inline mr-1 text-red-400 w-4 h-4" />
@@ -163,7 +170,7 @@ export default function FormRegisterBlood({
               <Input
                 type="tel"
                 name="phone"
-                value={formData.phone}
+                value={userData?.data.user_id}
                 onChange={handleChange}
                 className={inputStyle}
                 placeholder="Nhập số điện thoại liện hệ"
@@ -175,23 +182,24 @@ export default function FormRegisterBlood({
           <div className="w-1/2">
             <label className="block font-semibold mb-1">Email</label>
             <div className="relative">
-              <motion.div {...iconMotion}>
+              {/* <motion.div {...iconMotion}>
                 <IconMail className={iconClass} />
-              </motion.div>
+              </motion.div> */}
               <Input
                 type="email"
                 name="email"
-                value={formData.email}
+                value={userData?.data.email}
                 onChange={handleChange}
                 className={inputStyle}
                 placeholder="Nhập email liên hệ"
+                disabled
               />
             </div>
           </div>
         </div>
 
         {/* Vai trò & thời gian cần máu */}
-        <div className="mb-4 flex gap-4">
+        {/* <div className="mb-4 flex gap-4">
           <div className="w-1/2 relative">
             <label className="block font-semibold mb-1">Vai trò</label>
             <Select
@@ -232,10 +240,10 @@ export default function FormRegisterBlood({
               placeholder="Giờ"
             />
           </div>
-        </div>
+        </div> */}
 
         {/* Nhóm máu & số lượng */}
-        <div className="mb-4 flex gap-4">
+        {/* <div className="mb-4 flex gap-4">
           <div className="w-3/8 relative">
             <label className="block font-semibold mb-1 ">Nhóm máu</label>
             <Select
@@ -312,7 +320,7 @@ export default function FormRegisterBlood({
               suffix={<IconNumbers className="text-red-400 w-4 h-4" />}
             />
           </div>
-        </div>
+        </div> */}
 
         {/* Địa điểm hiến máu */}
         <div className={inputWrapper}>
@@ -324,7 +332,7 @@ export default function FormRegisterBlood({
             <input
               type="text"
               name="location"
-              value={formData.location}
+              value={userData?.data.location_id.district}
               onChange={handleChange}
               className={inputStyle}
               placeholder="Nhập địa điểm"
@@ -332,9 +340,7 @@ export default function FormRegisterBlood({
           </div>
         </div>
 
-        {/* Bệnh viện */}
-        <div className="flex gap-4">
-          {/* Bệnh viện */}
+        {/* <div className="flex gap-4">
           <div className="w-5/8">
             <label className="block font-semibold mb-1">Bệnh viện</label>
             <div className="relative">
@@ -352,7 +358,6 @@ export default function FormRegisterBlood({
             </div>
           </div>
 
-          {/* Khoa */}
           <div className="w-3/8">
             <label className="block font-semibold mb-1">
               Mức độ thực hiện{" "}
@@ -373,7 +378,7 @@ export default function FormRegisterBlood({
               </Select>
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Submit */}
         <button

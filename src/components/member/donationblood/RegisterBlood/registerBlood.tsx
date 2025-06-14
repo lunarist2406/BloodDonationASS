@@ -64,7 +64,7 @@ export default function RegisterBlood() {
                   Đăng ký hiến máu
                   <IconChevronRight size={20} />
                 </button>
-                <FormHealth/>
+                <FormHealth />
               </motion.div>
             ) : (
               <motion.div
@@ -82,11 +82,7 @@ export default function RegisterBlood() {
                   <IconChevronLeft size={20} />
                   Điền Thông Tin Sức Khỏe
                 </button>
-                <FormRegisterBlood
-                  formData={formData}
-                  setFormData={setFormData}
-                  setWaitingList={setWaitingList}
-                />
+                <FormRegisterBlood />
               </motion.div>
             )}
           </AnimatePresence>

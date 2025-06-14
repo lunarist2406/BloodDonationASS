@@ -16,7 +16,7 @@ export interface viewDonationBlood {
   createdAt: string;
   updatedAt: string;
 }
-export default function useDonationViewBlood() {
+export default function useDonationView() {
   const { viewBlood, setViewBlood } = useState<viewDonationBlood>();
   const 
   useEffect(() => {

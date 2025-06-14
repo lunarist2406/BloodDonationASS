@@ -12,7 +12,7 @@ export interface LocationUser {
   country: string;
   district: string;
   road: string;
-  location_id: string;
+  location_id: string | null;
 }
 
 export interface data {
@@ -20,8 +20,9 @@ export interface data {
   fullname: string;
   role_id: RoleUser[];
   gender: string;
-  location_id: LocationUser[];
+  location_id: LocationUser;
   token: string;
+  email:string;
 }
 export interface UserInformation{
     data : data
