@@ -6,6 +6,7 @@ import LayoutPage from "./layout/layoutPage";
 import GuestR from "./components/router/GuestR";
 import { useAuth } from "./hooks/User/useAuth";
 import MemberR from "./components/router/MemberR";
+import AdminR from "./components/router/AdminR";
 
 function App() {
   const {user} = useAuth();
@@ -20,15 +21,7 @@ function App() {
             (MemberR())
           )}
           {isAdmin && (
-            <Route
-              path="admin/*"
-              element={
-                <div>
-                  {/* Admin components can be added here */}
-                  <h1>Admin Dashboard</h1>
-                </div>
-              }
-            />
+            (AdminR())
           )}
 
         </Route>

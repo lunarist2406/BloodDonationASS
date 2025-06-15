@@ -252,7 +252,7 @@ export default function GuestHeader() {
 
                 <div className="flex gap-40 flex-wrap mt-5">
                   <Link
-                    to="/manage-users"
+                    to="/controlling-user"
                     className="flex items-center gap-2 hover:scale-105 hover:text-red-500 transition-all duration-200 font-semibold"
                     onClick={() => setShowDropdown(false)}
                   >

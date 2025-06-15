@@ -1,9 +1,12 @@
-import { Navigate } from "react-router-dom";
-import { useAuth } from "../../hooks/User/useAuth";
+import { Route } from "react-router-dom";
+import HomePage from "../../page/HomePage";
+import ControllingUser from "../admin/Body/user/ControllingUser";
 
-export const AdminRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated, hasRole } = useAuth();
-  if (!isAuthenticated()) return <Navigate to="/" />;
-  if (!hasRole("ADMIN")) return <Navigate to="/unauthorized" />;
-  return <>{children}</>;
-};
+export default function AdminR() {
+  return (
+    <>
+      <Route path="/:admin" element={<HomePage />}/>
+              <Route path="/controlling-user" element={<ControllingUser />} />
+    </>
+  );
+}
