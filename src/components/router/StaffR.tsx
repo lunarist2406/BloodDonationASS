@@ -1,7 +1,11 @@
+import { Route } from "react-router-dom";
+import HomePage from "../../page/HomePage";
+
 export default function StaffR(){
     return (
-        <div>
-            
-        </div>
+        <>
+              <Route path="/:staff" element={<HomePage />}/>
+
+        /</>
     )
 }

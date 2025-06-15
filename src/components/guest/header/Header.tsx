@@ -23,6 +23,7 @@ export default function GuestHeader() {
   const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
   const isAdmin = () => user?.role === "ADMIN";
+  const isStaff = () => user?.role === "STAFF";
   const isMember = () => user?.role === "MEMBER";
   console.log("User role:", user?.role);
   const toggleDropdown = () => setShowDropdown(!showDropdown);
@@ -53,10 +54,6 @@ export default function GuestHeader() {
     navigate(`/${encodeURIComponent(lastWord)}`);
   };
 
-  // const handleSignIn = () => {
-  //   navigate("/login");
-  // };
-
   const handleSignOut = () => {
     clearAuth();
     navigate("/");
@@ -78,7 +75,7 @@ export default function GuestHeader() {
             onClick={toggleDropdown}
           >
             <span className="font-bold text-xl">LUNARIST</span>
-            {(isMember() || isAdmin()) && (
+            {(isMember() || isAdmin() || isStaff()) && (
               <IconChevronDown size={25} className="cursor-pointer" />
             )}
           </div>
@@ -285,6 +282,56 @@ export default function GuestHeader() {
                   >
                     <IconSettings2 size={18} />
                     Quản Lý Hệ Thống
+                  </Link>
+                </div>
+              </motion.div>
+            )}
+            {/* staff  */}
+            {isStaff() && (
+              <motion.div className="p-6 space-y-5">
+                <motion.h3
+                  className=" font-bold text-lg flex items-center text-red-700 "
+                  whileHover={{ y: -3 }}
+                >
+                  <IconShieldCheck size={20} className="mr-2" />
+                  Quản Lý Hệ Thống Cấp Thấp
+                </motion.h3>
+
+                <div className="flex gap-8 flex-wrap mt-5">
+                  <Link
+                    to="/controlling-user"
+                    className="flex items-center gap-2 hover:scale-105 hover:text-red-500 transition-all duration-200 font-semibold"
+                    onClick={() => setShowDropdown(false)}
+                  >
+                    <IconUserCog size={18} />
+                    Quản Lý Đơn Đăng ký Hiến Máu
+                  </Link>
+
+                  <Link
+                    to="/controlling-central"
+                    className="flex items-center gap-2 hover:scale-105 hover:text-red-500 transition-all duration-200 font-semibold"
+                    onClick={() => setShowDropdown(false)}
+                  >
+                    <IconBuildingBank size={18} />
+                    Quản Lý Đơn Yêu Cầu Nhận Máu
+                  </Link>
+
+                  <Link
+                    to="/manage-blood-storage"
+                    className="flex items-center gap-2 hover:scale-105 hover:text-red-500 transition-all duration-200 font-semibold"
+                    onClick={() => setShowDropdown(false)}
+                  >
+                    <IconDatabase size={18} />
+                    Quản Lý Đơn Vị Kho Máu của Trung Tâm
+                  </Link>
+
+                  <Link
+                    to="/system-settings"
+                    className="flex items-center gap-2 hover:scale-105 hover:text-red-500 transition-all duration-200 font-semibold"
+                    onClick={() => setShowDropdown(false)}
+                  >
+                    <IconSettings2 size={18} />
+                    Quản Lý Hệ Thống Nghiệp Vụ Máu
                   </Link>
                 </div>
               </motion.div>
