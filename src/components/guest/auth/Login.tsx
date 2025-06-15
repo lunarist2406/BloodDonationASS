@@ -131,14 +131,11 @@ export default function Login() {
             transition={{ delay: 0.2, type: "spring" }}
             className="flex justify-center mb-6"
           >
-            <img src={logo} alt="logo" className="w-20 h-20" />
+            <img src={logo} alt="logo" className="w-16 h-20" />
           </motion.div>
           <h2 className="text-3xl font-bold text-center mb-2 text-gray-800">
             Đăng Nhập
           </h2>
-          <p className="text-center text-gray-600 mb-8">
-            Hệ thống Hỗ trợ Hiến Máu
-          </p>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">

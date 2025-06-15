@@ -56,9 +56,9 @@ export default function TableCentral({
       key: "is_open",
       render: (_: any, record: any) =>
         record.working_id?.is_open ? (
-          <Tag color="green">Đang mở</Tag>
+          <Tag color="green">Hoạt Động</Tag>
         ) : (
-          <Tag color="red">Đang đóng</Tag>
+          <Tag color="red">Ngưng Hoạt Động</Tag>
         ),
     },
     {

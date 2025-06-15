@@ -23,6 +23,8 @@ export interface data {
   location_id: LocationUser;
   token: string;
   email: string;
+  phone: string;
+  dob: string;
 }
 export interface UserInformation {
   data: data;
@@ -50,6 +52,8 @@ export interface User {
   user_id: string;
   fullname: string;
   email: string;
+  phone: string;
+  dob: string | null; // ISO 8601 date string
   gender: string;
   role_id: RoleUser;
   location_id: Location;
@@ -74,9 +78,9 @@ export interface GetAllUsersResponse {
 export default function useUser() {
   const { user } = useAuth();
   const [userData, setUserData] = useState<UserInformation | null>(null); // 👈 dùng object thay vì array
-    const [allUsers, setAllUsers] = useState<GetAllUsersResponse| null>(null); // 👈 list tất cả người dùng
+  const [allUsers, setAllUsers] = useState<GetAllUsersResponse | null>(null); // 👈 list tất cả người dùng
 
-  const { getUserById,getAllUsers} = useUserService();
+  const { getUserById, getAllUsers } = useUserService();
 
   useEffect(() => {
     const fetchUser = async () => {

@@ -125,15 +125,16 @@ export default function FormRegisterBlood() {
           <div className={inputWrapper + " w-1/2"}>
             <label className="block font-semibold mb-1">Ngày sinh</label>
             <div className="relative">
-              <motion.div {...iconMotion}>
-                <IconCalendar className={iconClass} />
-              </motion.div>
               <Input
-                type="date"
                 name="dob"
-                value={userData?.data.fullname}
+                value={
+                  userData?.data.dob
+                    ? new Date(userData.data.dob).toLocaleDateString("vi-VN")
+                    : ""
+                }
                 onChange={handleChange}
                 className={inputStyle}
+                disabled
               />
             </div>
           </div>
@@ -170,7 +171,7 @@ export default function FormRegisterBlood() {
               <Input
                 type="tel"
                 name="phone"
-                value={userData?.data.user_id}
+                value={userData?.data.phone}
                 onChange={handleChange}
                 className={inputStyle}
                 placeholder="Nhập số điện thoại liện hệ"

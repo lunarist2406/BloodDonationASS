@@ -17,7 +17,7 @@ export default function ControllingCentral() {
         className="self-start text-base font-bold flex items-center gap-2 mb-8"
       >
         <IconBuildingBank size={20} className="text-red-500" />
-        Quản Lý Người Dùng
+        Quản Lý Trung Tâm Hiến Máu
       </motion.h4>
 
       <div className="flex gap-4 mb-10 h-full">
