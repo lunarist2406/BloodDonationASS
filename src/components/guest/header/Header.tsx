@@ -261,7 +261,7 @@ export default function GuestHeader() {
                   </Link>
 
                   <Link
-                    to="/manage-blood-centers"
+                    to="/controlling-central"
                     className="flex items-center gap-2 hover:scale-105 hover:text-red-500 transition-all duration-200 font-semibold"
                     onClick={() => setShowDropdown(false)}
                   >

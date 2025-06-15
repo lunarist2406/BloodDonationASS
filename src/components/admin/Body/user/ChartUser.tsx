@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+
 import {
   PieChart,
   Pie,
@@ -149,6 +150,7 @@ export default function ChartUser() {
 
   return (
     <div className="col-span-6 flex flex-col gap-4 items-center justify-center">
+
       {renderChart("Phân Bố Vai Trò Người Dùng", roleData, IconUsers)}
       {renderChart("Phân Bố Người Dùng Theo Quận", districtData, IconMapPin)}
     </div>
