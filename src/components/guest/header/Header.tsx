@@ -89,7 +89,7 @@ export default function GuestHeader() {
             <span className="text-white">Xin chào, {user?.fullname}</span>
             <motion.button
               onClick={handleSignOut}
-              className="px-4 py-2 bg-red-700 text-white text-3xs rounded-lg font-bold flex items-center hover:bg-red-500 gap-2"
+              className="px-4 py-2 bg-red-700 text-white text-3xs rounded-lg font-bold flex items-center hover:bg-red-500 gap-2 cursor-pointer"
               whileHover={{
                 y: -5,
                 scale: 1.05,

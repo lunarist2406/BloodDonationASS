@@ -1,3 +1,4 @@
+import ChatBot from "../components/chatbot/ChatBot";
 import GuestFooter from "../components/guest/footer/GuestFooter";
 import GuestHeader from "../components/guest/header/Header";
 
@@ -11,6 +12,7 @@ export default function LayoutPage() {
         <Outlet />
       </main>
       <GuestFooter />
+      <ChatBot />
     </div>
   );
 }
