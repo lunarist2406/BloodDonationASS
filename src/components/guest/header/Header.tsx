@@ -326,7 +326,7 @@ export default function GuestHeader() {
                   </Link>
 
                   <Link
-                    to="/system-settings"
+                    to="/business-systems"
                     className="flex items-center gap-2 hover:scale-105 hover:text-red-500 transition-all duration-200 font-semibold"
                     onClick={() => setShowDropdown(false)}
                   >

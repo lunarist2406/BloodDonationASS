@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 
 interface UserAuthResponse {
   user_id: string;
@@ -8,7 +8,7 @@ interface UserAuthResponse {
 }
 
 interface UserAuthStore {
-  token: string | null;
+  token: string;
   user: UserAuthResponse | null;
   setAuthToken: (token: string) => void;
   setUser: (user: UserAuthResponse) => void;
@@ -21,12 +21,12 @@ export const useAuth = create<UserAuthStore>((set, get) => ({
   token: null,
   user: null,
   setAuthToken: (token) => {
-    console.log('Đang cài đặt token:', token);
+    console.log("Đang cài đặt token:", token);
     set({ token });
     return token;
   },
   setUser: (user) => {
-    console.log('Đang cài đặt thông tin người dùng:', user);
+    console.log("Đang cài đặt thông tin người dùng:", user);
     set({ user });
     return user ? { ...user } : null;
   },
@@ -38,5 +38,5 @@ export const useAuth = create<UserAuthStore>((set, get) => ({
   hasRole: (role) => {
     const state = get();
     return state.user?.role_name === role;
-  }
+  },
 }));
