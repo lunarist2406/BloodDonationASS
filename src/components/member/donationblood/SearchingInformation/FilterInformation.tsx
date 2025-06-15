@@ -33,19 +33,19 @@ export const FilterInformationUI = ({
   originalData,
 }: FilterInformationUIProps) => {
   const { central } = useCentral();
-  const { searchByCurrentPosition } = useBloodDonationService();
+  const { searchByCurrentPosition, searchByCentralDistance } = useBloodDonationService();
   const [useCurrentLocation, setUseCurrentLocation] = useState(false);
-  const { searchByCentralDistance } = useBloodDonationService();
 
   const handleCenterChange = async (center: string | null) => {
     onCenterChange(center);
 
     if (!center || center === "None") {
-      setUseCurrentLocation(false); 
-      onUseCurrentLocationChange?.(null);
       setData(originalData);
       return;
     }
+
+    setUseCurrentLocation(false);
+    onUseCurrentLocationChange?.(null);
 
     try {
       const response = await searchByCentralDistance({
