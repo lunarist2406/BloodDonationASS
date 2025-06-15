@@ -33,13 +33,14 @@ export const FilterInformationUI = ({
   originalData,
 }: FilterInformationUIProps) => {
   const { central } = useCentral();
-  const { searchByCurrentPosition, searchByCentralDistance } = useBloodDonationService();
+  const { searchByCurrentPosition, searchByCentralDistance } =
+    useBloodDonationService();
   const [useCurrentLocation, setUseCurrentLocation] = useState(false);
 
   const handleCenterChange = async (center: string | null) => {
     onCenterChange(center);
 
-    if (!center || center === "None") {
+    if (!center) {
       setData(originalData);
       return;
     }
@@ -57,6 +58,13 @@ export const FilterInformationUI = ({
     } catch (err) {
       message.error("Không thể tìm theo trung tâm. Vui lòng thử lại.");
     }
+  };
+
+  const handleAllowClear = () => {
+    onCenterChange(null);
+    setUseCurrentLocation(false);
+    onUseCurrentLocationChange?.(null);
+    setData(originalData);
   };
 
   const handleUseLocationChange = async (checked: boolean) => {
@@ -110,7 +118,7 @@ export const FilterInformationUI = ({
         <Checkbox
           checked={useCurrentLocation}
           onChange={(e) => handleUseLocationChange(e.target.checked)}
-          disabled={!!selectedCenter && selectedCenter !== "None"}
+          disabled={!!selectedCenter}
         >
           Sử dụng vị trí hiện tại để tìm kiếm
         </Checkbox>
@@ -134,11 +142,9 @@ export const FilterInformationUI = ({
           style={{ width: "100%", marginBottom: "1rem" }}
           onChange={handleCenterChange}
           allowClear
+          onClear={handleAllowClear}
           placeholder="Chọn trung tâm"
         >
-          <Select.Option key="none" value="None">
-            -- Không chọn --
-          </Select.Option>
           {central.map((c) => (
             <Select.Option
               key={c.centralBlood_id}
@@ -160,6 +166,13 @@ export const FilterInformationUI = ({
         />
       </div>
       <Divider />
+      <div className="text-sm text-center text-gray-600 italic mt-2">
+        {useCurrentLocation
+          ? "Đang tìm kiếm dựa trên địa chỉ hiện tại"
+          : selectedCenter
+          ? "Đang tìm kiếm dựa trên vị trí trung tâm"
+          : "Đang tìm kiếm dựa trên địa chỉ đã đăng ký"}
+      </div>
     </div>
   );
 };
