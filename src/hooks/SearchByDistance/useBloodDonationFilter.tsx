@@ -1,7 +1,24 @@
 import { useState, useCallback, useEffect } from "react";
 
+export type SearchByCentralDistanceDTO = {
+    central_id: string;
+    radiusInKm: number;
+  };
+
+export type SearchByCurrentPosDTO = {
+    lat: number;
+    lng: number;
+    radiusInKm: number;
+  };
+
+export type SearchByDistanceDTO = {
+    user_id: string;
+    radiusInKm: number;
+    typeToSearch?: string | undefined;
+  };
+
 export interface BloodDonationData {
-  id: number;
+  id: string;
   type: string;
   name: string;
   distance: number;
@@ -14,11 +31,24 @@ interface FilterState {
   selectedCenter: string | null;
 }
 
-export const useBloodDonationFilter = (allData: BloodDonationData[]) => {
+interface FilterState {
+  selectedTypes: string[];
+  selectedCenter: string | null;
+}
+
+type UseBloodDonationFilterOptions = {
+  distanceKm: number;
+  selectedCenter: number;
+};
+
+export const useBloodDonationFilter = (
+  allData: BloodDonationData[],
+  options: UseBloodDonationFilterOptions
+) => {
   const [filterState, setFilterState] = useState<FilterState>({
     selectedTypes: [],
-    distanceKm: 10,
-    selectedCenter: null,
+    distanceKm: options.distanceKm,
+    selectedCenter: options.selectedCenter,
   });
   const [filteredData, setFilteredData] = useState<BloodDonationData[]>(allData);
   const [error, setError] = useState<string | null>(null);
@@ -26,13 +56,14 @@ export const useBloodDonationFilter = (allData: BloodDonationData[]) => {
   const filterData = useCallback(() => {
     try {
       setError(null);
-      const { selectedTypes, distanceKm, selectedCenter } = filterState;
+      const { selectedTypes, selectedCenter } = filterState;
+      const distanceKm = options.distanceKm;
 
       const result = allData.filter((item) => {
         const matchType = selectedTypes.length === 0 || selectedTypes.includes(item.type);
         const matchDistance = item.distance <= distanceKm;
         const matchCenter = !selectedCenter || item.center === selectedCenter;
-        
+
         return matchType && matchDistance && matchCenter;
       });
 
@@ -44,41 +75,20 @@ export const useBloodDonationFilter = (allData: BloodDonationData[]) => {
       setFilteredData([]);
       return [];
     }
-  }, [allData, filterState]);
+  }, [allData, filterState, options.distanceKm]);
 
   const updateTypes = useCallback((types: string[]) => {
-    try {
-      setFilterState(prev => ({ ...prev, selectedTypes: types }));
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-      setError(`Lỗi khi cập nhật loại vai trò: ${errorMessage}`);
-    }
-  }, []);
-
-  const updateDistance = useCallback((distance: number) => {
-    try {
-      if (distance < 0) {
-        throw new Error("Khoảng cách phải là số dương");
-      }
-      setFilterState(prev => ({ ...prev, distanceKm: distance }));
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-      setError(`Lỗi khi cập nhật khoảng cách: ${errorMessage}`);
-    }
-  }, []);
-
-  const updateCenter = useCallback((center: string | null) => {
-    setFilterState(prev => ({ ...prev, selectedCenter: center }));
+    setFilterState((prev) => ({ ...prev, selectedTypes: types }));
   }, []);
 
   const clearFilters = useCallback(() => {
     setFilterState({
       selectedTypes: [],
-      distanceKm: 10,
+      distanceKm: options.distanceKm,
       selectedCenter: null,
     });
     setError(null);
-  }, []);
+  }, [options.distanceKm]);
 
   useEffect(() => {
     filterData();
@@ -87,12 +97,8 @@ export const useBloodDonationFilter = (allData: BloodDonationData[]) => {
   return {
     filteredData,
     selectedTypes: filterState.selectedTypes,
-    distanceKm: filterState.distanceKm,
-    selectedCenter: filterState.selectedCenter,
     error,
     updateTypes,
-    updateDistance,
-    updateCenter,
     clearFilters,
     filterData
   };

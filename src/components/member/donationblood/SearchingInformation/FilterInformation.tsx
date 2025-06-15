@@ -1,4 +1,11 @@
-import { Checkbox, Divider, Select, Slider } from "antd";
+import { Checkbox, Divider, message, Select, Slider } from "antd";
+import useCentral from "../../../../hooks/CentralBlood/useCentral";
+import { useState } from "react";
+import useBloodDonationService from "../../../../hooks/SearchByDistance/useBloodDonationService";
+import type {
+  BloodDonationData,
+  SearchByCurrentPosDTO,
+} from "../../../../hooks/SearchByDistance/useBloodDonationFilter";
 
 interface FilterInformationUIProps {
   selectedTypes: string[];
@@ -7,6 +14,11 @@ interface FilterInformationUIProps {
   onTypeChange: (types: string[]) => void;
   onDistanceChange: (distance: number) => void;
   onCenterChange: (center: string | null) => void;
+  onUseCurrentLocationChange?: (
+    coords: { lat: number; lng: number } | null
+  ) => void;
+  setData: (data: BloodDonationData[]) => void;
+  originalData: BloodDonationData[];
 }
 
 export const FilterInformationUI = ({
@@ -16,12 +28,93 @@ export const FilterInformationUI = ({
   onTypeChange,
   onDistanceChange,
   onCenterChange,
+  onUseCurrentLocationChange,
+  setData,
+  originalData,
 }: FilterInformationUIProps) => {
+  const { central } = useCentral();
+  const { searchByCurrentPosition } = useBloodDonationService();
+  const [useCurrentLocation, setUseCurrentLocation] = useState(false);
+  const { searchByCentralDistance } = useBloodDonationService();
+
+  const handleCenterChange = async (center: string | null) => {
+    onCenterChange(center);
+
+    if (!center || center === "None") {
+      setUseCurrentLocation(false); 
+      onUseCurrentLocationChange?.(null);
+      setData(originalData);
+      return;
+    }
+
+    try {
+      const response = await searchByCentralDistance({
+        central_id: center,
+        radiusInKm: distanceKm,
+      });
+
+      setData(response.data);
+    } catch (err) {
+      message.error("Không thể tìm theo trung tâm. Vui lòng thử lại.");
+    }
+  };
+
+  const handleUseLocationChange = async (checked: boolean) => {
+    if (!checked) {
+      setUseCurrentLocation(false);
+      onUseCurrentLocationChange?.(null);
+      setData(originalData);
+      return;
+    }
+
+    if (!navigator.geolocation) {
+      message.error("Trình duyệt không hỗ trợ định vị.");
+      setUseCurrentLocation(false);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        setUseCurrentLocation(true);
+        onUseCurrentLocationChange?.({ lat: latitude, lng: longitude });
+        console.log("lat", latitude);
+        console.log("lng", longitude);
+        const objectSearch: SearchByCurrentPosDTO = {
+          lat: latitude,
+          lng: longitude,
+          radiusInKm: distanceKm || 10,
+        };
+        const response = await searchByCurrentPosition(objectSearch);
+        console.log(response.data);
+        setData(response.data);
+      },
+      (error) => {
+        setUseCurrentLocation(false);
+        if (error.code === error.PERMISSION_DENIED) {
+          message.error("Bạn đã từ chối truy cập vị trí.");
+        } else {
+          message.error("Không thể lấy vị trí. Vui lòng thử lại.");
+        }
+        onUseCurrentLocationChange?.(null);
+      }
+    );
+  };
+
   return (
     <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-3xl mx-auto h-[100%]">
       <h2 className="text-xl font-semibold text-center text-red-600 mb-4">
         Bộ lọc thông tin
       </h2>
+      <div className="text-xs font-semibold text-red-600 mb-2">
+        <Checkbox
+          checked={useCurrentLocation}
+          onChange={(e) => handleUseLocationChange(e.target.checked)}
+          disabled={!!selectedCenter && selectedCenter !== "None"}
+        >
+          Sử dụng vị trí hiện tại để tìm kiếm
+        </Checkbox>
+      </div>
       <div className="text-2xs font-semibold text-red-600">
         <h4>Vai Trò</h4>
         <Checkbox.Group
@@ -38,13 +131,22 @@ export const FilterInformationUI = ({
         <h4>Trung Tâm</h4>
         <Select
           value={selectedCenter}
-          style={{ width: '100%', marginBottom: "1rem" }}
-          onChange={onCenterChange}
+          style={{ width: "100%", marginBottom: "1rem" }}
+          onChange={handleCenterChange}
           allowClear
           placeholder="Chọn trung tâm"
         >
-          <Select.Option value="center1">Trung tâm 1</Select.Option>
-          <Select.Option value="center2">Trung tâm 2</Select.Option>
+          <Select.Option key="none" value="None">
+            -- Không chọn --
+          </Select.Option>
+          {central.map((c) => (
+            <Select.Option
+              key={c.centralBlood_id}
+              value={c.centralBlood_id.toString()}
+            >
+              {c.centralBlood_name}
+            </Select.Option>
+          ))}
         </Select>
       </div>
       <div className="font-semibold text-red-600 mb-4">
