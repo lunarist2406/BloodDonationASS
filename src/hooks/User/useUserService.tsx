@@ -13,8 +13,14 @@ export default function useUserService() {
   };
 
   // Get all users for admin
-  const getAllUsers = async () => {
-    const res = await api.get(API_URL, authHeaders);
+  const getAllUsers = async (current = 1, pageSize = 10) => {
+    const res = await api.get(`${API_URL}`, {
+      params: {
+        current,
+        pageSize,
+      },
+      headers: authHeaders,
+    });
     return res.data;
   };
 

@@ -75,7 +75,7 @@ export default function Login() {
       if (response.data?.data?.access_token) {
         console.log("Token found:", response.data.data.access_token);
         setAuthToken(response.data.data.access_token);
-        setUser(response.data.data.user);
+        setUser(response.data?.data.user);
         const fullname = response.data.data.user.fullname?.trim() || "";
         const lastWord = fullname.split(" ").pop() || "";
         navigate(`/${encodeURIComponent(lastWord)}`);
