@@ -9,7 +9,7 @@ import {
   IconHeartHandshake,
 } from "@tabler/icons-react";
 
-import NewsManagement from "./NewsManagement";
+import NewsManagement from "./News/NewsManagement";
 import WorkingTimeManagement from "./WorkingTimeManagement/WorkingTimeManagement";
 import BloodManagement from "./BloodManagement";
 import BloodTypeManagement from "./BloodTypeManagement";
