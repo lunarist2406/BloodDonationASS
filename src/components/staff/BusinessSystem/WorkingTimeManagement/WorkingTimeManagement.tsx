@@ -124,8 +124,7 @@ export default function WorkingTimeManagement() {
       message.success("Xoá thành công");
       fetchData();
     } catch (err) {
-      message.error(`Xoá thất bại `+ err?.message);
-
+      message.error(`Xoá thất bại ` + err?.message);
     }
   };
 
@@ -173,7 +172,7 @@ export default function WorkingTimeManagement() {
   ];
 
   return (
-    <div className="flex gap-6 p-6 bg-gradient-to-b from-red-100 to-red-300">
+    <div className="flex gap-6 p-6">
       {/* Form bên trái */}
       <div className="w-1/3 p-8 my-8 rounded-lg shadow-md bg-gradient-to-r from-white/70 to-white/90 flex flex-col justify-center">
         <h2 className="font-bold text-red-600 text-center">
