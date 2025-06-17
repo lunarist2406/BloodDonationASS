@@ -18,25 +18,27 @@ interface UserAuthStore {
 }
 
 export const useAuth = create<UserAuthStore>((set, get) => ({
-  token: null,
-  user: null,
+  token: localStorage.getItem("token"),
+  user: JSON.parse(localStorage.getItem("user") || "null"),
   setAuthToken: (token) => {
-    console.log("Đang cài đặt token:", token);
+    localStorage.setItem("token", token);
     set({ token });
-    return token;
   },
   setUser: (user) => {
-    console.log("Đang cài đặt thông tin người dùng:", user);
+    localStorage.setItem("user", JSON.stringify(user));
     set({ user });
-    return user ? { ...user } : null;
   },
-  clearAuth: () => set({ token: null, user: null }),
+  clearAuth: () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    set({ token: null, user: null });
+  },
   isAuthenticated: () => {
-    const state = get();
-    return !!state.token && !!state.user;
+    const { token, user } = get();
+    return Boolean(token && user);
   },
   hasRole: (role) => {
-    const state = get();
-    return state.user?.role_name === role;
+    const user = get().user;
+    return user?.role === role;
   },
 }));

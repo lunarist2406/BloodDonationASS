@@ -1,15 +1,23 @@
-import { Route } from "react-router-dom";
-import HomePage from "../../page/HomePage";
-import ControllingUser from "../admin/Body/user/ControllingUser";
-import ControllingCentral from "../admin/Body/central/ControllingCentral";
+import { Route, Routes } from "react-router-dom";
+import { Suspense, lazy } from "react";
+import LoadingSpinner from "../LoadingSpinner";
 
-export default function AdminR() {
-  return (
-    <>
-      <Route path="/:admin" element={<HomePage />}/>
-              <Route path="/controlling-user" element={<ControllingUser />} />
-              <Route path="/controlling-central" element={<ControllingCentral />} />
+const HomePage = lazy(() => import("../../page/HomePage"));
+const ControllingUser = lazy(
+  () => import("../admin/Body/user/ControllingUser")
+);
+const ControllingCentral = lazy(
+  () => import("../admin/Body/central/ControllingCentral")
+);
 
-    </>
-  );
-}
+const AdminR: React.FC = () => (
+  <Suspense fallback={<LoadingSpinner />}>
+    <Routes>
+      <Route index element={<HomePage />} />
+      <Route path="controlling-user" element={<ControllingUser />} />
+      <Route path="controlling-central" element={<ControllingCentral />} />
+    </Routes>
+  </Suspense>
+);
+
+export default AdminR;

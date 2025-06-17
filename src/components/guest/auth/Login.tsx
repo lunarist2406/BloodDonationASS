@@ -98,7 +98,7 @@ export default function Login() {
   };
 
   const handleRegister = () => {
-    navigate("/register");
+    navigate("register");
   };
 
   return (
@@ -114,6 +114,8 @@ export default function Login() {
         <img
           src={backgroundImage}
           alt="Login"
+          loading="eager"
+          decoding="async"
           className="w-full h-full object-cover"
         />
       </motion.div>

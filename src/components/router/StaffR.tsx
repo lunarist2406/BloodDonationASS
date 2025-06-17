@@ -1,13 +1,20 @@
-import { Route } from "react-router-dom";
-import HomePage from "../../page/HomePage";
-import BusinessSystems from "../staff/BusinessSystem/BusinessSystem";
+import { Routes, Route } from "react-router-dom";
+import { Suspense, lazy } from "react";
 
-export default function StaffR(){
-    return (
-        <>
-              <Route path="/:staff" element={<HomePage />}/>
-              <Route path="/business-systems" element={<BusinessSystems />} />
+// Lazy load components
+const HomePage = lazy(() => import("../../page/HomePage"));
+const BusinessSystems = lazy(() => import("../staff/BusinessSystem/BusinessSystem"));
 
-        /</>
-    )
+export default function StaffR() {
+  return (
+    <Suspense fallback={<div className="text-center p-10">Loading...</div>}>
+      <Routes>
+        <Route path="/*">
+          <Route index element={<HomePage />} />
+          <Route path=":staff" element={<HomePage />} />
+          <Route path="business-systems" element={<BusinessSystems />} />
+        </Route>
+      </Routes>
+    </Suspense>
+  );
 }

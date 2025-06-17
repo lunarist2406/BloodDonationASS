@@ -1,36 +1,42 @@
 import "./App.css";
-
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Suspense, lazy } from "react";
 
 import LayoutPage from "./layout/layoutPage";
-import GuestR from "./components/router/GuestR";
 import { useAuth } from "./hooks/User/useAuth";
-import MemberR from "./components/router/MemberR";
-import AdminR from "./components/router/AdminR";
-import StaffR from "./components/router/StaffR";
+import Login from "./components/guest/auth/Login";
+import Register from "./components/guest/auth/Register";
+import EmailVerification from "./components/guest/auth/EmailVerification";
+import VerifyNotice from "./components/guest/auth/VerifyNotice";
+
+const MemberR = lazy(() => import("./components/router/MemberR"));
+const AdminR = lazy(() => import("./components/router/AdminR"));
+const StaffR = lazy(() => import("./components/router/StaffR"));
 
 function App() {
-  const {user} = useAuth();
+  const { user } = useAuth();
+  if (user === undefined) return <div>Loading...</div>;
+
   const isMember = user?.role === "MEMBER";
   const isAdmin = user?.role === "ADMIN";
   const isStaff = user?.role === "STAFF";
+
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<LayoutPage />}>
-          {GuestR()}
-          {isMember && (
-            (MemberR())
-          )}
-          {isAdmin && (
-            (AdminR())
-          )}
-          {isStaff && (
-            (StaffR())
-          )}
-
-        </Route>
-      </Routes>
+      <Suspense fallback={<div>Loading...</div>}>
+        <Routes>
+          <Route path="/" element={<LayoutPage />}>
+            <Route index element={<Login />} />
+            <Route path="register" element={<Register />} />
+            <Route path="verify-email" element={<EmailVerification />} />
+            <Route path="verify-notice" element={<VerifyNotice />} />
+            {isMember && <Route path=":member/*" element={<MemberR />} />}
+            {isAdmin && <Route path=":admin/*" element={<AdminR />} />}
+            {isStaff && <Route path=":staff/*" element={<StaffR />} />}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Route>
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 }

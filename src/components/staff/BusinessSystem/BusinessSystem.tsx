@@ -9,9 +9,9 @@ import {
   IconHeartHandshake,
 } from "@tabler/icons-react";
 
-import NewsManagement from "./NewsManagement";
+import NewsManagement from "./News/NewsManagement";
 import WorkingTimeManagement from "./WorkingTimeManagement/WorkingTimeManagement";
-import BloodManagement from "./BloodManagement";
+import BloodManagement from "./Blood/BloodManagement";
 import BloodTypeManagement from "./BloodTypeManagement";
 import RhManagement from "./RhManagement";
 
@@ -94,7 +94,7 @@ export default function BusinessSystems() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
           transition={{ duration: 0.3 }}
-          className="bg-white rounded-lg p-4 shadow-md"
+          className="bg-gradient-to-r from-black via-red-400 to-black rounded-2xl"
         >
           {currentTab}
         </motion.div>
