@@ -61,8 +61,13 @@ export default function RegisterBloodEmergency() {
                   className="mb-5 px-32 py-2 bg-red-500 text-white rounded items-center gap-2 flex"
                 >
                   {" "}
-                  Đăng ký hiến máu khẩn cấp
-                  <IconChevronRight size={20} />
+                  <span className="text-white">Đăng ký hiến máu khẩn cấp</span>
+                  <IconChevronRight 
+                    size={20}
+                    stroke={2}
+                    className="cursor-pointer"
+                    color="white" 
+                  />
                 </button>
                 <FormHealthEmergency
                   formData={formData}
@@ -82,8 +87,13 @@ export default function RegisterBloodEmergency() {
                   className="mb-5 px-34 py-2 bg-red-500 text-white rounded items-center gap-2 flex"
                 >
                   {" "}
-                  <IconChevronLeft size={20} />
-                  Điền Thông Tin Sức Khỏe
+                  <IconChevronLeft 
+                    size={20}
+                    stroke={2}
+                    className="cursor-pointer"
+                    color="white" 
+                  />
+                  <span className="text-white"> Điền Thông Tin Sức Khỏe </span>
                 </button>
                 <FormRegisterBloodEmergency
                   formData={formData}

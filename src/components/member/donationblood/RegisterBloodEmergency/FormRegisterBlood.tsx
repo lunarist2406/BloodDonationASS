@@ -393,7 +393,11 @@ export default function FormRegisterBloodEmergency({
         {/* Submit */}
         <button
           type="submit"
-          className="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 transition-all mt-4 text-sm"
+          className="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 transition-all mt-8 text-sm cursor-pointer"
+          style={{ 
+            color: '#FFFFFF',
+            marginTop: '1rem'
+           }}        
         >
           Gửi đăng ký
         </button>

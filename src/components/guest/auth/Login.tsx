@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { IconLogin, IconMail, IconLock } from "@tabler/icons-react";
+import { IconLogin, IconMail, IconLock, IconEyeOff, IconEye } from "@tabler/icons-react";
 import logo from "../../../assets/logo.png";
 import backgroundImage from "../../../assets/background.png";
 import { api } from "../../../components/config/axios/axiosInstance";
@@ -28,6 +28,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -161,15 +162,28 @@ export default function Login() {
                 <IconLock size={18} className="mr-2" />
                 Mật khẩu
               </label>
-              <input
-                type="password"
-                name="password"
-                value={password}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
-                placeholder="Nhập mật khẩu của bạn"
-                required
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  value={password}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                  placeholder="Nhập mật khẩu của bạn"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                >
+                  {showPassword ? (
+                    <IconEyeOff size={20} className="cursor-pointer" />
+                  ) : (
+                    <IconEye size={20} className="cursor-pointer" />
+                  )}
+                </button>
+              </div>
             </div>
 
             <div className="flex items-center justify-between text-sm">
@@ -177,7 +191,7 @@ export default function Login() {
                 <input type="checkbox" className="mr-6" />
                 Ghi nhớ đăng nhập
               </label>
-              <a href="#" className="text-red-600 hover:text-red-800">
+              <a href="#" className="text-red-600 hover:underline hover:text-red-800">
                 Quên mật khẩu?
               </a>
             </div>
@@ -203,12 +217,12 @@ export default function Login() {
               </span>
             </motion.button>
 
-            <div className="text-center text-sm text-gray-600">
+            <div className="text-center text-sm text-red-600">
               Chưa có tài khoản?{" "}
               <button
                 type="button"
                 onClick={handleRegister}
-                className="text-red-600 hover:text-red-800 font-medium"
+                className="text-red-600 hover:text-red-800 hover:underline font-medium cursor-pointer"
               >
                 Đăng ký ngay
               </button>

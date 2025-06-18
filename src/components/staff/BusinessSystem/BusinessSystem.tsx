@@ -74,7 +74,7 @@ export default function BusinessSystems() {
             onClick={() => setSelectedTab(tab.key)}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.98 }}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition cursor-pointer ${
               selectedTab === tab.key
                 ? "bg-red-600 text-white shadow-md"
                 : "bg-gray-100 text-gray-800"

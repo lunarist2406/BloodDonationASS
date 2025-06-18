@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Form, Input, Select, DatePicker, Button } from "antd";
+import { Form, Input, Select, DatePicker, Button, Modal } from "antd";
 import {
   UserOutlined,
   MailOutlined,
@@ -14,6 +14,8 @@ import { useNavigate } from "react-router-dom";
 import { api } from "../../../components/config/axios/axiosInstance";
 import axios from "axios";
 import moment from "moment";
+import { getProvinces, getDistricts, getWards } from "vietnam-provinces";
+
 
 const { Option } = Select;
 
@@ -22,6 +24,9 @@ export default function Register() {
   const [form] = Form.useForm();
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [provinces] = useState(getProvinces());
+const [districts, setDistricts] = useState([]);
+const [wards, setWards] = useState([]);
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -34,9 +39,11 @@ export default function Register() {
     role_name: "MEMBER",
     location: {
       ipAddress: "",
-      country: "Việt Nam",
+      city: "TP.HCM",
       district: "",
+      ward: "",
       road: "",
+      house_number: ""
     },
   });
 
@@ -69,54 +76,110 @@ export default function Register() {
     fetchIP();
   }, [form]);
 
-  const handleSubmit = async (values) => {
-    setError("");
-    setIsLoading(true);
+  const handleProvinceChange = (value) => {
+  const selectedProvince = provinces.find((p) => p.code === value);
+  if (selectedProvince) {
+    const provinceDistricts = getDistricts(selectedProvince.code);
+    setDistricts(provinceDistricts);
+    setWards([]);
+    form.setFieldsValue({
+      'location.district': undefined,
+      'location.ward': undefined
+    });
+  }
+};
 
-    const formattedValues = {
-      ...values,
+const handleDistrictChange = (value) => {
+  const selectedDistrict = districts.find((d) => d.code === value);
+  if (selectedDistrict) {
+    const districtWards = getWards(selectedDistrict.code);
+    setWards(districtWards);
+    form.setFieldsValue({
+      'location.ward': undefined
+    });
+  }
+};
+
+const handleSubmit = async (values) => {
+  setError("");
+  setIsLoading(true);
+
+  const selectedProvince = provinces.find(p => p.code === values.location.city);
+  const selectedDistrict = districts.find(d => d.code === values.location.district);
+  const selectedWard = wards.find(w => w.code === values.location.ward);
+
+  try {
+    // await api.post("/api/v1/auth/register", {
+    //   email: values.email,
+    //   password: values.password,
+    //   fullname: values.fullName,
+    //   role_name: formData.role_name,
+    //   gender: values.gender,
+    //   phone: values.phone,
+    //   dob: values.dob ? moment(values.dob).format("YYYY-MM-DD") : "",
+    //   location: {
+    //     ipAddress: formData.location.ipAddress,
+    //     city: selectedProvince?.name || "",
+    //     district: selectedDistrict?.name || "",
+    //     ward: selectedWard?.name || "",
+    //     road: values.location.road || "",
+    //     house_number: values.location.house_number || ""
+    //   }
+    // });
+    const registerData = {
+      email: values.email,
+      password: values.password,
+      fullname: values.fullName,
+      role_name: formData.role_name,
+      gender: values.gender,
+      phone: values.phone,
       dob: values.dob ? moment(values.dob).format("YYYY-MM-DD") : "",
-    };
-
-    try {
-      await api.post("/api/v1/auth/register", {
-        email: formattedValues.email,
-        password: formattedValues.password,
-        fullname: formattedValues.fullName,
-        role_name: formData.role_name,
-        gender: formattedValues.gender,
-        phone: formattedValues.phone,
-        dob: formattedValues.dob,
-        location: {
-          ipAddress: formData.location.ipAddress,
-          country: formData.location.country,
-          district: formattedValues["location.district"],
-          road: formattedValues["location.road"],
-        },
-      });
-
-      navigate("/");
-    } catch (err) {
-      console.error("Lỗi đăng ký:", err);
-      if (axios.isAxiosError(err)) {
-        if (err.code === "ECONNABORTED") {
-          setError("Không thể kết nối đến server. Vui lòng thử lại sau.");
-        } else {
-          console.error("Response data:", err.response?.data);
-          console.error("Response status:", err.response?.status);
-          if (Array.isArray(err.response?.data?.message)) {
-            setError(err.response?.data?.message.join(", "));
-          } else {
-            setError(err.response?.data?.message || "Đăng ký thất bại");
-          }
-        }
-      } else {
-        setError("Có lỗi xảy ra khi đăng ký");
+      location: {
+        ipAddress: formData.location.ipAddress,
+        city: selectedProvince?.name || "",
+        district: selectedDistrict?.name || "",
+        ward: selectedWard?.name || "",
+        road: values.location.road || "",
+        house_number: values.location.house_number || ""
       }
-    } finally {
-      setIsLoading(false);
-    }
   };
+
+    await api.post("/api/v1/auth/register", registerData);
+    Modal.success({
+      title: 'Đăng ký thành công!',
+      content: 'Vui lòng kiểm tra email của bạn để xác thực tài khoản.',
+      onOk: () => {
+        navigate('/verify-notice', {
+          state: {
+            email: values.email,
+            message: 'Vui lòng kiểm tra email để hoàn tất quá trình đăng ký.'
+          }
+        });
+      }
+    });
+
+
+  } catch (err) {
+    console.error("Lỗi đăng ký:", err);
+    if (axios.isAxiosError(err)) {
+      if (err.code === "ECONNABORTED") {
+        setError("Không thể kết nối đến server. Vui lòng thử lại sau.");
+      } else {
+        console.error("Response data:", err.response?.data);
+        console.error("Response status:", err.response?.status);
+        if (Array.isArray(err.response?.data?.message)) {
+          setError(err.response?.data?.message.join(", "));
+        } else {
+          setError(err.response?.data?.message || "Đăng ký thất bại");
+        }
+      }
+    } else {
+      setError("Có lỗi xảy ra khi đăng ký");
+    }
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen relative">
@@ -255,29 +318,70 @@ export default function Register() {
                 />
               </Form.Item>
               <Form.Item
-                label="Quận/Huyện"
-                name="location.district"
-                rules={[
-                  { required: true, message: "Vui lòng nhập quận/huyện" },
-                ]}
-              >
-                <Input
-                  prefix={<EnvironmentOutlined />}
-                  placeholder="Quận/Huyện"
-                  size="middle"
-                />
-              </Form.Item>
-              <Form.Item
-                label="Đường/Phố"
-                name="location.road"
-                rules={[{ required: true, message: "Vui lòng nhập đường/phố" }]}
-              >
-                <Input
-                  prefix={<EnvironmentOutlined />}
-                  placeholder="Đường/Phố"
-                  size="middle"
-                />
-              </Form.Item>
+  label="Tỉnh/Thành phố"
+  name={['location', 'city']}
+  rules={[{ required: true, message: 'Vui lòng chọn tỉnh/thành phố' }]}
+>
+  <Select
+    placeholder="Chọn tỉnh/thành phố"
+    onChange={handleProvinceChange}
+    size="middle"
+  >
+    {provinces.map(province => (
+      <Option key={province.code} value={province.code}>
+        {province.name}
+      </Option>
+    ))}
+  </Select>
+</Form.Item>
+
+<Form.Item
+  label="Quận/Huyện"
+  name={['location', 'district']}
+  rules={[{ required: true, message: 'Vui lòng chọn quận/huyện' }]}
+>
+  <Select
+    placeholder="Chọn quận/huyện"
+    onChange={handleDistrictChange}
+    size="middle"
+    disabled={!form.getFieldValue(['location', 'city'])}
+  >
+    {districts.map(district => (
+      <Option key={district.code} value={district.code}>
+        {district.name}
+      </Option>
+    ))}
+  </Select>
+</Form.Item>
+
+<Form.Item
+  label="Phường/Xã"
+  name={['location', 'ward']}
+  rules={[{ required: true, message: 'Vui lòng chọn phường/xã' }]}
+>
+  <Select
+    placeholder="Chọn phường/xã"
+    size="middle"
+    disabled={!form.getFieldValue(['location', 'district'])}
+  >
+    {wards.map(ward => (
+      <Option key={ward.code} value={ward.code}>
+        {ward.name}
+      </Option>
+    ))}
+  </Select>
+</Form.Item>
+
+<Form.Item
+  label="Số nhà"
+  name={['location', 'road']}
+>
+  <Input
+    prefix={<EnvironmentOutlined />}
+    placeholder="Số nhà, tên đường"
+    size="middle"
+  />
+</Form.Item>
             </div>
 
             {error && (
@@ -305,12 +409,12 @@ export default function Register() {
               </motion.div>
             </Form.Item>
 
-            <div className="text-center text-xs text-gray-600">
+            <div className="text-center text-xs text-red-600">
               Đã có tài khoản?{" "}
               <button
                 type="button"
                 onClick={() => navigate("/")}
-                className="text-red-600 hover:text-red-800 font-medium"
+                className="text-red-600 hover:text-red-800 hover:underline font-medium cursor-pointer"
               >
                 Đăng nhập ngay
               </button>
