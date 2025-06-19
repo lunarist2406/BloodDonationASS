@@ -4,16 +4,12 @@ import {
   IconNews,
   IconClock,
   IconDroplet,
-  IconDropletHalf2,
-  IconTestPipe,
   IconHeartHandshake,
 } from "@tabler/icons-react";
 
 import NewsManagement from "./News/NewsManagement";
 import WorkingTimeManagement from "./WorkingTimeManagement/WorkingTimeManagement";
 import BloodManagement from "./Blood/BloodManagement";
-import BloodTypeManagement from "./BloodTypeManagement";
-import RhManagement from "./RhManagement";
 
 const tabList = [
   {
@@ -33,18 +29,6 @@ const tabList = [
     label: "Blood",
     icon: <IconDroplet size={18} />,
     component: <BloodManagement />,
-  },
-  {
-    key: "bloodType",
-    label: "Blood Type",
-    icon: <IconDropletHalf2 size={18} />,
-    component: <BloodTypeManagement />,
-  },
-  {
-    key: "rh",
-    label: "Rh",
-    icon: <IconTestPipe size={18} />,
-    component: <RhManagement />,
   },
 ];
 
