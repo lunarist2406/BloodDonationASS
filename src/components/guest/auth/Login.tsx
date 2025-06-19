@@ -1,7 +1,13 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { IconLogin, IconMail, IconLock, IconEyeOff, IconEye } from "@tabler/icons-react";
+import {
+  IconLogin,
+  IconMail,
+  IconLock,
+  IconEyeOff,
+  IconEye,
+} from "@tabler/icons-react";
 import logo from "../../../assets/logo.png";
 import backgroundImage from "../../../assets/background.png";
 import { api } from "../../../components/config/axios/axiosInstance";
@@ -191,9 +197,13 @@ export default function Login() {
                 <input type="checkbox" className="mr-6" />
                 Ghi nhớ đăng nhập
               </label>
-              <a href="#" className="text-red-600 hover:underline hover:text-red-800">
+              <button
+                type="button"
+                onClick={() => navigate("verify-notice")}
+                className="text-red-600 hover:underline hover:text-red-800 bg-transparent p-0 m-0 border-none cursor-pointer"
+              >
                 Quên mật khẩu?
-              </a>
+              </button>
             </div>
 
             {error && (

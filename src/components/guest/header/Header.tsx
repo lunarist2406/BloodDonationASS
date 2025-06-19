@@ -13,6 +13,7 @@ import {
   IconBuildingBank,
   IconUserCog,
   IconShieldCheck,
+  IconUserBolt,
 } from "@tabler/icons-react";
 import img1 from "../../../assets/Blood-Donation-1.webp";
 import { useAuth } from "../../../hooks/User/useAuth";
@@ -80,7 +81,7 @@ export default function GuestHeader() {
   }, [showDropdown]);
 
   const renderMemberLinks = () => (
-    <div className="grid grid-cols-4 gap-2 p-5">
+    <div className="grid grid-cols-5  p-5">
       <motion.div className="space-y-2">
         <motion.h3
           className="font-bold flex items-center"
@@ -136,6 +137,20 @@ export default function GuestHeader() {
           onClick={() => setShowDropdown(false)}
         />
       </motion.div>
+      <motion.div className="space-y-2">
+        <motion.h3
+          className="font-bold flex items-center"
+          whileHover={{ y: -5, color: "#ff0000" }}
+        >
+          <IconUserBolt size={18} className="mr-2" />
+          Tài Khoản
+        </motion.h3>
+        <DropdownLink
+          to={`/${encodedName}/user-profile`}
+          label="Thông Tin Tài Khoản"
+          onClick={() => setShowDropdown(false)}
+        />
+      </motion.div>
 
       <motion.div
         whileHover={{
@@ -147,7 +162,7 @@ export default function GuestHeader() {
         <img
           src={img1}
           alt="promo"
-          className="w-full h-45 object-cover rounded-md"
+          className="w-full h-38 object-cover rounded-md"
         />
       </motion.div>
     </div>
