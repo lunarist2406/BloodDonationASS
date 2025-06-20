@@ -53,7 +53,7 @@ const MemberR: React.FC = () => (
           path="register-blood-emergency"
           element={<RegisterBloodEmergency />}
         />
-        <Route path="donation-blood" element={<DonateBlood />} />
+        <Route path="donate-blood" element={<DonateBlood />} />
         <Route path="receiver-blood" element={<ReceiverBlood />} />
         <Route path="seek-information" element={<SeekInformation />} />
       </Route>

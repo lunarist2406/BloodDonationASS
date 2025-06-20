@@ -4,7 +4,6 @@ import { useAuth } from "../User/useAuth";
 const API_URL = "http://localhost:3000/api/v1/donate-bloods";
 
 export interface DonateBloodPayload {
-  blood_id: string;
   date_donate: string; // ISO format
   centralBlood_id: number;
 }

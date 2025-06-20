@@ -279,8 +279,8 @@ export default function GuestHeader() {
 }
 
 const labelMap: Record<string, string> = {
-  "register-blood": "Đăng ký Nhóm Máu",
-  "register-blood-emergency": "Đăng ký Nhóm Máu Khẩn Cấp",
+  "register-blood": "Đăng ký Hiến Máu",
+  "register-blood-emergency": "Đăng ký Cần Máu Khẩn Cấp",
   "donate-blood": "Hiến Máu",
   "receiver-blood": "Nhận Máu",
 };
