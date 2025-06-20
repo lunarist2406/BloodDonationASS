@@ -3,6 +3,7 @@ import { lazy, Suspense } from "react";
 import LoadingSpinner from "../LoadingSpinner";
 import { ProtectedRoute } from "../../middleware/auth/ProtectedRoute";
 import Profile from "../member/profile/Profile";
+import CentralInformation from "../member/information/central/ControllingCentral";
 
 // Lazy load các page
 const HomePage = lazy(() => import("../../page/HomePage"));
@@ -42,20 +43,12 @@ const MemberR: React.FC = () => (
       <Route path="/*">
         <Route index element={<HomePage />} />
         <Route path=":user" element={<HomePage />} />
-        <Route path="user-profile" element={<Profile/>} />
-        <Route
-          path="blood-donation-centers"
-          element={<BloodDonationCenter />}
-        />
+        <Route path="user-profile" element={<Profile />} />
+        <Route path="blood-donation-centers" element={<CentralInformation />} />
         <Route path="blood-documents" element={<BloodDocuments />} />
         <Route path="blood-news" element={<BloodNews />} />
         <Route path="blood-experience" element={<BloodExperience />} />
-        <Route
-          path="register-blood"
-          element={
-              <RegisterBlood />
-          }
-        />
+        <Route path="register-blood" element={<RegisterBlood />} />
         <Route
           path="register-blood-emergency"
           element={<RegisterBloodEmergency />}
