@@ -300,7 +300,7 @@ const adminLinks = [
     icon: IconBuildingBank,
   },
   { to: "controlling-user", label: "Quản Lý Kho Máu", icon: IconDatabase },
-  { to: "controlling-user", label: "Quản Lý Hệ Thống", icon: IconSettings2 },
+  { to: "admin-profile", label: "Tài Khoản", icon: IconUserBolt },
 ];
 
 const staffLinks = [
@@ -319,7 +319,7 @@ const staffLinks = [
     label: "Quản Lý Đơn Vị Kho Máu của Trung Tâm",
     icon: IconDatabase,
   },
-  { to: "staff-profile", label: "Tài Khoản", icon: IconUser },
+  { to: "staff-profile", label: "Tài Khoản", icon: IconUserBolt },
   {
     to: "business-systems",
     label: "Quản Lý Hệ Thống Nghiệp Vụ Máu",

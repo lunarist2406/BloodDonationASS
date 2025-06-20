@@ -1,39 +1,11 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { IconUser, IconHeartbeat, IconHistory } from "@tabler/icons-react";
+import { IconUser } from "@tabler/icons-react";
 import ProfileAccount from "./ProfileAccount";
-// import ProfileHealth from "./ProfileHealth";
-import HistoryDonation from "./History";
-import useUser from "../../../hooks/User/useUser";
+import useUser from "../../../../hooks/User/useUser";
 
-const profileTabs = [
-  {
-    key: "account",
-    label: "Tài khoản",
-    icon: <IconUser size={18} />,
-    component: <ProfileAccount />,
-  },
-  // {
-  //   key: "health",
-  //   label: "Sức khỏe",
-  //   icon: <IconHeartbeat size={18} />,
-  //   component: <ProfileHealth />,
-  // },
-  {
-    key: "history",
-    label: "Lịch sử thực hiện",
-    icon: <IconHistory size={18} />,
-    component: <HistoryDonation />,
-  },
-];
-
-export default function StaffProfile() {
-  const [selectedTab, setSelectedTab] = useState("account");
+export default function AdminProfile() {
   const { userData } = useUser();
-
-  const currentTab = profileTabs.find(
-    (tab) => tab.key === selectedTab
-  )?.component;
 
   return (
     <div className="p-6">
@@ -54,40 +26,20 @@ export default function StaffProfile() {
         <div className="col-span-1 lg:col-span-13">
           <AnimatePresence mode="wait">
             <motion.div
-              key={selectedTab}
+              key="account"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.3 }}
               className="bg-gradient-to-r from-red-400 to-red-700 rounded-xl shadow-md p-4"
             >
-              {currentTab}
+              <ProfileAccount />
             </motion.div>
           </AnimatePresence>
         </div>
 
         {/* RIGHT SIDEBAR: 2/5 width */}
         <div className="col-span-1 lg:col-span-7">
-          {/* Tabs */}
-          <div className="flex flex-wrap gap-4 mb-6 justify-end">
-            {profileTabs.map((tab) => (
-              <motion.button
-                key={tab.key}
-                onClick={() => setSelectedTab(tab.key)}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.98 }}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition cursor-pointer ${
-                  selectedTab === tab.key
-                    ? "bg-red-600 text-white shadow-md"
-                    : "bg-gray-100 text-gray-800"
-                }`}
-              >
-                {tab.icon}
-                {tab.label}
-              </motion.button>
-            ))}
-          </div>
-
           {/* Avatar + Info */}
           <div className="bg-white rounded-xl shadow-md p-6 flex flex-col items-center text-center">
             <img
