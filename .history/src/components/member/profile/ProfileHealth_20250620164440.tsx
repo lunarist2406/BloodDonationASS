@@ -56,7 +56,7 @@ export default function ProfileHealth() {
             </span>
           }
         >
-          {healthInfo?.blood_id.blood_id || "Chưa có"}
+          {healthInfo?.blood_id. || "Chưa có"}
         </Descriptions.Item>
 
         <Descriptions.Item

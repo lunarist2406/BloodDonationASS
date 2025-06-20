@@ -14,7 +14,6 @@ import {
   IconUserCog,
   IconShieldCheck,
   IconUserBolt,
-  IconUser,
 } from "@tabler/icons-react";
 import img1 from "../../../assets/Blood-Donation-1.webp";
 import { useAuth } from "../../../hooks/User/useAuth";
@@ -194,30 +193,30 @@ export default function GuestHeader() {
     </motion.div>
   );
 
-  const renderStaffLinks = () => (
-    <motion.div className="p-6 space-y-10">
-      <motion.h3
-        className="font-bold text-lg flex items-center text-red-700"
-        whileHover={{ y: -3 }}
-      >
-        <IconShieldCheck size={20} className="mr-2" />
-        Quản Lý Hệ Thống Cấp Thấp
-      </motion.h3>
-      <div className="grid grid-cols-3 gap-8 flex-wrap mt-5">
-        {staffLinks.map(({ to, label, icon: Icon }) => (
-          <Link
-            key={label}
-            to={`/${encodedName}/${to}`}
-            className="flex items-center gap-2 hover:scale-105 hover:text-red-500 transition-all duration-200 font-semibold"
-            onClick={() => setShowDropdown(false)}
-          >
-            <Icon size={18} />
-            {label}
-          </Link>
-        ))}
-      </div>
-    </motion.div>
-  );
+const renderStaffLinks = () => (
+  <motion.div className="p-6 space-y-5">
+    <motion.h3
+      className="font-bold text-lg flex items-center text-red-700"
+      whileHover={{ y: -3 }}
+    >
+      <IconShieldCheck size={20} className="mr-2" />
+      Quản Lý Hệ Thống Cấp Thấp
+    </motion.h3>
+    <div className="flex gap-8 flex-wrap mt-5">
+      {staffLinks.map(({ to, label, icon: Icon }) => (
+        <Link
+          key={label}
+          to={`/${encodedName}/${to}`}
+          className="flex items-center gap-2 hover:scale-105 hover:text-red-500 transition-all duration-200 font-semibold"
+          onClick={() => setShowDropdown(false)}
+        >
+          <Icon size={18} />
+          {label}
+        </Link>
+      ))}
+    </div>
+  </motion.div>
+);
 
   return (
     <header className="bg-gradient-to-r from-red-500 to-red-900 text-gray-300 py-2 shadow-lg sticky top-0 z-20">
@@ -319,7 +318,7 @@ const staffLinks = [
     label: "Quản Lý Đơn Vị Kho Máu của Trung Tâm",
     icon: IconDatabase,
   },
-  { to: "staff-profile", label: "Tài Khoản", icon: IconUser },
+  
   {
     to: "business-systems",
     label: "Quản Lý Hệ Thống Nghiệp Vụ Máu",

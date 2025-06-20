@@ -203,7 +203,7 @@ export default function GuestHeader() {
         <IconShieldCheck size={20} className="mr-2" />
         Quản Lý Hệ Thống Cấp Thấp
       </motion.h3>
-      <div className="grid grid-cols-3 gap-8 flex-wrap mt-5">
+      <div className="grid grid-cols-4 gap-8 flex-wrap mt-5">
         {staffLinks.map(({ to, label, icon: Icon }) => (
           <Link
             key={label}

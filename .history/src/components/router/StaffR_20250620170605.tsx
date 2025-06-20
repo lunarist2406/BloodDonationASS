@@ -1,7 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import { Suspense, lazy } from "react";
 import ControllingDonate from "../staff/ControllingDonation/ControllingDonation";
-import StaffProfile from "../staff/profile/Profile";
 
 // Lazy load components
 const HomePage = lazy(() => import("../../page/HomePage"));

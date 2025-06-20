@@ -15,7 +15,7 @@ export default function StaffR() {
           <Route index element={<HomePage />} />
           <Route path=":staff" element={<HomePage />} />
           <Route path="donate-controlling" element={<ControllingDonate />} />
-          <Route path="staff-profile" element={<StaffProfile />} />
+          <Route path="staff-profile" element={<StaffProfileProfile />} />
 
           <Route path="business-systems" element={<BusinessSystems />} />
         </Route>

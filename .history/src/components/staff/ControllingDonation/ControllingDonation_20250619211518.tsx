@@ -53,7 +53,6 @@ export default function ControllingDonate() {
         pageSize: res.data.meta.pageSize,
         total: res.data.meta.total,
       });
-      console.log("Danh sách đơn đăng ký:", res);
     } catch (err) {
       message.error("Lỗi khi tải dữ liệu");
     } finally {
