@@ -1,260 +1,326 @@
+import React, { useEffect, useState } from "react";
 import {
-  Row,
-  Col,
-  Card,
   Table,
+  Tag,
   Button,
   Modal,
-  Form,
+  Descriptions,
+  Pagination,
   Input,
-  DatePicker,
+  Popconfirm,
   message,
-  Select,
 } from "antd";
-import { useEffect, useState } from "react";
-import dayjs from "dayjs";
-import useDonateBloodService, {
-  type DonateBloodPayload,
-} from "../../../hooks/RegistrationForm/useDonateBloodService";
-
-const { Option } = Select;
-
+import {
+  ReloadOutlined,
+  SearchOutlined,
+  CheckCircleOutlined,
+  CloseCircleOutlined,
+  DeleteOutlined,
+  InfoCircleOutlined,
+  ClockCircleOutlined,
+} from "@ant-design/icons";
+import useDonateBloodService from "../../../hooks/RegistrationForm/useDonateBloodService";
+import { IconUserCheck } from "@tabler/icons-react";
+import { motion } from "framer-motion";
 export default function ControllingDonate() {
-  const { getAllDonateBloods, createDonateBlood, updateDonateBlood } =
+  const { getAllDonateBloods, deleteDonateBlood, updateDonateBlood } =
     useDonateBloodService();
 
-  const [form] = Form.useForm();
-  const [donationList, setDonationList] = useState([]);
+  const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [viewModal, setViewModal] = useState(false);
-  const [selectedDonation, setSelectedDonation] = useState<any>(null);
+  const [search, setSearch] = useState("");
 
   const [pagination, setPagination] = useState({
     current: 1,
-    pageSize: 5,
+    pageSize: 10,
     total: 0,
   });
 
-  const [filterStatus, setFilterStatus] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState<any>(null);
+  useEffect(() => {
+    fetchData(pagination.current, pagination.pageSize);
+  }, []);
 
-  const fetchDonations = async (page = 1, pageSize = 5, status?: string) => {
+  const [allData, setAllData] = useState<any[]>([]); // giữ full data
+
+  async function fetchData(page: number, pageSize: number) {
     setLoading(true);
     try {
-      const res = await getAllDonateBloods(page, pageSize);
-      const data = res.data.results;
+      const res = await getAllDonateBloods(page, pageSize, "");
+      const formattedList = res.data.results.map(
+        (item: any, index: number) => ({
+          key: item.donate_id,
+          stt: (page - 1) * pageSize + index + 1,
+          fullName: item.infor_health?.user_id?.fullname || "Chưa có tên",
+          bloodType: item.blood_id?.blood_id || "Chưa có nhóm máu",
+          location:
+            item.centralBlood_id?.centralBlood_name || "Chưa có địa điểm",
+          status: item.status_donate || "Chưa có trạng thái",
+          raw: item,
+        })
+      );
 
-      const filteredData = status
-        ? data.filter((item: any) => item.status_regist === status)
-        : data;
-
-      setDonationList(filteredData);
+      setAllData(formattedList); // lưu nguyên bản
+      setData(formattedList); // dữ liệu hiện tại hiển thị
       setPagination({
         current: res.data.meta.current,
         pageSize: res.data.meta.pageSize,
         total: res.data.meta.total,
       });
-      console.log("Danh sách đơn đăng ký:", res);
-    } catch (err) {
-      message.error("Lỗi khi tải dữ liệu");
+    } catch (error) {
+      console.error("Lỗi khi tải dữ liệu hiến máu:", error);
     } finally {
       setLoading(false);
     }
+  }
+
+  const handleTableChange = (page: number, pageSize: number) => {
+    fetchData(page, pageSize, search);
   };
 
-  useEffect(() => {
-    fetchDonations(pagination.current, pagination.pageSize);
-  }, []);
-
-  const handleTableChange = (pag: any) => {
-    fetchDonations(pag.current, pag.pageSize, filterStatus ?? undefined);
+  const showDetailModal = (record: any) => {
+    setSelectedRecord(record.raw);
+    setIsModalOpen(true);
   };
 
-  const handleFilterChange = (value: string | null) => {
-    setFilterStatus(value);
-    fetchDonations(1, pagination.pageSize, value ?? undefined);
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setSelectedRecord(null);
   };
 
-  const handleCreate = async (values: any) => {
-    const payload: DonateBloodPayload = {
-      blood_id: values.blood_id,
-      date_donate: values.date_donate.toISOString(),
-      centralBlood_id: Number(values.centralBlood_id),
-    };
+  const handleDelete = async (id: string) => {
     try {
-      await createDonateBlood(payload);
-      message.success("Tạo đơn đăng ký thành công");
-      form.resetFields();
-      fetchDonations();
-    } catch (err) {
-      message.error("Tạo đơn đăng ký thất bại");
+      await deleteDonateBlood(id);
+      message.success("Xóa đơn đăng ký thành công");
+      fetchData(pagination.current, pagination.pageSize, search);
+    } catch (error) {
+      message.error("Xóa thất bại");
     }
   };
+  const handleSearch = (value: string) => {
+    setSearch(value);
+    const filtered = allData.filter((item) =>
+      item.fullName.toLowerCase().includes(value.toLowerCase())
+    );
+    setData(filtered);
+  };
 
-  const handleStatusUpdate = async (status: string) => {
-    if (!selectedDonation) return;
+  const handleStatusUpdate = async (record: any, status: string) => {
     try {
-      await updateDonateBlood(selectedDonation.donate_id, {
-        status_regist: status,
-      });
+      const payload = {
+        date_donate: record.date_donate,
+        centralBlood_id: record.centralBlood_id?.centralBlood_id,
+        ml: record.ml || 0,
+        unit: record.unit || 0,
+        status_regist: record.status_regist,
+        status_donate: status,
+      };
+      await updateDonateBlood(record.donate_id, payload);
       message.success("Cập nhật trạng thái thành công");
-      setViewModal(false);
-      fetchDonations();
-    } catch (err) {
+      fetchData(pagination.current, pagination.pageSize, search);
+    } catch (error) {
       message.error("Cập nhật thất bại");
+      console.error("Cập nhật trạng thái lỗi:", error);
     }
   };
 
   const columns = [
     {
-      title: "Mã đơn",
-      dataIndex: "donate_id",
-      key: "donate_id",
+      title: "STT",
+      dataIndex: "stt",
+      key: "stt",
+      width: 60,
+      align: "center" as const,
     },
     {
-      title: "Mã máu",
-      key: "blood_id",
-      render: (_: any, record: any) => record.blood_id?.blood_id || "N/A",
+      title: "Họ tên",
+      dataIndex: "fullName",
+      key: "fullName",
+      align: "center" as const,
     },
     {
-      title: "Ngày đăng ký",
-      dataIndex: "date_register",
-      key: "date_register",
-      render: (text: string) => dayjs(text).format("DD/MM/YYYY"),
+      title: "Nhóm máu",
+      dataIndex: "bloodType",
+      key: "bloodType",
+      align: "center" as const,
+    },
+    {
+      title: "Địa điểm",
+      dataIndex: "location",
+      key: "location",
+      align: "center" as const,
     },
     {
       title: "Trạng thái",
-      dataIndex: "status_regist",
-      key: "status_regist",
-      filters: [
-        { text: "PENDING", value: "PENDING" },
-        { text: "COMPLETED", value: "COMPLETED" },
-        { text: "Đã duyệt", value: "Đã duyệt" },
-        { text: "Từ chối", value: "Từ chối" },
-      ],
-      onFilter: (value: any, record: any) => record.status_regist === value,
-    },
-    {
-      title: "Trung tâm",
-      key: "centralBlood",
-      render: (_: any, record: any) =>
-        record.centralBlood_id?.centralBlood_name || "N/A",
+      dataIndex: "status",
+      key: "status",
+      align: "center" as const,
+      render: (status: string) => {
+        let color = "orange";
+        if (status === "COMPLETED") color = "green";
+        else if (status === "CANCELLED") color = "red";
+        else if (status === "PENDING") color = "gold";
+        return <Tag color={color}>{status}</Tag>;
+      },
     },
     {
       title: "Hành động",
-      key: "actions",
+      key: "action",
+      align: "center" as const,
       render: (_: any, record: any) => (
-        <Button
-          onClick={() => {
-            setSelectedDonation(record);
-            setViewModal(true);
-          }}
-        >
-          Chi tiết
-        </Button>
+        <div className="flex gap-2 justify-center">
+          <Button
+            icon={<InfoCircleOutlined />}
+            onClick={() => showDetailModal(record)}
+          />
+          <Button
+            icon={<ClockCircleOutlined />}
+            onClick={() => handleStatusUpdate(record.raw, "PENDING")}
+          />
+          <Button
+            icon={<CheckCircleOutlined />}
+            onClick={() => handleStatusUpdate(record.raw, "COMPLETED")}
+          />
+          <Button
+            icon={<CloseCircleOutlined />}
+            danger
+            onClick={() => handleStatusUpdate(record.raw, "CANCELLED")}
+          />
+          <Popconfirm
+            title="Xóa đơn đăng ký này?"
+            onConfirm={() => handleDelete(record.key)}
+          >
+            <Button icon={<DeleteOutlined />} danger />
+          </Popconfirm>
+        </div>
       ),
     },
   ];
 
   return (
-    <Row gutter={16}>
-      <Col span={8}>
-        <Card title="Tạo đơn đăng ký hiến máu">
-          <Form form={form} layout="vertical" onFinish={handleCreate}>
-            <Form.Item
-              name="blood_id"
-              label="Mã máu"
-              rules={[{ required: true }]}
-            >
-              <Input />
-            </Form.Item>
-            <Form.Item
-              name="date_donate"
-              label="Ngày hiến máu"
-              rules={[{ required: true }]}
-            >
-              <DatePicker format="DD/MM/YYYY" style={{ width: "100%" }} />
-            </Form.Item>
-            <Form.Item
-              name="centralBlood_id"
-              label="ID trung tâm"
-              rules={[{ required: true }]}
-            >
-              <Input type="number" />
-            </Form.Item>
-            <Form.Item>
-              <Button type="primary" htmlType="submit" block>
-                Tạo đơn
-              </Button>
-            </Form.Item>
-          </Form>
-        </Card>
-      </Col>
-
-      <Col span={16}>
-        <Card
-          title="Danh sách đơn đăng ký"
-          extra={
-            <Select
-              allowClear
-              placeholder="Lọc theo trạng thái"
-              onChange={handleFilterChange}
-              style={{ width: 200 }}
-            >
-              <Option value="PENDING">PENDING</Option>
-              <Option value="COMPLETED">COMPLETED</Option>
-              <Option value="Đã duyệt">Đã duyệt</Option>
-              <Option value="Từ chối">Từ chối</Option>
-            </Select>
-          }
+    <div className="bg-white rounded-xl shadow-lg p-4 h-full flex flex-col">
+      <div className="flex justify-between items-center mb-4">
+        <motion.h2
+          initial={{ x: 0, color: "#000" }} // màu mặc định (đen)
+          whileHover={{ x: 8, color: "#f43f5e" }} // màu đỏ khi hover
+          transition={{ type: "spring", stiffness: 300 }}
+          className="self-start text-base font-bold flex items-center gap-2  pt-5"
         >
-          <Table
-            rowKey="donate_id"
-            dataSource={donationList}
-            columns={columns}
-            loading={loading}
-            pagination={pagination}
-            onChange={handleTableChange}
+          <IconUserCheck size={20} className="text-red-500" />
+          Quản Lý Đơn Đăng Ký Hiến Máu
+        </motion.h2>
+        <div className="flex gap-2">
+          <Input
+            placeholder="Tìm kiếm theo tên"
+            value={search}
+            onChange={(e) => handleSearch(e.target.value)}
+            prefix={<SearchOutlined />}
           />
-        </Card>
-      </Col>
+
+          <Button
+            icon={<ReloadOutlined />}
+            onClick={() =>
+              fetchData(pagination.current, pagination.pageSize, search)
+            }
+          >
+            Làm mới
+          </Button>
+        </div>
+      </div>
+
+      <div className="flex-grow overflow-auto">
+        <Table
+          columns={columns}
+          dataSource={data}
+          loading={loading}
+          pagination={false}
+          rowClassName={() => "hover:bg-red-50"}
+          size="small"
+          bordered
+          scroll={{ y: 400 }}
+        />
+      </div>
+
+      <div className="mt-auto pt-4 flex justify-center">
+        <Pagination
+          current={pagination.current}
+          pageSize={pagination.pageSize}
+          total={pagination.total}
+          showSizeChanger
+          pageSizeOptions={["5", "10", "20", "50"]}
+          onChange={handleTableChange}
+          onShowSizeChange={(current, size) => fetchData(1, size, search)}
+          showTotal={(total, range) =>
+            `${range[0]}-${range[1]} / ${total} bản ghi`
+          }
+        />
+      </div>
 
       <Modal
-        title="Chi tiết đơn đăng ký"
-        open={viewModal}
-        onCancel={() => setViewModal(false)}
+        title={`Chi tiết đăng ký của ${
+          selectedRecord?.infor_health?.user_id?.fullname || ""
+        }`}
+        open={isModalOpen}
+        onCancel={handleModalClose}
         footer={[
-          <Button onClick={() => handleStatusUpdate("Đã duyệt")} type="primary">
-            Duyệt
-          </Button>,
-          <Button onClick={() => handleStatusUpdate("Từ chối")} danger>
-            Hủy
+          <Button key="close" onClick={handleModalClose}>
+            Đóng
           </Button>,
         ]}
+        width={700}
       >
-        {selectedDonation && (
-          <div>
-            <p>
-              <strong>Mã máu:</strong>{" "}
-              {selectedDonation.blood_id?.blood_id || "N/A"}
-            </p>
-            <p>
-              <strong>Ngày đăng ký:</strong>{" "}
-              {dayjs(selectedDonation.date_register).format("DD/MM/YYYY")}
-            </p>
-            <p>
-              <strong>Trạng thái:</strong> {selectedDonation.status_regist}
-            </p>
-            <p>
-              <strong>Trung tâm:</strong>{" "}
-              {selectedDonation.centralBlood_id?.centralBlood_name || "N/A"}
-            </p>
-            <p>
-              <strong>Địa chỉ:</strong>{" "}
-              {selectedDonation.centralBlood_id?.centralBlood_address || "N/A"}
-            </p>
-          </div>
+        {selectedRecord ? (
+          <Descriptions bordered column={1} size="small">
+            <Descriptions.Item label="Họ tên">
+              {selectedRecord.infor_health?.user_id?.fullname || "Không có"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Email">
+              {selectedRecord.infor_health?.user_id?.email || "Không có"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Giới tính">
+              {selectedRecord.infor_health?.user_id?.gender || "Không có"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Ngày đăng ký">
+              {selectedRecord.date_register
+                ? new Date(selectedRecord.date_register).toLocaleString("vi-VN")
+                : "Không có"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Ngày hiến">
+              {selectedRecord.date_donate
+                ? new Date(selectedRecord.date_donate).toLocaleString("vi-VN")
+                : "Không có"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Trạng thái đăng ký">
+              {selectedRecord.status_regist || "Không có"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Trạng thái hiến">
+              {selectedRecord.status_donate || "Không có"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Chiều cao (cm)">
+              {selectedRecord.infor_health?.height ?? "Không có"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Cân nặng (kg)">
+              {selectedRecord.infor_health?.weight_decimal ?? "Không có"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Huyết áp">
+              {selectedRecord.infor_health?.blood_pressure ?? "Không có"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Tiền sử bệnh lý">
+              {selectedRecord.infor_health?.medical_history || "Không có"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Trung tâm hiến máu">
+              {selectedRecord.centralBlood_id?.centralBlood_name || "Không có"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Địa chỉ trung tâm">
+              {selectedRecord.centralBlood_id?.centralBlood_address ||
+                "Không có"}
+            </Descriptions.Item>
+          </Descriptions>
+        ) : (
+          <p>Không có dữ liệu chi tiết</p>
         )}
       </Modal>
-    </Row>
+    </div>
   );
 }

@@ -16,7 +16,7 @@ export default function DonateBlood() {
         className="self-start text-base font-bold flex items-center gap-2 ml-5 pt-5"
       >
         <IconDroplet size={20} className="text-red-500" />
-        Đăng Ký Nhận Máu Khẩn Cấp
+        Bảng Đăng Ký Hiến Máu
       </motion.h4>
       <div className="grid grid-cols-20 gap-4 px-5 mb-10">
         {/* Truyền formData để hiển thị */}
@@ -24,7 +24,7 @@ export default function DonateBlood() {
           <TableDonateBlood data={waitingList} />
         </div>
         <div className="col-span-14">
-          <FormViewDonate formData={waitingList} />
+          <FormViewDonate />
         </div>
       </div>
     </div>

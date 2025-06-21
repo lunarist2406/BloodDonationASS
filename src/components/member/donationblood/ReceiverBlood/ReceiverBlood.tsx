@@ -4,7 +4,7 @@ import FormViewReceiver from "./FormViewReceiver";
 import { motion } from "framer-motion";
 import { IconDroplet } from "@tabler/icons-react";
 export default function ReceiverBlood() {
-  const { waitingList, formData, setFormData } = useRegisterBlood();
+  const { waitingList} = useRegisterBlood();
 
   return (
     <div className="flex flex-col bg-gradient-to-b from-red-100 to-red-300 min-h-screen">
@@ -15,7 +15,7 @@ export default function ReceiverBlood() {
         className="self-start text-base font-bold flex items-center gap-2 ml-5 pt-5"
       >
         <IconDroplet size={20} className="text-red-500" />
-        Danh Sách Người Nhận Máu
+        Bảng Người Nhận Máu
       </motion.h4>
       <div className="grid grid-cols-20 gap-4 px-5 mb-10">
         {/* Truyền formData để hiển thị */}
