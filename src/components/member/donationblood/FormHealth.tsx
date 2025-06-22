@@ -24,10 +24,10 @@ import {
 import dayjs from "dayjs";
 import type { UploadChangeParam } from "antd/es/upload";
 import type { RcFile } from "antd/es/upload/interface";
-import useHealthService from "../../../../hooks/HealthInfor/useHealthService";
-import useUser from "../../../../hooks/User/useUser";
-import useBlood from "../../../../hooks/Blood/useBlood";
-import isAxiosLikeError from "../../../../constraint/typeError";
+import useHealthService from "../../../hooks/HealthInfor/useHealthService";
+import useUser from "../../../hooks/User/useUser";
+import useBlood from "../../../hooks/Blood/useBlood";
+import isAxiosLikeError from "../../../constraint/typeError";
 
 export default function FormHealth() {
   const [form] = Form.useForm();
@@ -43,13 +43,22 @@ export default function FormHealth() {
     try {
       const data = await getHealthInfoByUser();
       if (data?.data) {
-        setHealthData(data.data);
-        form.setFieldsValue({
-          ...data.data,
+        // map data cho đúng với tên field của form
+        const mappedData = {
+          blood_id: data.data.blood_id?.blood_id || undefined,
+          height: data.data.height,
+          weight: data.data.weight_decimal,
+          blood_pressure: data.data.blood_pressure,
+          medical_history: data.data.medical_history,
           latest_donate: data.data.latest_donate
             ? dayjs(data.data.latest_donate)
             : null,
-        });
+          status_health: data.data.status_health,
+          img_health: data.data.img_health,
+        };
+        setHealthData(data.data);
+
+        form.setFieldsValue(mappedData);
       }
       console.log("Thông tin sức khỏe:", data);
     } catch (err) {
@@ -144,7 +153,7 @@ export default function FormHealth() {
           <Input disabled value={userData?.data?.fullname} />
         </Form.Item>
 
-        <div className="flex gap-4">
+        <div className="flex gap-4 mb-4">
           <Form.Item
             name="height"
             label={
@@ -152,7 +161,7 @@ export default function FormHealth() {
                 <IconLineHeight size={20} /> Chiều cao (cm)
               </span>
             }
-            style={{ flex: 1 }}
+            style={{ flex: "1 1 50%" }}
             rules={[{ required: true }]}
           >
             <Input type="number" min={140} max={250} />
@@ -165,10 +174,33 @@ export default function FormHealth() {
                 <IconWeight size={20} /> Cân nặng (kg)
               </span>
             }
-            style={{ flex: 1 }}
+            style={{ flex: "1 1 50%" }}
             rules={[{ required: true }]}
           >
             <Input type="number" min={40} max={150} />
+          </Form.Item>
+        </div>
+
+        <div className="flex gap-4 mb-4">
+          <Form.Item
+            name="blood_id"
+            label={
+              <span className={inputClass}>
+                <IconFilterHeart size={20} /> Nhóm máu
+              </span>
+            }
+            style={{ flex: "1 1 50%" }}
+            rules={[{ required: true }]}
+          >
+            <Select
+              placeholder="Chọn nhóm máu"
+              options={
+                blood?.data?.result?.map((b) => ({
+                  label: `${b.blood_type_id.blood_name} (${b.rh_id.blood_Rh})`,
+                  value: b.blood_id,
+                })) || []
+              }
+            />
           </Form.Item>
 
           <Form.Item
@@ -178,7 +210,7 @@ export default function FormHealth() {
                 <IconHeartbeat size={20} /> Huyết áp
               </span>
             }
-            style={{ flex: 1 }}
+            style={{ flex: "1 1 50%" }}
             rules={[{ required: true }]}
           >
             <Input type="number" placeholder="VD: 120" />
@@ -202,26 +234,6 @@ export default function FormHealth() {
               { label: "Hô hấp", value: "Hô hấp" },
               { label: "Khác", value: "Khác" },
             ]}
-          />
-        </Form.Item>
-
-        <Form.Item
-          name="blood_id"
-          label={
-            <span className={inputClass}>
-              <IconFilterHeart size={20} /> Nhóm máu
-            </span>
-          }
-          rules={[{ required: true }]}
-        >
-          <Select
-            placeholder="Chọn nhóm máu"
-            options={
-              blood?.data?.result?.map((b) => ({
-                label: `${b.blood_type_id.blood_name} (${b.rh_id.blood_Rh})`,
-                value: b.blood_id,
-              })) || []
-            }
           />
         </Form.Item>
 
@@ -279,7 +291,7 @@ export default function FormHealth() {
         </Form.Item>
 
         <Button type="primary" htmlType="submit" size="large">
-          {healthData?.health_id ? "Cập nhật thông tin" : "Tạo mới thông tin"}
+          {healthData ? "Cập nhật thông tin" : "Tạo mới thông tin"}
         </Button>
       </Form>
     </motion.div>

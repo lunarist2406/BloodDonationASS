@@ -13,7 +13,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { useRegisterBlood } from "../../../../hooks/RegistrationForm/useRegisterBlood";
 import FormRegisterBlood from "./FormRegisterBlood";
-import FormHealth from "./FormHealth";
+import FormHealth from "../FormHealth";
 import { useState, useEffect } from "react";
 import { Table, Button, Tag, Modal, Descriptions, Pagination } from "antd";
 import useDonateBloodService from "../../../../hooks/RegistrationForm/useDonateBloodService";

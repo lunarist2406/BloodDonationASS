@@ -14,6 +14,7 @@ import { useRegisterBlood } from "../../../../hooks/RegistrationForm/useRegister
 import { useState } from "react";
 import FormRegisterBloodEmergency from "./FormRegisterBlood";
 import FormHealthEmergency from "./FormHealth";
+import FormHealth from "../FormHealth";
 
 export default function RegisterBloodEmergency() {
   interface MyProps {
@@ -78,10 +79,7 @@ export default function RegisterBloodEmergency() {
                     color="white"
                   />
                 </button>
-                <FormHealthEmergency
-                  formData={formData}
-                  setFormData={setFormData}
-                />
+                <FormHealth />
               </motion.div>
             ) : (
               <motion.div
