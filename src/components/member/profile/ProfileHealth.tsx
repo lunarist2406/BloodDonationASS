@@ -12,11 +12,15 @@ import {
 import dayjs from "dayjs";
 import { api } from "../../config/axios/axiosInstance";
 import { useAuth } from "../../../hooks/User/useAuth";
+import useBloodService from "../../../hooks/Blood/useBloodService";
 
 export default function ProfileHealth() {
   const [healthInfo, setHealthInfo] = useState<any>(null);
+  const [bloodDetail, setBloodDetail] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const { token } = useAuth();
+  const { getBloodById } = useBloodService(); // <-- hook lấy chi tiết máu
+
   const fetchHealthInfo = async () => {
     try {
       const res = await api.get(
@@ -27,7 +31,14 @@ export default function ProfileHealth() {
           },
         }
       );
-      setHealthInfo(res.data.data);
+      const info = res.data.data;
+      setHealthInfo(info);
+
+      if (info?.blood_id?.blood_id) {
+        const bloodRes = await getBloodById(info.blood_id.blood_id);
+        setBloodDetail(bloodRes?.data);
+      }
+
       console.log("Thông tin sức khỏe:", res);
     } catch (err) {
       console.error("Lỗi khi lấy thông tin sức khỏe", err);
@@ -42,6 +53,11 @@ export default function ProfileHealth() {
 
   if (loading) return <Spin tip="Đang tải thông tin..." />;
 
+  const bloodDisplay =
+    bloodDetail?.blood_type_id?.blood_name && bloodDetail?.rh_id?.blood_Rh
+      ? `${bloodDetail.blood_type_id.blood_name}${bloodDetail.rh_id.blood_Rh}`
+      : "Chưa rõ";
+
   return (
     <Card
       title="Thông Tin Sức Khỏe Cá Nhân"
@@ -52,11 +68,11 @@ export default function ProfileHealth() {
         <Descriptions.Item
           label={
             <span className="flex items-center gap-2">
-              <IconHeartbeat size={18} /> Mã Nhóm Máu
+              <IconHeartbeat size={18} /> Nhóm Máu
             </span>
           }
         >
-          {healthInfo?.blood_id.blood_id || "Chưa có"}
+          {bloodDisplay}
         </Descriptions.Item>
 
         <Descriptions.Item

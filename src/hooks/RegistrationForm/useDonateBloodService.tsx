@@ -56,12 +56,16 @@ export default function useDonateBloodService() {
     const res = await api.delete(`${API_URL}/${id}`, authHeaders);
     return res.data;
   };
-
+  const getDonateHistoryByUser = async () => {
+    const res = await api.get(`${API_URL}/history/user`, authHeaders);
+    return res.data;
+  };
   return {
     getAllDonateBloods,
     createDonateBlood,
     getDonateBloodById,
     updateDonateBlood,
     deleteDonateBlood,
+    getDonateHistoryByUser
   };
 }

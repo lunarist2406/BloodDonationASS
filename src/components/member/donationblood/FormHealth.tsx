@@ -237,34 +237,38 @@ export default function FormHealth() {
           />
         </Form.Item>
 
-        <Form.Item
-          name="latest_donate"
-          label={
-            <span className={inputClass}>
-              <IconCalendar size={20} /> Lần hiến máu gần nhất
-            </span>
-          }
-        >
-          <DatePicker style={{ width: "100%" }} format="YYYY-MM-DD" />
-        </Form.Item>
+        <div className="flex gap-4 mb-4">
+          <Form.Item
+            name="latest_donate"
+            label={
+              <span className={inputClass}>
+                <IconCalendar size={20} /> Lần hiến máu gần nhất
+              </span>
+            }
+            style={{ flex: "1 1 50%" }}
+          >
+            <DatePicker style={{ width: "100%" }} format="YYYY-MM-DD" />
+          </Form.Item>
 
-        <Form.Item
-          name="status_health"
-          label={
-            <span className={inputClass}>
-              <IconHeartRateMonitor size={20} /> Tình trạng hiện tại
-            </span>
-          }
-        >
-          <Select
-            placeholder="Chọn tình trạng"
-            options={[
-              { label: "Tốt", value: "Tốt" },
-              { label: "Trung bình", value: "Trung bình" },
-              { label: "Yếu", value: "Yếu" },
-            ]}
-          />
-        </Form.Item>
+          <Form.Item
+            name="status_health"
+            label={
+              <span className={inputClass}>
+                <IconHeartRateMonitor size={20} /> Tình trạng hiện tại
+              </span>
+            }
+            style={{ flex: "1 1 50%" }}
+          >
+            <Select
+              placeholder="Chọn tình trạng"
+              options={[
+                { label: "Tốt", value: "Tốt" },
+                { label: "Trung bình", value: "Trung bình" },
+                { label: "Yếu", value: "Yếu" },
+              ]}
+            />
+          </Form.Item>
+        </div>
 
         <Form.Item
           label={

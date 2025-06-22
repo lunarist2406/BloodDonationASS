@@ -9,6 +9,7 @@ import {
   IconChevronRight,
   IconChevronLeft,
   IconUserCheck,
+  IconReload,
 } from "@tabler/icons-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRegisterBlood } from "../../../../hooks/RegistrationForm/useRegisterBlood";
@@ -17,6 +18,7 @@ import FormHealth from "../FormHealth";
 import { useState, useEffect } from "react";
 import { Table, Button, Tag, Modal, Descriptions, Pagination } from "antd";
 import useDonateBloodService from "../../../../hooks/RegistrationForm/useDonateBloodService";
+import useBloodService from "../../../../hooks/Blood/useBloodService";
 
 export default function RegisterBlood() {
   interface MyProps {
@@ -29,8 +31,8 @@ export default function RegisterBlood() {
     "health"
   );
   const [loading, setLoading] = useState(false);
-  const { getAllDonateBloods } = useDonateBloodService();
-
+  const { getDonateHistoryByUser } = useDonateBloodService();
+  const { getBloodById } = useBloodService();
   // Pagination state
   const [pagination, setPagination] = useState({
     current: 1,
@@ -49,45 +51,60 @@ export default function RegisterBlood() {
   async function fetchData(page: number, pageSize: number) {
     setLoading(true);
     try {
-      const res = await getAllDonateBloods(page, pageSize);
-      // Map API response to table data
-      const formattedList = res.data.results.map(
-        (item: any, index: number) => ({
-          key: item.donate_id,
-          stt: (page - 1) * pageSize + index + 1,
-          fullName: item.infor_health?.user_id?.fullname || "Chưa có tên",
-          dob: item.infor_health?.user_id?.dob
-            ? new Date(item.infor_health.user_id.dob).toLocaleDateString(
-                "vi-VN"
-              )
-            : "Chưa có ngày sinh",
-          phone: item.infor_health?.user_id?.phone || "Chưa có số điện thoại",
-          roleDonation: item.roleDonation || "Chưa có vai trò",
-          bloodType: item.blood_id?.blood_id || "Chưa có nhóm máu",
-          location:
-            item.centralBlood_id?.centralBlood_name || "Chưa có địa điểm",
-          status: item.status_donate || "Chưa có trạng thái",
-          raw: item, // giữ data gốc để mở chi tiết
+      const res = await getDonateHistoryByUser();
+
+      const pendingList = res.data.filter(
+        (item: any) => item.status_regist === "PENDING"
+      );
+
+      const paginated = pendingList.slice(
+        (page - 1) * pageSize,
+        page * pageSize
+      );
+
+      const formattedList = await Promise.all(
+        paginated.map(async (item: any, index: number) => {
+          let bloodDisplay = "Chưa có nhóm máu";
+          if (item.blood_id?.blood_id) {
+            try {
+              const bloodRes = await getBloodById(item.blood_id.blood_id);
+              const blood = bloodRes.data;
+              if (blood?.blood_type_id?.blood_name && blood?.rh_id?.blood_Rh) {
+                bloodDisplay =
+                  blood.blood_type_id.blood_name + blood.rh_id.blood_Rh;
+              }
+            } catch (err) {
+              console.error("Lỗi khi lấy nhóm máu:", err);
+            }
+          }
+
+          return {
+            key: item.donate_id,
+            stt: (page - 1) * pageSize + index + 1,
+            fullName: item.infor_health?.user_id?.fullname || "Chưa có tên",
+            bloodType: bloodDisplay,
+            location:
+              item.centralBlood_id?.centralBlood_name || "Chưa có địa điểm",
+            status: item.status_donate || "Chưa có trạng thái",
+            registerDate: item.date_register,
+            donateDate: item.date_donate,
+            raw: item,
+          };
         })
       );
 
       setWaitingList(formattedList);
       setPagination({
-        current: res.data.meta.current,
-        pageSize: res.data.meta.pageSize,
-        total: res.data.meta.total,
+        current: page,
+        pageSize,
+        total: pendingList.length,
       });
     } catch (error) {
-      console.error("Lấy dữ liệu đăng ký hiến máu lỗi:", error);
+      console.error("Lỗi lấy danh sách đăng ký hiến máu:", error);
     } finally {
       setLoading(false);
     }
   }
-
-  // Handle pagination change
-  const handleTableChange = (paginationData: any) => {
-    fetchData(paginationData.current, paginationData.pageSize);
-  };
 
   // Mở modal chi tiết
   const showDetailModal = (record: any) => {
@@ -123,6 +140,19 @@ export default function RegisterBlood() {
       dataIndex: "fullName",
       key: "fullName",
       align: "center" as const,
+    },
+
+    {
+      title: (
+        <span className="flex items-center justify-center gap-1 text-red-800">
+          <IconCalendar size={16} /> Ngày hiến
+        </span>
+      ),
+      dataIndex: "donateDate",
+      key: "donateDate",
+      align: "center" as const,
+      render: (date: string) =>
+        date ? new Date(date).toLocaleString("vi-VN") : "Không có",
     },
 
     {
@@ -252,10 +282,23 @@ export default function RegisterBlood() {
           transition={{ duration: 0.5 }}
         >
           <div className="bg-white rounded-xl shadow-lg p-4 h-full flex flex-col">
-            <h2 className="text-2xl font-bold mb-4 text-red-700 flex items-center gap-2">
-              <IconClock size={24} className="text-red-700" />
-              Thông Tin Đã Đăng Ký
-            </h2>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold text-red-700 flex items-center gap-2">
+                <IconClock size={24} className="text-red-700" />
+                Thông Tin Đã Đăng Ký
+              </h2>
+              <Button
+                icon={<IconReload />}
+                onClick={() =>
+                  fetchData(pagination.current, pagination.pageSize)
+                }
+                loading={loading}
+                type="default"
+                className="text-red-600 border-red-300 hover:border-red-500 hover:text-red-700"
+              >
+                Tải lại
+              </Button>
+            </div>
 
             {/* Table scrollable và tự co chiều cao */}
             <div className="flex-grow overflow-auto">

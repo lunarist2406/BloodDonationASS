@@ -1,12 +1,9 @@
-import React from "react";
-import { useRegisterBlood } from "../../../../hooks/RegistrationForm/useRegisterBlood";
+
 import FormViewDonate from "./FormViewDonate";
 import TableDonateBlood from "./TableDonation";
 import { motion } from "framer-motion";
 import { IconDroplet } from "@tabler/icons-react";
 export default function DonateBlood() {
-  const { waitingList } = useRegisterBlood();
-
   return (
     <div className="flex flex-col bg-gradient-to-b from-red-100 to-red-300 min-h-screen">
       <motion.h4
@@ -21,7 +18,7 @@ export default function DonateBlood() {
       <div className="grid grid-cols-20 gap-4 px-5 mb-10">
         {/* Truyền formData để hiển thị */}
         <div className="col-span-6">
-          <TableDonateBlood data={waitingList} />
+          <TableDonateBlood />
         </div>
         <div className="col-span-14">
           <FormViewDonate />
