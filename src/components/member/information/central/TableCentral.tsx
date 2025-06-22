@@ -1,7 +1,15 @@
-import { Table, Button, Tag, Modal, Descriptions, Pagination } from "antd";
+import {
+  Table,
+  Button,
+  Tag,
+  Modal,
+  Descriptions,
+  Pagination,
+  message,
+} from "antd";
 import { ReloadOutlined, EyeOutlined } from "@ant-design/icons";
-import { useState } from "react";
-import useCentral from "../../../../hooks/CentralBlood/useCentral";
+import { useState, useEffect } from "react";
+import useCentralService from "../../../../hooks/CentralBlood/useCentralService";
 import {
   IconMapPin,
   IconBuildingBank,
@@ -16,29 +24,41 @@ export default function TableCentral({
 }: {
   onSelectCentral: (central: any) => void;
 }) {
-  const { central, fetchCentral } = useCentral();
+  const { getAllCentral } = useCentralService();
+  const [central, setCentral] = useState<any[]>([]);
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(false);
 
   const pageSize = 5;
 
-  const handleReload = () => {
-    fetchCentral();
+  const fetchCentral = async () => {
+    setLoading(true);
+    try {
+      const res = await getAllCentral(1, 100);
+      setCentral(res.data.result);
+    } catch {
+      message.error("Lỗi khi load danh sách trung tâm");
+    } finally {
+      setLoading(false);
+    }
   };
+
+  useEffect(() => {
+    fetchCentral();
+  }, []);
 
   const showDetail = (record: any) => {
     setSelectedItem(record);
     setIsModalVisible(true);
   };
 
-  // Lấy dữ liệu của trang hiện tại
   const pagedData = central.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
 
-  // Thêm dòng trống nếu thiếu
   const paddedData =
     pagedData.length < pageSize
       ? [
@@ -82,14 +102,15 @@ export default function TableCentral({
     {
       title: "Trạng Thái",
       key: "is_open",
-      render: (_: any, record: any) =>
-        record.isFake ? (
-          ""
-        ) : record.working_id?.is_open ? (
+      render: (_: any, record: any) => {
+        if (record.isFake) return "";
+        const anyOpen = record.working_id?.some((item: any) => item.is_open);
+        return anyOpen ? (
           <Tag color="green">Hoạt Động</Tag>
         ) : (
-          <Tag color="red">Ngưng Hoạt Động</Tag>
-        ),
+          <Tag color="red">Ngưng</Tag>
+        );
+      },
     },
     {
       title: "Hành Động",
@@ -115,7 +136,7 @@ export default function TableCentral({
         <h2 className="text-xl font-semibold flex items-center gap-2">
           <IconBuildingBank size={22} /> Danh Sách Trung Tâm
         </h2>
-        <Button icon={<ReloadOutlined />} onClick={handleReload}>
+        <Button icon={<ReloadOutlined />} onClick={fetchCentral}>
           Reload
         </Button>
       </div>
@@ -134,6 +155,7 @@ export default function TableCentral({
           dataSource={paddedData}
           rowKey={(record) => record.centralBlood_id}
           pagination={false}
+          loading={loading}
         />
 
         <div className="flex justify-end mt-2">
@@ -185,37 +207,24 @@ export default function TableCentral({
             <Descriptions.Item
               label={
                 <span className="flex items-center gap-2">
-                  <IconPower size={18} />
-                  Trạng Thái Mở Cửa
-                </span>
-              }
-            >
-              {selectedItem.working_id?.is_open ? "Có" : "Không"}
-            </Descriptions.Item>
-
-            <Descriptions.Item
-              label={
-                <span className="flex items-center gap-2">
                   <IconClock size={18} />
                   Giờ Làm Việc
                 </span>
               }
             >
-              {`${selectedItem.working_id?.open_time?.slice(
-                11,
-                16
-              )} - ${selectedItem.working_id?.close_time?.slice(11, 16)}`}
-            </Descriptions.Item>
-
-            <Descriptions.Item
-              label={
-                <span className="flex items-center gap-2">
-                  <IconCalendarTime size={18} />
-                  Thứ
-                </span>
-              }
-            >
-              {selectedItem.working_id?.day_of_week}
+              {selectedItem.working_id && selectedItem.working_id.length > 0 ? (
+                <ul className="list-disc list-inside">
+                  {selectedItem.working_id.map((item: any) => (
+                    <li key={item.working_id}>
+                      {item.day_of_week}: {item.open_time?.slice(11, 16)} -{" "}
+                      {item.close_time?.slice(11, 16)} (
+                      {item.is_open ? "Mở" : "Đóng"})
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                "Không có giờ làm việc"
+              )}
             </Descriptions.Item>
           </Descriptions>
         )}
