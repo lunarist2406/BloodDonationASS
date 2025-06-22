@@ -62,7 +62,7 @@ export default function FormViewDonate() {
             bloodType: bloodDisplay,
             location:
               item.centralBlood_id?.centralBlood_name || "Chưa có địa điểm",
-            status: item.status_donate || "Chưa có trạng thái",
+            status: item.status_regist || "Chưa có trạng thái",
           };
         })
       );
@@ -193,8 +193,7 @@ export default function FormViewDonate() {
       align: "center" as const,
       render: (status: string) => {
         let color = "orange";
-        if (status === "COMPLETED") color = "green";
-        else if (status === "CANCELLED") color = "red";
+        if (status === "APPROVED") color = "green";
         return (
           <Tag color={color} className="font-semibold">
             {status}

@@ -85,7 +85,7 @@ export default function RegisterBlood() {
             bloodType: bloodDisplay,
             location:
               item.centralBlood_id?.centralBlood_name || "Chưa có địa điểm",
-            status: item.status_donate || "Chưa có trạng thái",
+            status: item.status_regist || "Chưa có trạng thái",
             registerDate: item.date_register,
             donateDate: item.date_donate,
             raw: item,

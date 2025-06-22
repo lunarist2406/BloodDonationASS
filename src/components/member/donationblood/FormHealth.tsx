@@ -126,12 +126,14 @@ export default function FormHealth() {
 
   return (
     <motion.div
-      className="max-w-2xl mx-auto p-6 bg-white rounded-xl shadow-lg"
+      className="max-w-2xl mx-auto p-4 bg-white rounded-xl shadow-lg" // p-6 → p-4
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <h2 className="text-2xl font-bold mb-6 text-center text-red-600">
+      <h2 className="text-2xl font-bold mb-4 text-center text-red-600">
+        {" "}
+        {/* mb-6 → mb-4 */}
         Thông Tin Sức Khỏe
       </h2>
 
@@ -143,9 +145,12 @@ export default function FormHealth() {
           fullName: userData?.data?.fullname || "",
         }}
       >
+        {/* Input class giảm margin-bottom */}
         <Form.Item
           label={
-            <span className={inputClass}>
+            <span className="flex items-center gap-2 mb-2">
+              {" "}
+              {/* mb-4 → mb-2 */}
               <IconUser size={20} /> Tên người điền
             </span>
           }
@@ -153,11 +158,15 @@ export default function FormHealth() {
           <Input disabled value={userData?.data?.fullname} />
         </Form.Item>
 
-        <div className="flex gap-4 mb-4">
+        <div className="flex gap-2 mb-3">
+          {" "}
+          {/* gap-4 → gap-2, mb-4 → mb-3 */}
           <Form.Item
             name="height"
             label={
-              <span className={inputClass}>
+              <span className="flex items-center gap-2 mb-2">
+                {" "}
+                {/* mb-4 → mb-2 */}
                 <IconLineHeight size={20} /> Chiều cao (cm)
               </span>
             }
@@ -166,11 +175,12 @@ export default function FormHealth() {
           >
             <Input type="number" min={140} max={250} />
           </Form.Item>
-
           <Form.Item
             name="weight"
             label={
-              <span className={inputClass}>
+              <span className="flex items-center gap-2 mb-2">
+                {" "}
+                {/* mb-4 → mb-2 */}
                 <IconWeight size={20} /> Cân nặng (kg)
               </span>
             }
@@ -181,11 +191,15 @@ export default function FormHealth() {
           </Form.Item>
         </div>
 
-        <div className="flex gap-4 mb-4">
+        <div className="flex gap-2 mb-3">
+          {" "}
+          {/* gap-4 → gap-2, mb-4 → mb-3 */}
           <Form.Item
             name="blood_id"
             label={
-              <span className={inputClass}>
+              <span className="flex items-center gap-2 mb-2">
+                {" "}
+                {/* mb-4 → mb-2 */}
                 <IconFilterHeart size={20} /> Nhóm máu
               </span>
             }
@@ -202,11 +216,12 @@ export default function FormHealth() {
               }
             />
           </Form.Item>
-
           <Form.Item
             name="blood_pressure"
             label={
-              <span className={inputClass}>
+              <span className="flex items-center gap-2 mb-2">
+                {" "}
+                {/* mb-4 → mb-2 */}
                 <IconHeartbeat size={20} /> Huyết áp
               </span>
             }
@@ -220,7 +235,9 @@ export default function FormHealth() {
         <Form.Item
           name="medical_history"
           label={
-            <span className={inputClass}>
+            <span className="flex items-center gap-2 mb-2">
+              {" "}
+              {/* mb-4 → mb-2 */}
               <IconHeartRateMonitor size={20} /> Tiền sử bệnh
             </span>
           }
@@ -237,11 +254,15 @@ export default function FormHealth() {
           />
         </Form.Item>
 
-        <div className="flex gap-4 mb-4">
+        <div className="flex gap-2 mb-3">
+          {" "}
+          {/* gap-4 → gap-2, mb-4 → mb-3 */}
           <Form.Item
             name="latest_donate"
             label={
-              <span className={inputClass}>
+              <span className="flex items-center gap-2 mb-2">
+                {" "}
+                {/* mb-4 → mb-2 */}
                 <IconCalendar size={20} /> Lần hiến máu gần nhất
               </span>
             }
@@ -249,11 +270,12 @@ export default function FormHealth() {
           >
             <DatePicker style={{ width: "100%" }} format="YYYY-MM-DD" />
           </Form.Item>
-
           <Form.Item
             name="status_health"
             label={
-              <span className={inputClass}>
+              <span className="flex items-center gap-2 mb-2">
+                {" "}
+                {/* mb-4 → mb-2 */}
                 <IconHeartRateMonitor size={20} /> Tình trạng hiện tại
               </span>
             }
@@ -272,7 +294,9 @@ export default function FormHealth() {
 
         <Form.Item
           label={
-            <span className={inputClass}>
+            <span className="flex items-center gap-2 mb-2">
+              {" "}
+              {/* mb-4 → mb-2 */}
               <IconUpload size={20} /> Ảnh giấy khám sức khỏe
             </span>
           }
@@ -294,7 +318,7 @@ export default function FormHealth() {
           )}
         </Form.Item>
 
-        <Button type="primary" htmlType="submit" size="large">
+        <Button type="primary" htmlType="submit" size="large" block>
           {healthData ? "Cập nhật thông tin" : "Tạo mới thông tin"}
         </Button>
       </Form>
