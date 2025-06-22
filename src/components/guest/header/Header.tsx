@@ -299,7 +299,7 @@ const adminLinks = [
     label: "Quản Lý Trung Tâm Hiến Máu",
     icon: IconBuildingBank,
   },
-  { to: "controlling-user", label: "Quản Lý Kho Máu", icon: IconDatabase },
+  { to: "controlling-storage", label: "Quản Lý Kho Máu", icon: IconDatabase },
   { to: "admin-profile", label: "Tài Khoản", icon: IconUserBolt },
 ];
 

@@ -9,7 +9,13 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import useUser from "../../../../hooks/User/useUser";
-import { IconUsers, IconMapPin } from "@tabler/icons-react";
+import {
+  IconUsers,
+  IconMapPin,
+  IconSwitchHorizontal,
+} from "@tabler/icons-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Button } from "antd";
 
 const COLORS = [
   "#0088FE",
@@ -34,6 +40,7 @@ export default function ChartUser() {
   const [districtData, setDistrictData] = useState<
     { name: string; value: number }[]
   >([]);
+  const [showRoleChart, setShowRoleChart] = useState(true);
 
   useEffect(() => {
     fetchAllUsers(1, 1000).then((res) => {
@@ -91,6 +98,12 @@ export default function ChartUser() {
     );
   };
 
+  const chartVariants = {
+    hidden: { opacity: 0, scale: 0.95, y: 20 },
+    visible: { opacity: 1, scale: 1, y: 0 },
+    exit: { opacity: 0, scale: 0.95, y: -20 },
+  };
+
   const renderChart = (
     title: string,
     data: { name: string; value: number }[],
@@ -99,12 +112,12 @@ export default function ChartUser() {
     const total = data.reduce((sum, item) => sum + item.value, 0);
 
     return (
-      <div className="w-full max-w-md mx-auto bg-white shadow-md rounded-xl p-4">
+      <div className="w-full max-w-md mx-auto   rounded-xl p-4 min-h-[360px]">
         <h2 className="text-sm font-semibold text-gray-800 mb-2 flex items-center gap-2 justify-center">
           <Icon size={18} color="#4B5563" />
           {title}
         </h2>
-        <ResponsiveContainer width="100%" height={250}>
+        <ResponsiveContainer width="100%" height={400}>
           <PieChart>
             <Pie
               data={data}
@@ -149,10 +162,45 @@ export default function ChartUser() {
   };
 
   return (
-    <div className="col-span-6 flex flex-col gap-4 items-center justify-center">
+    <div className="w-full flex flex-col gap-4 items-center relative">
+      <div className="sticky top-0 z-10 bg-white pt-2 pb-1 flex justify-start w-full max-w-md mx-auto">
+        <Button
+          onClick={() => setShowRoleChart(!showRoleChart)}
+          icon={<IconSwitchHorizontal size={16} />}
+        >
+          {showRoleChart ? "Xem Quận" : "Xem Vai Trò"}
+        </Button>
+      </div>
 
-      {renderChart("Phân Bố Vai Trò Người Dùng", roleData, IconUsers)}
-      {renderChart("Phân Bố Người Dùng Theo Quận", districtData, IconMapPin)}
+      <AnimatePresence mode="wait">
+        {showRoleChart ? (
+          <motion.div
+            key="role-chart"
+            variants={chartVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            transition={{ duration: 0.4 }}
+          >
+            {renderChart("Phân Bổ Vai Trò Người Dùng", roleData, IconUsers)}
+          </motion.div>
+        ) : (
+          <motion.div
+            key="district-chart"
+            variants={chartVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            transition={{ duration: 0.4 }}
+          >
+            {renderChart(
+              "Phân Bổ Người Dùng Theo Quận",
+              districtData,
+              IconMapPin
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
