@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { IconUser } from "@tabler/icons-react";
+import { IconUser, IconUserBolt } from "@tabler/icons-react";
 import ProfileAccount from "./ProfileAccount";
 import useUser from "../../../hooks/User/useUser";
 
@@ -10,15 +10,15 @@ export default function StaffProfile() {
   return (
     <div className="p-6">
       {/* Header title */}
-      <motion.h4
-        initial={{ x: 0, color: "#ef4444" }}
-        whileHover={{ x: 8, color: "#f87171" }}
+      <motion.h2
+        initial={{ x: 0, color: "#000" }}
+        whileHover={{ x: 8, color: "#f43f5e" }}
         transition={{ type: "spring", stiffness: 300 }}
-        className="text-lg font-bold flex items-center gap-2 mb-6 text-red-500"
+        className="self-start text-base font-bold flex items-center gap-2 "
       >
-        <IconUser size={24} className="text-red-500" />
-        Thông Tin Cá Nhân
-      </motion.h4>
+        <IconUserBolt size={20} className="text-red-500" />
+        Quản Lý Đơn Vị Kho Máu Trung Tâm
+      </motion.h2>
 
       {/* Main layout: 2 columns */}
       <div className="grid grid-cols-1 lg:grid-cols-20 gap-6">

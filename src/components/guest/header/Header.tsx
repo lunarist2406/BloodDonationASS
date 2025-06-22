@@ -315,7 +315,7 @@ const staffLinks = [
     icon: IconBuildingBank,
   },
   {
-    to: "blood-storage",
+    to: "storage-controlling",
     label: "Quản Lý Đơn Vị Kho Máu của Trung Tâm",
     icon: IconDatabase,
   },

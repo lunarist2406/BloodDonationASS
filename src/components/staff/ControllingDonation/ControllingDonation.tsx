@@ -273,12 +273,12 @@ export default function ControllingDonate() {
 
   return (
     <div className="bg-white rounded-xl shadow-lg p-4 h-full flex flex-col">
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center">
         <motion.h2
           initial={{ x: 0, color: "#000" }}
           whileHover={{ x: 8, color: "#f43f5e" }}
           transition={{ type: "spring", stiffness: 300 }}
-          className="self-start text-base font-bold flex items-center gap-2  pt-5"
+          className="self-start text-base font-bold flex items-center gap-2"
         >
           <IconUserCheck size={20} className="text-red-500" />
           Quản Lý Đơn Đăng Ký Hiến Máu
@@ -347,7 +347,53 @@ export default function ControllingDonate() {
       >
         {selectedRecord ? (
           <Descriptions bordered column={1} size="small">
-            {/* ... phần mô tả chi tiết y nguyên như bạn có */}
+            <Descriptions.Item label="Mã đơn đăng ký">
+              {selectedRecord.donate_id || "Không có"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Họ tên">
+              {selectedRecord.infor_health?.user_id?.fullname || "Không có"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Email">
+              {selectedRecord.infor_health?.user_id?.email || "Không có"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Giới tính">
+              {selectedRecord.infor_health?.user_id?.gender || "Không có"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Ngày đăng ký">
+              {selectedRecord.date_register
+                ? new Date(selectedRecord.date_register).toLocaleString("vi-VN")
+                : "Không có"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Ngày hiến">
+              {selectedRecord.date_donate
+                ? new Date(selectedRecord.date_donate).toLocaleString("vi-VN")
+                : "Không có"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Trạng thái đăng ký">
+              {selectedRecord.status_regist || "Không có"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Trạng thái hiến">
+              {selectedRecord.status_donate || "Không có"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Chiều cao (cm)">
+              {selectedRecord.infor_health?.height ?? "Không có"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Cân nặng (kg)">
+              {selectedRecord.infor_health?.weight_decimal ?? "Không có"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Huyết áp">
+              {selectedRecord.infor_health?.blood_pressure ?? "Không có"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Tiền sử bệnh lý">
+              {selectedRecord.infor_health?.medical_history || "Không có"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Trung tâm hiến máu">
+              {selectedRecord.centralBlood_id?.centralBlood_name || "Không có"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Địa chỉ trung tâm">
+              {selectedRecord.centralBlood_id?.centralBlood_address ||
+                "Không có"}
+            </Descriptions.Item>
           </Descriptions>
         ) : (
           <p>Không có dữ liệu chi tiết</p>
