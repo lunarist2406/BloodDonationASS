@@ -120,7 +120,28 @@ export default function TableDonateBlood() {
 
   if (data.length === 0)
     return (
-      <p className="text-center p-10">Không có đơn đăng ký PENDING nào.</p>
+      <div className="flex flex-col items-center justify-center p-10 bg-white rounded-xl shadow-lg">
+        <IconHistory size={48} color="#f87171" className="mb-4" />
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{
+            duration: 1,
+            repeat: Infinity,
+            repeatType: "reverse",
+            ease: "easeInOut",
+          }}
+        >
+          <h5 className="text-[#d32f2f] text-base font-semibold mb-2 text-center">
+            Không có đơn đăng ký hiến máu đang chờ duyệt
+          </h5>
+        </motion.div>
+        <p className="text-gray-500 mb-4 text-center">
+          Bạn chưa có đơn đăng ký hiến máu nào ở trạng thái <b>PENDING</b>.
+          <br />
+          Hãy đăng ký để tham gia hiến máu và giúp đỡ cộng đồng!
+        </p>
+      </div>
     );
 
   return (

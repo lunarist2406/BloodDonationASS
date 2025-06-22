@@ -32,7 +32,7 @@ import isAxiosLikeError from "../../../constraint/typeError";
 export default function FormHealth() {
   const [form] = Form.useForm();
   const [healthData, setHealthData] = useState<any>(null);
-  const [fileUpload, setFileUpload] = useState<File | null>(null);
+  const [fileList, setFileList] = useState<RcFile[]>([]);
   const [loading, setLoading] = useState(true);
   const { userData } = useUser();
   const { getHealthInfoByUser, createHealthInfo, updateHealthInfo } =
@@ -73,12 +73,14 @@ export default function FormHealth() {
   }, []);
 
   const handleUpload = (info: UploadChangeParam) => {
-    const file = info.file.originFileObj as RcFile;
-    if (file) {
-      setFileUpload(file);
-      const url = URL.createObjectURL(file);
-      form.setFieldValue("img_health", url);
-    }
+    const files = info.fileList
+      .map((file) => file.originFileObj)
+      .filter(Boolean) as RcFile[];
+    setFileList(files);
+
+    // Chuyển tạm để preview
+    const previewURLs = files.map((file) => URL.createObjectURL(file));
+    form.setFieldValue("img_health", previewURLs);
   };
 
   const onFinish = async (values: any) => {
@@ -94,7 +96,11 @@ export default function FormHealth() {
       values.latest_donate ? dayjs(values.latest_donate).toISOString() : ""
     );
     formData.append("status_health", values.status_health || "");
-    if (fileUpload) formData.append("img_health", fileUpload);
+    if (fileList && fileList.length > 0) {
+      fileList.forEach((file, index) => {
+        formData.append("img_health", file); // nếu backend nhận mảng thì đổi thành `img_health[]`
+      });
+    }
 
     try {
       if (healthData?.health_id) {
@@ -295,7 +301,6 @@ export default function FormHealth() {
         <Form.Item
           label={
             <span className="flex items-center gap-2 mb-2">
-              {" "}
               {/* mb-4 → mb-2 */}
               <IconUpload size={20} /> Ảnh giấy khám sức khỏe
             </span>
@@ -305,17 +310,28 @@ export default function FormHealth() {
             showUploadList={false}
             beforeUpload={() => false}
             onChange={handleUpload}
+            multiple
           >
             <Button icon={<IconUpload />}>Tải ảnh</Button>
           </Upload>
-          {form.getFieldValue("img_health") && (
-            <Image
-              src={form.getFieldValue("img_health")}
-              alt="Ảnh giấy khám sức khỏe"
-              style={{ marginTop: 8 }}
-              width={150}
-            />
-          )}
+
+          <div
+            style={{ marginTop: 12, display: "flex", gap: 8, flexWrap: "wrap" }}
+          >
+            {Array.isArray(form.getFieldValue("img_health")) &&
+              form
+                .getFieldValue("img_health")
+                .map((url: string, idx: number) => (
+                  <Image
+                    key={idx}
+                    src={url}
+                    alt={`Ảnh ${idx + 1}`}
+                    style={{ objectFit: "cover", width: 120, height: 120 }}
+                    width={120}
+                    height={120}
+                  />
+                ))}
+          </div>
         </Form.Item>
 
         <Button type="primary" htmlType="submit" size="large" block>
