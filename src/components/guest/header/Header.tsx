@@ -15,6 +15,7 @@ import {
   IconShieldCheck,
   IconUserBolt,
   IconUser,
+  IconUserCancel,
 } from "@tabler/icons-react";
 import img1 from "../../../assets/Blood-Donation-1.webp";
 import { useAuth } from "../../../hooks/User/useAuth";
@@ -304,11 +305,17 @@ const adminLinks = [
 ];
 
 const staffLinks = [
+    {
+    to: "health-controlling",
+    label: "Quản Lý Thông Tin Sức Khỏe",
+    icon: IconUserCog,
+  },
   {
     to: "donate-controlling",
     label: "Quản Lý Đơn Đăng ký Hiến Máu",
-    icon: IconUserCog,
+    icon: IconUserCancel,
   },
+
   {
     to: "receiver-controlling",
     label: "Quản Lý Đơn Yêu Cầu Nhận Máu",

@@ -1,24 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, Row, Col, Typography, Button, Modal, Spin } from "antd";
+import { Form, Input, Row, Col, Typography, Button, Spin } from "antd";
 import {
-  IconUser,
-  IconCalendar,
-  IconPhone,
+
   IconMail,
   IconMapPin,
   IconActivityHeartbeat,
   IconBuildingHospital,
-  IconStar,
-  IconArrowBigUpLine,
-  IconWeight,
-  IconHeartRateMonitor,
-  IconHeartbeat,
-  IconHistory,
-  IconPill,
-  IconCalendarTime,
-  IconVirus,
   IconDroplet,
-  IconHeart,
+  IconHistory,
+
 } from "@tabler/icons-react";
 import { motion } from "framer-motion";
 import useDonateBloodService from "../../../../hooks/RegistrationForm/useDonateBloodService";
@@ -242,7 +232,6 @@ export default function TableDonateBlood() {
               </Col>
             </Row>
 
-            {/* Modal xem thông tin sức khỏe thì giữ nguyên nhé */}
           </Form>
         </div>
       ))}

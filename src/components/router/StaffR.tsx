@@ -3,6 +3,7 @@ import { Suspense, lazy } from "react";
 import ControllingDonate from "../staff/ControllingDonation/ControllingDonation";
 import StaffProfile from "../staff/profile/Profile";
 import ControllingStorage from "../staff/ControllingStorage/ControllingStorage";
+import ControllingHealth from "../staff/ControllingHealth/ControllingHealth";
 
 // Lazy load components
 const HomePage = lazy(() => import("../../page/HomePage"));
@@ -16,6 +17,8 @@ export default function StaffR() {
           <Route index element={<HomePage />} />
           <Route path=":staff" element={<HomePage />} />
           <Route path="donate-controlling" element={<ControllingDonate />} />
+          <Route path="health-controlling" element={<ControllingHealth />} />
+
           <Route path="storage-controlling" element={<ControllingStorage />} />
 
           <Route path="staff-profile" element={<StaffProfile />} />
