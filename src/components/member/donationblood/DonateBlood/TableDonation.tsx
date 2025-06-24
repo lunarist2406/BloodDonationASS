@@ -142,7 +142,7 @@ export default function TableDonateBlood() {
       className="bg-white p-6 rounded-xl shadow-lg"
     >
       <Title level={3} style={{ color: "#d32f2f", marginBottom: 24 }}>
-        Đơn đăng ký hiến máu gần nhất đang chờ duyệt
+        Đơn Gần Nhất đang chờ duyệt
       </Title>
 
       {data.map((item, index) => (

@@ -19,10 +19,10 @@ export default function ReceiverBlood() {
       </motion.h4>
       <div className="grid grid-cols-20 gap-4 px-5 mb-10">
         {/* Truyền formData để hiển thị */}
-        <div className="col-span-6">
-          <TableReceiverBlood data={waitingList} />
+        <div className="col-span-7">
+          <TableReceiverBlood />
         </div>
-        <div className="col-span-14">
+        <div className="col-span-13">
           <FormViewReceiver formData={waitingList} />
         </div>
       </div>
