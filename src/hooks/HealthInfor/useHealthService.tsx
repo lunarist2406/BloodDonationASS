@@ -102,20 +102,8 @@ const updateHealthInfo = async (data) => {
 };
 
 
-const updateHealthInfoAdmin = async (id, data) => {
+const updateHealthInfoAdmin = async (id, formData) => {
   try {
-    const formData = new FormData();
-    for (const [key, value] of Object.entries(data)) {
-      if (value !== undefined && value !== null) {
-        // Với file upload (img_health), cần check xem đúng object file không
-        if (key === "img_health" && value instanceof File) {
-          formData.append(key, value);
-        } else {
-          formData.append(key, value.toString());
-        }
-      }
-    }
-
     const response = await api.patch(`${API_URL}/${id}/admin`, formData, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -128,6 +116,8 @@ const updateHealthInfoAdmin = async (id, data) => {
     throw error;
   }
 };
+
+
 
 
   const deleteHealthInfo = async (id) => {

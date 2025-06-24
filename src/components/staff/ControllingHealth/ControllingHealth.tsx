@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   Table,
   Button,
@@ -20,10 +20,19 @@ import {
   DeleteOutlined,
   ReloadOutlined,
   UploadOutlined,
+  SearchOutlined,
 } from "@ant-design/icons";
+import {
+  IconUser,
+  IconMail,
+  IconRulerMeasure,
+  IconScale,
+  IconHeart,
+  IconUserCheck,
+} from "@tabler/icons-react";
 import dayjs from "dayjs";
 import useHealthService from "../../../hooks/HealthInfor/useHealthService";
-
+import {motion} from "framer-motion"
 const { TextArea } = Input;
 
 export default function ControllingHealth() {
@@ -39,11 +48,19 @@ export default function ControllingHealth() {
   const [editModal, setEditModal] = useState({ open: false, record: null });
   const [form] = Form.useForm();
 
+  const [fileList, setFileList] = useState([]);
+
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
     total: 0,
   });
+
+  // NEW: state search fullname
+  const [searchName, setSearchName] = useState("");
+
+  // NEW: state sort info (antd passes sorter obj, but here we do local sorting)
+  const [sorter, setSorter] = useState({ field: null, order: null });
 
   const fetchData = async (current = 1, pageSize = 10) => {
     setLoading(true);
@@ -84,7 +101,7 @@ export default function ControllingHealth() {
   const handleEdit = (record) => {
     setEditModal({ open: true, record });
     form.setFieldsValue({
-      user_id: record.user_id?.user_id || "", // đảm bảo không bị undefined
+      user_id: record.user_id?.user_id || "",
       blood_id: record.blood_id?.blood_id,
       height: record.height,
       weight_decimal: record.weight_decimal,
@@ -93,65 +110,181 @@ export default function ControllingHealth() {
       latest_donate: dayjs(record.latest_donate),
       status_health: record.status_health,
     });
+
+    if (record.img_health) {
+      setFileList([
+        {
+          uid: "-1",
+          name: "Ảnh hiện tại",
+          status: "done",
+          url: record.img_health,
+        },
+      ]);
+    } else {
+      setFileList([]);
+    }
   };
 
-const handleUpdate = async () => {
-  try {
-    const values = await form.validateFields();
-    console.log("🧪 Values from form:", values);
+  const handleUpdate = async () => {
+    try {
+      const values = await form.validateFields();
+      const formData = new FormData();
 
-    const formData = new FormData();
-
-    for (const [key, value] of Object.entries(values)) {
-      if (key === "latest_donate") {
-        formData.append(key, value.toISOString());
-      } else if (key === "img_health" && value?.file) {
-        formData.append("img_health", value.file.originFileObj);
-      } else {
-        formData.append(key, value);
+      for (const [key, value] of Object.entries(values)) {
+        if (key === "latest_donate") {
+          formData.append(key, value.toISOString());
+        } else if (key !== "img_health" && value !== undefined && value !== null) {
+          formData.append(key, value.toString());
+        }
       }
+
+      fileList.forEach((file) => {
+        if (file.originFileObj) {
+          formData.append("img_health", file.originFileObj);
+        }
+      });
+
+      await updateHealthInfoAdmin(editModal.record.infor_health, formData);
+
+      message.success("Cập nhật thành công!");
+      setEditModal({ open: false, record: null });
+      setFileList([]);
+      fetchData();
+    } catch (err) {
+      console.error("❌ Cập nhật thất bại:", err);
+      message.error("Cập nhật thất bại!");
+    }
+  };
+
+  const onUploadChange = ({ fileList: newFileList }) => {
+    setFileList(newFileList);
+  };
+
+  // Handle table change for sorting & pagination (pagination on server side, sorting local here)
+  const handleTableChange = (pagination, filters, sorter) => {
+    setSorter({
+      field: sorter.field,
+      order: sorter.order,
+    });
+    fetchData(pagination.current, pagination.pageSize);
+  };
+
+  // Filter + sort data locally before rendering Table
+  const processedData = useMemo(() => {
+    let filtered = data;
+
+    if (searchName.trim()) {
+      filtered = filtered.filter((item) =>
+        item.user_id?.fullname
+          ?.toLowerCase()
+          .includes(searchName.trim().toLowerCase())
+      );
     }
 
-    // Log FormData để xem user_id chính xác không
-    console.log("📦 FormData content:");
-    for (let pair of formData.entries()) {
-      console.log(pair[0] + ": " + pair[1]);
+    if (sorter.field && sorter.order) {
+      filtered = filtered.slice().sort((a, b) => {
+        let aVal = a[sorter.field];
+        let bVal = b[sorter.field];
+
+        // handle nested user_id.fullname case if needed
+        if (sorter.field === "fullname") {
+          aVal = a.user_id?.fullname || "";
+          bVal = b.user_id?.fullname || "";
+        }
+
+        if (aVal === undefined || aVal === null) aVal = "";
+        if (bVal === undefined || bVal === null) bVal = "";
+
+        if (typeof aVal === "string") aVal = aVal.toLowerCase();
+        if (typeof bVal === "string") bVal = bVal.toLowerCase();
+
+        if (aVal > bVal) return sorter.order === "ascend" ? 1 : -1;
+        if (aVal < bVal) return sorter.order === "ascend" ? -1 : 1;
+        return 0;
+      });
     }
 
-    await updateHealthInfoAdmin(editModal.record.infor_health, formData);
-    message.success("Cập nhật thành công!");
-    setEditModal({ open: false, record: null });
-    fetchData();
-  } catch (err) {
-    console.error("❌ Cập nhật thất bại:", err);
-    message.error("Cập nhật thất bại!");
-  }
-};
-
+    return filtered;
+  }, [data, searchName, sorter]);
 
   const columns = [
     {
-      title: "Họ tên",
+      title: (
+        <div className="flex flex-col items-center gap-1 text-sm font-semibold text-gray-800">
+          <span>STT</span>
+        </div>
+      ),
+      key: "stt",
+      align: "center",
+      render: (_text, _record, index) =>
+        (pagination.current - 1) * pagination.pageSize + index + 1,
+    },
+    {
+      title: (
+        <div className="flex flex-col items-center gap-1 text-sm font-semibold text-gray-800">
+          <IconUser size={16} stroke={1.5} color="red" />
+          <span>Họ tên</span>
+        </div>
+      ),
       dataIndex: ["user_id", "fullname"],
+      key: "fullname",
+      align: "center",
     },
     {
-      title: "Email",
+      title: (
+        <div className="flex flex-col items-center gap-1 text-sm font-semibold text-gray-800">
+          <IconMail size={16} stroke={1.5} color="red" />
+          <span>Email</span>
+        </div>
+      ),
       dataIndex: ["user_id", "email"],
+      key: "email",
+      align: "center",
     },
     {
-      title: "Chiều cao",
+      title: (
+        <div className="flex flex-col items-center gap-1 text-sm font-semibold text-gray-800">
+          <IconRulerMeasure size={16} stroke={1.5} color="red" />
+          <span>Chiều cao (cm)</span>
+        </div>
+      ),
       dataIndex: "height",
+      key: "height",
+      align: "center",
+      sorter: true,
     },
     {
-      title: "Cân nặng",
+      title: (
+        <div className="flex flex-col items-center gap-1 text-sm font-semibold text-gray-800">
+          <IconScale size={16} stroke={1.5} color="red" />
+          <span>Cân nặng (kg)</span>
+        </div>
+      ),
       dataIndex: "weight_decimal",
+      key: "weight_decimal",
+      align: "center",
+      sorter: true,
     },
     {
-      title: "Tình trạng",
+      title: (
+        <div className="flex flex-col items-center gap-1 text-sm font-semibold text-gray-800">
+          <IconHeart size={16} stroke={1.5} color="red" />
+          <span>Tình trạng</span>
+        </div>
+      ),
       dataIndex: "status_health",
+      key: "status_health",
+      align: "center",
     },
     {
-      title: "Ảnh",
+      title: (
+        <div className="flex flex-col items-center text-sm font-semibold text-gray-800">
+          <span>Ảnh</span>
+        </div>
+      ),
+      dataIndex: "img_health",
+      key: "img_health",
+      align: "center",
       render: (_, record) =>
         record.img_health ? (
           <Image width={50} src={record.img_health} />
@@ -160,10 +293,19 @@ const handleUpdate = async () => {
         ),
     },
     {
-      title: "Hành động",
+      title: (
+        <div className="flex flex-col items-center text-sm font-semibold text-gray-800">
+          <span>Hành động</span>
+        </div>
+      ),
+      key: "actions",
+      align: "center",
       render: (_, record) => (
         <Space>
-          <Button icon={<EyeOutlined />} onClick={() => setViewModal({ open: true, record })} />
+          <Button
+            icon={<EyeOutlined />}
+            onClick={() => setViewModal({ open: true, record })}
+          />
           <Button icon={<EditOutlined />} onClick={() => handleEdit(record)} />
           <Button
             icon={<DeleteOutlined />}
@@ -177,23 +319,47 @@ const handleUpdate = async () => {
 
   return (
     <>
-      <div className="mb-4 flex justify-between">
-        <h2 className="text-xl font-bold">Quản lý thông tin sức khỏe</h2>
-        <Button icon={<ReloadOutlined />} onClick={fetchData}>
-          Tải lại
-        </Button>
-      </div>
+      <div className="p-8 bg-gray-50 rounded-md shadow-sm">
+        <div className="mb-6 flex justify-between items-center gap-4">
+          <motion.h2
+            initial={{ x: 0, color: "#000" }}
+            whileHover={{ x: 8, color: "#f43f5e" }}
+            transition={{ type: "spring", stiffness: 300 }}
+            className="self-start text-base font-bold flex items-center gap-2"
+          >
+            <IconUserCheck size={20} className="text-red-500" />
+            Quản Lý Đơn Thông Tin Sức Khỏe
+          </motion.h2>
+            <div style={{ display: "flex", gap: 8 }}>
+              <Input
+                placeholder="Tìm theo tên..."
+                prefix={<SearchOutlined />}
+                value={searchName}
+                onChange={(e) => setSearchName(e.target.value)}
+                style={{ maxWidth: 300 }}
+                allowClear
+              />
+              <Button icon={<ReloadOutlined />} onClick={fetchData}>
+                Tải lại
+              </Button>
+            </div>
+          </div>
 
-      <Table
-        columns={columns}
-        dataSource={data}
-        rowKey={(record) => record.infor_health}
-        loading={loading}
-        pagination={{
-          ...pagination,
-          onChange: (page, pageSize) => fetchData(page, pageSize),
-        }}
-      />
+        <Table
+          columns={columns}
+          dataSource={processedData}
+          rowKey={(record) => record.infor_health}
+          loading={loading}
+          pagination={{
+            ...pagination,
+            onChange: handleTableChange,
+          }}
+          bordered
+          size="middle"
+          style={{ minHeight: 500 }}
+          onChange={handleTableChange}
+        />
+      </div>
 
       {/* Modal View */}
       <Modal
@@ -204,13 +370,27 @@ const handleUpdate = async () => {
       >
         {viewModal.record && (
           <Descriptions column={1} bordered size="small">
-            <Descriptions.Item label="Tên">{viewModal.record.user_id?.fullname}</Descriptions.Item>
-            <Descriptions.Item label="Email">{viewModal.record.user_id?.email}</Descriptions.Item>
-            <Descriptions.Item label="Chiều cao">{viewModal.record.height} cm</Descriptions.Item>
-            <Descriptions.Item label="Cân nặng">{viewModal.record.weight_decimal} kg</Descriptions.Item>
-            <Descriptions.Item label="Huyết áp">{viewModal.record.blood_pressure}</Descriptions.Item>
-            <Descriptions.Item label="Tình trạng">{viewModal.record.status_health}</Descriptions.Item>
-            <Descriptions.Item label="Tiền sử">{viewModal.record.medical_history}</Descriptions.Item>
+            <Descriptions.Item label="Tên">
+              {viewModal.record.user_id?.fullname}
+            </Descriptions.Item>
+            <Descriptions.Item label="Email">
+              {viewModal.record.user_id?.email}
+            </Descriptions.Item>
+            <Descriptions.Item label="Chiều cao">
+              {viewModal.record.height} cm
+            </Descriptions.Item>
+            <Descriptions.Item label="Cân nặng">
+              {viewModal.record.weight_decimal} kg
+            </Descriptions.Item>
+            <Descriptions.Item label="Huyết áp">
+              {viewModal.record.blood_pressure}
+            </Descriptions.Item>
+            <Descriptions.Item label="Tình trạng">
+              {viewModal.record.status_health}
+            </Descriptions.Item>
+            <Descriptions.Item label="Tiền sử">
+              {viewModal.record.medical_history}
+            </Descriptions.Item>
             <Descriptions.Item label="Lần hiến gần nhất">
               {dayjs(viewModal.record.latest_donate).format("DD/MM/YYYY")}
             </Descriptions.Item>
@@ -222,33 +402,68 @@ const handleUpdate = async () => {
       <Modal
         title="Cập nhật thông tin sức khỏe"
         open={editModal.open}
-        onCancel={() => setEditModal({ open: false, record: null })}
+        onCancel={() => {
+          setEditModal({ open: false, record: null });
+          setFileList([]);
+        }}
         onOk={handleUpdate}
         okText="Cập nhật"
       >
         <Form layout="vertical" form={form}>
-          <Form.Item name="user_id" label="User ID" rules={[{ required: true }]}>
+          <Form.Item
+            name="user_id"
+            label="User ID"
+            rules={[{ required: true }]}
+          >
             <Input />
           </Form.Item>
-          <Form.Item name="blood_id" label="Blood ID" rules={[{ required: true }]}>
+          <Form.Item
+            name="blood_id"
+            label="Blood ID"
+            rules={[{ required: true }]}
+          >
             <Input />
           </Form.Item>
-          <Form.Item name="height" label="Chiều cao (cm)" rules={[{ required: true }]}>
+          <Form.Item
+            name="height"
+            label="Chiều cao (cm)"
+            rules={[{ required: true }]}
+          >
             <InputNumber min={0} style={{ width: "100%" }} />
           </Form.Item>
-          <Form.Item name="weight_decimal" label="Cân nặng (kg)" rules={[{ required: true }]}>
+          <Form.Item
+            name="weight_decimal"
+            label="Cân nặng (kg)"
+            rules={[{ required: true }]}
+          >
             <InputNumber min={0} style={{ width: "100%" }} />
           </Form.Item>
-          <Form.Item name="blood_pressure" label="Huyết áp" rules={[{ required: true }]}>
+          <Form.Item
+            name="blood_pressure"
+            label="Huyết áp"
+            rules={[{ required: true }]}
+          >
             <InputNumber min={0} style={{ width: "100%" }} />
           </Form.Item>
-          <Form.Item name="medical_history" label="Tiền sử bệnh" rules={[{ required: true }]}>
+          <Form.Item
+            name="medical_history"
+            label="Tiền sử bệnh"
+            rules={[{ required: true }]}
+          >
             <TextArea rows={2} />
           </Form.Item>
-          <Form.Item name="latest_donate" label="Lần hiến gần nhất" rules={[{ required: true }]}>
+          <Form.Item
+            name="latest_donate"
+            label="Lần hiến gần nhất"
+            rules={[{ required: true }]}
+          >
             <DatePicker style={{ width: "100%" }} />
           </Form.Item>
-          <Form.Item name="status_health" label="Tình trạng sức khỏe" rules={[{ required: true }]}>
+          <Form.Item
+            name="status_health"
+            label="Tình trạng sức khỏe"
+            rules={[{ required: true }]}
+          >
             <Select>
               <Select.Option value="Tốt">Tốt</Select.Option>
               <Select.Option value="Khá">Khá</Select.Option>
@@ -256,8 +471,24 @@ const handleUpdate = async () => {
             </Select>
           </Form.Item>
           <Form.Item name="img_health" label="Ảnh sức khỏe">
-            <Upload beforeUpload={() => false} maxCount={1}>
-              <Button icon={<UploadOutlined />}>Chọn ảnh</Button>
+            <Upload
+              beforeUpload={() => false}
+              multiple
+              fileList={fileList}
+              onChange={onUploadChange}
+              listType="picture-card"
+              onRemove={(file) => {
+                setFileList((current) =>
+                  current.filter((f) => f.uid !== file.uid)
+                );
+              }}
+            >
+              {fileList.length >= 5 ? null : (
+                <div>
+                  <UploadOutlined />
+                  <div style={{ marginTop: 8 }}>Upload</div>
+                </div>
+              )}
             </Upload>
           </Form.Item>
         </Form>

@@ -272,8 +272,8 @@ export default function ControllingDonate() {
   ];
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-4 h-full flex flex-col">
-      <div className="flex justify-between items-center">
+    <div className="bg-white rounded-xl shadow-lg p-8 h-full flex flex-col">
+      <div className="flex justify-between items-center mb-5">
         <motion.h2
           initial={{ x: 0, color: "#000" }}
           whileHover={{ x: 8, color: "#f43f5e" }}

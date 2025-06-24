@@ -133,7 +133,7 @@ export default function ControllingStorage() {
   };
 
   return (
-    <div className="p-6 w-full overflow-hidden flex flex-col gap-6">
+    <div className="p-8 w-full overflow-hidden flex flex-col gap-6">
       {/* 👉 Tiêu đề nằm trên cùng */}
       <motion.h2
         initial={{ x: 0, color: "#000" }}
