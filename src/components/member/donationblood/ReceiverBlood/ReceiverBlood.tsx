@@ -23,7 +23,7 @@ export default function ReceiverBlood() {
           <TableReceiverBlood />
         </div>
         <div className="col-span-13">
-          <FormViewReceiver formData={waitingList} />
+          <FormViewReceiver  />
         </div>
       </div>
     </div>
