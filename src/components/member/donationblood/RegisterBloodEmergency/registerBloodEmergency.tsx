@@ -68,10 +68,10 @@ export default function RegisterBloodEmergency() {
               >
                 <button
                   onClick={() => setCurrentStep("register")}
-                  className="mb-5 px-32 py-2 bg-red-500 text-white rounded items-center gap-2 flex"
+                  className="mb-5 px-40 py-2 bg-red-500 text-white rounded items-center gap-2 flex"
                 >
                   {" "}
-                  <span className="text-white">Đăng ký hiến máu khẩn cấp</span>
+                  <span className="text-white">Đăng ký Nhận Máu</span>
                   <IconChevronRight
                     size={20}
                     stroke={2}

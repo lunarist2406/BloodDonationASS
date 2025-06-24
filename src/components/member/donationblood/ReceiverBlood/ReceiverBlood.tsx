@@ -4,7 +4,6 @@ import FormViewReceiver from "./FormViewReceiver";
 import { motion } from "framer-motion";
 import { IconDroplet } from "@tabler/icons-react";
 export default function ReceiverBlood() {
-  const { waitingList} = useRegisterBlood();
 
   return (
     <div className="flex flex-col bg-gradient-to-b from-red-100 to-red-300 min-h-screen">

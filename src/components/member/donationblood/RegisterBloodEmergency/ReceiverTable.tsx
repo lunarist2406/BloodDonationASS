@@ -175,14 +175,9 @@ const [centers, setCenters] = useState([]);
       key: "fullName",
       align: "center" as const,
     },
+
     {
-      title: <span className="flex items-center gap-1 text-red-800"><IconCalendar size={16}/> Ngày sinh</span>,
-      dataIndex: "dob",
-      key: "dob",
-      align: "center" as const,
-    },
-    {
-      title: <span className="flex items-center gap-1 text-red-800"><IconPhone size={16}/> SĐT</span>,
+      title: <span className="flex items-center gap-1 text-red-800"><IconPhone size={16}/>Số điện thoại </span>,
       dataIndex: "phone",
       key: "phone",
       align: "center" as const,
