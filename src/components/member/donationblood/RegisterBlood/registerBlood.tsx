@@ -21,11 +21,7 @@ import useDonateBloodService from "../../../../hooks/RegistrationForm/useDonateB
 import useBloodService from "../../../../hooks/Blood/useBloodService";
 
 export default function RegisterBlood() {
-  interface MyProps {
-    label: string;
-    icon: React.ElementType;
-    delay?: number;
-  }
+
   const { waitingList, setWaitingList } = useRegisterBlood();
   const [currentStep, setCurrentStep] = useState<"health" | "register">(
     "health"

@@ -31,6 +31,12 @@ export default function useReceiverService() {
     return res.data;
   };
 
+  // ✅ NEW: GET history
+  const getReceiverHistoryById = async () => {
+    const res = await api.get(`${BASE_URL}/history`, authHeaders);
+    return res.data;
+  };
+
   // GET: by centralBlood_id
   const getByCentralBlood = async (centralBlood_id: string) => {
     const res = await api.get(
@@ -71,6 +77,7 @@ export default function useReceiverService() {
   return {
     getAllReceiverBloods,
     getReceiverById,
+    getReceiverHistoryById, // ✅ return new method
     getByCentralBlood,
     getByEmail,
     createReceiver,
