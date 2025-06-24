@@ -21,18 +21,18 @@ import {
   ClockCircleOutlined,
   CloseCircleOutlined,
 } from "@ant-design/icons";
-import useReceiverService from "../../../hooks/Receiver/useReceiverService";
-import { IconHeartbeat } from "@tabler/icons-react";
+import { IconUserCheck } from "@tabler/icons-react";
 import { motion } from "framer-motion";
+import useReceiverService from "../../../hooks/Receiver/useReceiverService";
+import useBloodService from "../../../hooks/Blood/useBloodService";
 
 export default function ControllingReceiver() {
-  const { getAllReceiverBloods, deleteReceiver, updateReceiver } = useReceiverService();
-
+  const { getAllReceiverBloods, deleteReceiver, updateReceiver } =
+    useReceiverService();
+  const {getBloodById} = useBloodService();
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
-  const [selectedRecord, setSelectedRecord] = useState<any>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [pagination, setPagination] = useState({
     current: 1,
@@ -40,50 +40,90 @@ export default function ControllingReceiver() {
     total: 0,
   });
 
-  const [allData, setAllData] = useState<any[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState<any>(null);
 
   useEffect(() => {
     fetchData(pagination.current, pagination.pageSize);
   }, []);
 
-  async function fetchData(page: number, pageSize: number) {
-    setLoading(true);
-    try {
-      const res = await getAllReceiverBloods(page, pageSize, "");
-      const formatted = res.data.results.map((item: any, index: number) => ({
-        key: item.receiver_id,
-        stt: (page - 1) * pageSize + index + 1,
-        fullName: item.user_id?.fullname || "Không có tên",
-        bloodType:
-          item.blood_id?.blood_type_id?.blood_name +
-            " (" +
-            item.blood_id?.rh_id?.blood_Rh +
-            ")" || "Không rõ",
-        center: item.centralBlood_id?.centralBlood_name || "Không rõ",
-        status: item.status || "Chưa rõ",
-        raw: item,
-      }));
+  const [allData, setAllData] = useState<any[]>([]);
 
-      setAllData(formatted);
-      setData(formatted);
-      setPagination({
-        current: res.data.meta.current,
-        pageSize: res.data.meta.pageSize,
-        total: res.data.meta.total,
-      });
-    } catch (err) {
-      console.error("Lỗi tải danh sách nhận máu:", err);
-    } finally {
-      setLoading(false);
-    }
+const bloodCache = new Map();
+
+const getBloodLabel = async (bloodId: string) => {
+  if (bloodCache.has(bloodId)) return bloodCache.get(bloodId);
+
+  try {
+    const res = await getBloodById(bloodId);
+    const label = `${res.data.blood_type_id.blood_name} (${res.data.rh_id.blood_Rh})`;
+    bloodCache.set(bloodId, label);
+    return label;
+  } catch (err) {
+    console.error("Lỗi khi lấy thông tin nhóm máu:", err);
+    return "Chưa rõ";
   }
+};
+
+async function fetchData(page: number, pageSize: number) {
+  setLoading(true);
+  try {
+    const res = await getAllReceiverBloods(page, pageSize, "");
+    const rawList = res.data.results;
+
+    const formattedList = await Promise.all(
+      rawList.map(async (item: any, index: number) => {
+        const bloodId = item.blood_id?.blood_id;
+        const bloodLabel = bloodId ? await getBloodLabel(bloodId) : "Chưa rõ";
+        
+        return {
+          key: item.receiver_id,
+          stt: (page - 1) * pageSize + index + 1,
+          fullName: item.user_id?.fullname || "Chưa có tên",
+          bloodType: bloodLabel,
+          location: item.centralBlood_id?.centralBlood_name || "Chưa rõ",
+          status_receiver: item.status_receiver || "Chưa rõ",
+          status_regist: item.status_regist || "Chưa rõ",
+          raw: item,
+          type: item.type || "Không có",
+        };
+      })
+    );
+
+    setAllData(formattedList);
+    setData(formattedList);
+    setPagination({
+      current: res.data.meta.current,
+      pageSize: res.data.meta.pageSize,
+      total: res.data.meta.total,
+    });
+  } catch (error) {
+    console.error("Lỗi khi tải dữ liệu nhận máu:", error);
+    message.error("Không thể tải danh sách nhận máu");
+  } finally {
+    setLoading(false);
+  }
+}
+
+
+
+
+  const showDetailModal = (record: any) => {
+    setSelectedRecord(record.raw);
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setSelectedRecord(null);
+  };
 
   const handleDelete = async (id: string) => {
     try {
       await deleteReceiver(id);
-      message.success("Xóa thành công");
-      fetchData(pagination.current, pagination.pageSize);
-    } catch {
+      message.success("Xóa đơn đăng ký thành công");
+      fetchData(pagination.current, pagination.pageSize, search);
+    } catch (error) {
       message.error("Xóa thất bại");
     }
   };
@@ -96,31 +136,74 @@ export default function ControllingReceiver() {
     setData(filtered);
   };
 
-  const handleStatusUpdate = async (record: any, status: string) => {
-    try {
-      const payload = {
-        ...record,
-        status,
-      };
-      await updateReceiver(record.receiver_id, payload);
-      message.success("Cập nhật trạng thái thành công");
-      fetchData(pagination.current, pagination.pageSize);
-    } catch (err) {
-      console.error("Cập nhật thất bại:", err);
-      message.error("Cập nhật thất bại");
-    }
-  };
+  // Hàm cập nhật trạng thái, type = 'donate' hoặc 'regist' để phân biệt
+const handleStatusUpdate = async (
+  record: any,
+  status: string,
+  type: "receiver" | "regist"
+) => {
+  try {
+    const payload = {
+      blood_id: record.blood_id?.blood_id || "",
+      date_receiver: record.date_receiver || new Date().toISOString(),
+      ml: record.ml || 0,
+      unit: record.unit || 0,
+      type: record.type || "DEFAULT",
+      centralBlood_id: String(record.centralBlood_id?.centralBlood_id || ""),
+      status_regist: type === "regist" ? status : record.status_regist,
+      status_receiver: type === "receiver" ? status : record.status_receiver,
+    };
+    console.log("DATA TRƯỚC KHI GỌI UPDATE: ", record);
+    console.log("PAYLOAD:", payload);
+    await updateReceiver(record.receiver_id, payload);
+    message.success("Cập nhật trạng thái thành công");
+    fetchData(pagination.current, pagination.pageSize, search);
+  } catch (error) {
+    message.error("Cập nhật thất bại");
+    console.error("Cập nhật trạng thái lỗi:", error);
+  }
+};
 
-  const statusMenu = (record: any) => (
+
+
+  // Menu cho dropdown trạng thái hiến máu
+  const ReceiverStatusMenu = (record: any) => (
     <Menu>
-      <Menu.Item onClick={() => handleStatusUpdate(record.raw, "PENDING")}>
+      <Menu.Item
+        key="COMPLETED"
+        onClick={() => handleStatusUpdate(record.raw, "COMPLETED", "receiver")}
+      >
+        <CheckCircleOutlined /> Hoàn thành
+      </Menu.Item>
+      <Menu.Item
+        key="PENDING"
+        onClick={() => handleStatusUpdate(record.raw, "PENDING", "receiver")}
+      >
         <ClockCircleOutlined /> Đang chờ
       </Menu.Item>
-      <Menu.Item onClick={() => handleStatusUpdate(record.raw, "COMPLETED")}>
-        <CheckCircleOutlined /> Đã nhận
-      </Menu.Item>
-      <Menu.Item onClick={() => handleStatusUpdate(record.raw, "CANCELLED")}>
+      <Menu.Item
+        key="CANCELLED"
+        onClick={() => handleStatusUpdate(record.raw, "CANCELLED", "receiver")}
+      >
         <CloseCircleOutlined /> Hủy
+      </Menu.Item>
+    </Menu>
+  );
+
+  // Menu cho dropdown trạng thái đăng ký
+  const registStatusMenu = (record: any) => (
+    <Menu>
+      <Menu.Item
+        key="APPROVED"
+        onClick={() => handleStatusUpdate(record.raw, "APPROVED", "regist")}
+      >
+        <CheckCircleOutlined /> Phê duyệt
+      </Menu.Item>
+      <Menu.Item
+        key="PENDING"
+        onClick={() => handleStatusUpdate(record.raw, "PENDING", "regist")}
+      >
+        <ClockCircleOutlined /> Đang chờ
       </Menu.Item>
     </Menu>
   );
@@ -130,6 +213,7 @@ export default function ControllingReceiver() {
       title: "STT",
       dataIndex: "stt",
       key: "stt",
+      width: 60,
       align: "center" as const,
     },
     {
@@ -145,23 +229,41 @@ export default function ControllingReceiver() {
       align: "center" as const,
     },
     {
-      title: "Trung tâm",
-      dataIndex: "center",
-      key: "center",
+      title: "Loại",
+      dataIndex: "type",
+      key: "type",
+      align: "center" as const,
+      render: (type: string) => {
+        let color = "geekblue";
+        let label = type;
+        if (type === "DEFAULT") {
+          color = "geekblue";
+          label = "Thông thường";
+        } else if (type === "EMERGENCY") {
+          color = "volcano";
+          label = "Khẩn cấp";
+        }
+        return <Tag color={color}>{label}</Tag>;
+      },
+    },
+    {
+      title: "Địa điểm",
+      dataIndex: "location",
+      key: "location",
       align: "center" as const,
     },
     {
-      title: "Trạng thái",
-      dataIndex: "status",
-      key: "status",
+      title: "Trạng thái đăng ký",
+      dataIndex: "status_regist",
+      key: "status_regist",
       align: "center" as const,
       render: (status: string, record: any) => {
         let color = "gold";
-        if (status === "COMPLETED") color = "green";
+        if (status === "APPROVED") color = "green";
         else if (status === "PENDING") color = "orange";
-        else if (status === "CANCELLED") color = "red";
+
         return (
-          <Dropdown overlay={statusMenu(record)}>
+          <Dropdown overlay={registStatusMenu(record)}>
             <Tag color={color} style={{ cursor: "pointer" }}>
               {status}
             </Tag>
@@ -170,20 +272,44 @@ export default function ControllingReceiver() {
       },
     },
     {
+      title: "Trạng thái nhận máu",
+      dataIndex: "status_receiver",
+      key: "status_receiver",
+      align: "center" as const,
+      render: (status: string, record: any) => {
+        let color = "gold";
+        if (status === "COMPLETED") color = "green";
+        else if (status === "PENDING") color = "orange";
+        else if (status === "CANCELLED") color = "red";
+
+        // Nếu trạng thái đăng ký không phải APPROVED thì chỉ hiện tag bình thường
+        if (record.status_regist !== "APPROVED") {
+          return <Tag color={color}>{status}</Tag>;
+        }
+
+        // Nếu đã APPROVED mới bật dropdown
+        return (
+          <Dropdown overlay={ReceiverStatusMenu(record)}>
+            <Tag color={color} style={{ cursor: "pointer" }}>
+              {status}
+            </Tag>
+          </Dropdown>
+        );
+      },
+    },
+
+    {
       title: "Hành động",
       key: "action",
       align: "center" as const,
       render: (_: any, record: any) => (
-        <div className="flex justify-center gap-2">
+        <div className="flex gap-2 justify-center">
           <Button
             icon={<InfoCircleOutlined />}
-            onClick={() => {
-              setSelectedRecord(record.raw);
-              setIsModalOpen(true);
-            }}
+            onClick={() => showDetailModal(record)}
           />
           <Popconfirm
-            title="Xác nhận xoá?"
+            title="Xóa đơn đăng ký này?"
             onConfirm={() => handleDelete(record.key)}
           >
             <Button icon={<DeleteOutlined />} danger />
@@ -202,10 +328,9 @@ export default function ControllingReceiver() {
           transition={{ type: "spring", stiffness: 300 }}
           className="self-start text-base font-bold flex items-center gap-2"
         >
-          <IconHeartbeat size={20} className="text-red-500" />
-          Quản Lý Đơn Nhận Máu Khẩn Cấp
+          <IconUserCheck size={20} className="text-red-500" />
+          Quản Lý Đơn Đăng Ký Nhận Máu
         </motion.h2>
-
         <div className="flex gap-2">
           <Input
             placeholder="Tìm kiếm theo tên"
@@ -213,10 +338,11 @@ export default function ControllingReceiver() {
             onChange={(e) => handleSearch(e.target.value)}
             prefix={<SearchOutlined />}
           />
+
           <Button
             icon={<ReloadOutlined />}
             onClick={() =>
-              fetchData(pagination.current, pagination.pageSize)
+              fetchData(pagination.current, pagination.pageSize, search)
             }
           >
             Làm mới
@@ -234,10 +360,11 @@ export default function ControllingReceiver() {
           size="small"
           bordered
           scroll={{ x: "max-content" }}
-          style={{minHeight:500}}
+          style={{ minHeight: "400px" }}
         />
       </div>
 
+      {/* Pagination dính đáy luôn nè */}
       <div className="mt-auto pt-4 flex justify-center">
         <Pagination
           current={pagination.current}
@@ -245,53 +372,76 @@ export default function ControllingReceiver() {
           total={pagination.total}
           showSizeChanger
           pageSizeOptions={["5", "10", "20", "50"]}
-          onChange={(page, size) => fetchData(page, size)}
+          onChange={(page, pageSize) => fetchData(page, pageSize)}
+          onShowSizeChange={(current, size) => fetchData(1, size)}
           showTotal={(total, range) =>
             `${range[0]}-${range[1]} / ${total} bản ghi`
           }
         />
       </div>
 
-      <Modal
-        title={`Chi tiết đơn nhận máu`}
-        open={isModalOpen}
-        onCancel={() => setIsModalOpen(false)}
-        footer={<Button onClick={() => setIsModalOpen(false)}>Đóng</Button>}
-        width={700}
-      >
-        {selectedRecord ? (
-          <Descriptions bordered column={1} size="small">
-            <Descriptions.Item label="Họ tên">
-              {selectedRecord.user_id?.fullname || "Không có"}
-            </Descriptions.Item>
-            <Descriptions.Item label="Email">
-              {selectedRecord.user_id?.email || "Không có"}
-            </Descriptions.Item>
-            <Descriptions.Item label="Ngày nhận">
-              {selectedRecord.date_receiver
-                ? new Date(selectedRecord.date_receiver).toLocaleString("vi-VN")
-                : "Không có"}
-            </Descriptions.Item>
-            <Descriptions.Item label="Số lượng (ml)">
-              {selectedRecord.ml || "Không có"}
-            </Descriptions.Item>
-            <Descriptions.Item label="Đơn vị máu">
-              {selectedRecord.unit || "Không có"}
-            </Descriptions.Item>
-            <Descriptions.Item label="Trung tâm">
-              {selectedRecord.centralBlood_id?.centralBlood_name || "Không có"}
-            </Descriptions.Item>
-            <Descriptions.Item label="Địa chỉ trung tâm">
-              {selectedRecord.centralBlood_id?.centralBlood_address || "Không có"}
-            </Descriptions.Item>
-            <Descriptions.Item label="Trạng thái">
-              {selectedRecord.status || "Không có"}
-            </Descriptions.Item>
-          </Descriptions>
-        ) : (
-          <p>Không có dữ liệu chi tiết</p>
-        )}
-      </Modal>
+<Modal
+  title={`Chi tiết đăng ký của ${selectedRecord?.user_id?.fullname || ""}`}
+  open={isModalOpen}
+  onCancel={handleModalClose}
+  footer={[
+    <Button key="close" onClick={handleModalClose}>
+      Đóng
+    </Button>,
+  ]}
+  width={700}
+>
+  {selectedRecord ? (
+    <Descriptions bordered column={1} size="small">
+      <Descriptions.Item label="Mã đơn nhận">
+        {selectedRecord.receiver_id || "Không có"}
+      </Descriptions.Item>
+      <Descriptions.Item label="Họ tên">
+        {selectedRecord.user_id?.fullname || "Không có"}
+      </Descriptions.Item>
+      <Descriptions.Item label="Email">
+        {selectedRecord.user_id?.email || "Không có"}
+      </Descriptions.Item>
+      <Descriptions.Item label="Giới tính">
+        {selectedRecord.user_id?.gender || "Không có"}
+      </Descriptions.Item>
+      <Descriptions.Item label="Ngày đăng ký">
+        {selectedRecord.date_register
+          ? new Date(selectedRecord.date_register).toLocaleString("vi-VN")
+          : "Không có"}
+      </Descriptions.Item>
+      <Descriptions.Item label="Ngày nhận máu">
+        {selectedRecord.date_receiver
+          ? new Date(selectedRecord.date_receiver).toLocaleString("vi-VN")
+          : "Không có"}
+      </Descriptions.Item>
+      <Descriptions.Item label="Trạng thái đăng ký">
+        {selectedRecord.status_regist || "Không có"}
+      </Descriptions.Item>
+      <Descriptions.Item label="Trạng thái nhận máu">
+        {selectedRecord.status_receiver || "Không có"}
+      </Descriptions.Item>
+      <Descriptions.Item label="Số ml máu">
+        {selectedRecord.ml ?? "Không có"}
+      </Descriptions.Item>
+      <Descriptions.Item label="Số đơn vị máu">
+        {selectedRecord.unit ?? "Không có"}
+      </Descriptions.Item>
+      <Descriptions.Item label="Loại">
+        {selectedRecord.type || "Không có"}
+      </Descriptions.Item>
+      <Descriptions.Item label="Trung tâm nhận máu">
+        {selectedRecord.centralBlood_id?.centralBlood_name || "Không có"}
+      </Descriptions.Item>
+      <Descriptions.Item label="Địa chỉ trung tâm">
+        {selectedRecord.centralBlood_id?.centralBlood_address || "Không có"}
+      </Descriptions.Item>
+    </Descriptions>
+  ) : (
+    <p>Không có dữ liệu chi tiết</p>
+  )}
+</Modal>
+
     </div>
   );
 }

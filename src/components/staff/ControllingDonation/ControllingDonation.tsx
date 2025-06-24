@@ -80,9 +80,7 @@ export default function ControllingDonate() {
     }
   }
 
-  const handleTableChange = (page: number, pageSize: number) => {
-    fetchData(page, pageSize, search);
-  };
+
 
   const showDetailModal = (record: any) => {
     setSelectedRecord(record.raw);
