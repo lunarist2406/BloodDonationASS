@@ -8,6 +8,7 @@ import Login from "./components/guest/auth/Login";
 import Register from "./components/guest/auth/Register";
 import EmailVerification from "./components/guest/auth/EmailVerification";
 import VerifyNotice from "./components/guest/auth/VerifyNotice";
+import ForgotPassword from "./components/guest/auth/ForgotPassword";
 
 const MemberR = lazy(() => import("./components/router/MemberR"));
 const AdminR = lazy(() => import("./components/router/AdminR"));
@@ -30,6 +31,7 @@ function App() {
             <Route path="register" element={<Register />} />
             <Route path="verify-email" element={<EmailVerification />} />
             <Route path="verify-notice" element={<VerifyNotice />} />
+            <Route path="forgot-password" element={<ForgotPassword />} />
             {isMember && <Route path=":member/*" element={<MemberR />} />}
             {isAdmin && <Route path=":admin/*" element={<AdminR />} />}
             {isStaff && <Route path=":staff/*" element={<StaffR />} />}

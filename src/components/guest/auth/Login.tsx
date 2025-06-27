@@ -101,6 +101,10 @@ export default function Login() {
     navigate("register");
   };
 
+  const handleForgotPassword = () => {
+    navigate("forgot-password");
+  };
+
   return (
     <div className="min-h-screen relative">
       {/* Full screen background image */}
@@ -187,14 +191,19 @@ export default function Login() {
             </div>
 
             <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center gap-2">
-                <input type="checkbox" className="mr-6" />
-                Ghi nhớ đăng nhập
-              </label>
-              <a href="#" className="text-red-600 hover:underline hover:text-red-800">
-                Quên mật khẩu?
-              </a>
-            </div>
+  <label className="flex items-center gap-2">
+    <input type="checkbox" className="mr-6" />
+    Ghi nhớ đăng nhập
+  </label>
+  <button
+    type="button"
+    onClick={handleForgotPassword}
+    style={{ color: '#FF0000' }}
+    className="hover:text-[#CC0000] hover:underline font-medium cursor-pointer"
+  >
+    Quên mật khẩu?
+  </button>
+</div>
 
             {error && (
               <div className="text-red-600 text-sm text-center">{error}</div>

@@ -156,7 +156,7 @@ export const FilterInformationUI = ({
         </Select>
       </div>
       <div className="font-semibold text-red-600 mb-4">
-        <h4>Khoảng cách (tối đa): {distanceKm} km</h4>
+        <h4>Khoảng cách (tối đa): Dưới {distanceKm} km</h4>
         <Slider
           min={1}
           max={20}
