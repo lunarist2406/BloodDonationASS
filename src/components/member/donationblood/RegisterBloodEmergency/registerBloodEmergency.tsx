@@ -13,7 +13,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useRegisterBlood } from "../../../../hooks/RegistrationForm/useRegisterBlood";
 import { useState } from "react";
 import FormRegisterBloodEmergency from "./FormRegisterBlood";
-import FormHealthEmergency from "./FormHealth";
+import FormHealth from "../FormHealth";
+import ReceiverTable from "./ReceiverTable";
 
 export default function RegisterBloodEmergency() {
   interface MyProps {
@@ -44,7 +45,16 @@ export default function RegisterBloodEmergency() {
 
   return (
     <div className="flex flex-col bg-gradient-to-b from-red-100 to-red-300 min-h-screen">
-      <div className="grid grid-cols-20 gap-4 px-5 mt-10 mb-10">
+      <motion.h4
+        initial={{ x: 0, color: "#000" }} // màu mặc định (đen)
+        whileHover={{ x: 8, color: "#f43f5e" }} // màu đỏ khi hover
+        transition={{ type: "spring", stiffness: 300 }}
+        className="self-start text-base font-bold flex items-center gap-2 ml-5 pt-5"
+      >
+        <IconDroplet size={20} className="text-red-500" />
+        Đăng Ký Nhận Máu Khẩn Cấp
+      </motion.h4>
+      <div className="grid grid-cols-20 gap-4 px-5 mb-10">
         {/* Form */}
         <div className="col-span-7">
           <AnimatePresence mode="wait">
@@ -58,21 +68,18 @@ export default function RegisterBloodEmergency() {
               >
                 <button
                   onClick={() => setCurrentStep("register")}
-                  className="mb-5 px-32 py-2 bg-red-500 text-white rounded items-center gap-2 flex"
+                  className="mb-5 px-40 py-2 bg-red-500 text-white rounded items-center gap-2 flex"
                 >
                   {" "}
-                  <span className="text-white">Đăng ký hiến máu khẩn cấp</span>
-                  <IconChevronRight 
+                  <span className="text-white">Đăng ký Nhận Máu</span>
+                  <IconChevronRight
                     size={20}
                     stroke={2}
                     className="cursor-pointer"
-                    color="white" 
+                    color="white"
                   />
                 </button>
-                <FormHealthEmergency
-                  formData={formData}
-                  setFormData={setFormData}
-                />
+                <FormHealth />
               </motion.div>
             ) : (
               <motion.div
@@ -87,72 +94,23 @@ export default function RegisterBloodEmergency() {
                   className="mb-5 px-34 py-2 bg-red-500 text-white rounded items-center gap-2 flex"
                 >
                   {" "}
-                  <IconChevronLeft 
+                  <IconChevronLeft
                     size={20}
                     stroke={2}
                     className="cursor-pointer"
-                    color="white" 
+                    color="white"
                   />
                   <span className="text-white"> Điền Thông Tin Sức Khỏe </span>
                 </button>
                 <FormRegisterBloodEmergency
-                  formData={formData}
-                  setFormData={setFormData}
-                  setWaitingList={setWaitingList}
                 />
               </motion.div>
             )}
           </AnimatePresence>
         </div>
-        <motion.div
-          className="col-span-13"
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <div className="bg-white rounded-xl shadow-lg p-4 overflow-auto h-full">
-            <h2 className="text-2xl font-bold mb-4 text-red-700 flex items-center gap-2">
-              <IconClock size={24} className="text-red-700" />
-              Thông Tin Đã Đăng Ký
-            </h2>
-            <table className="w-full table-auto border-collapse text-center text-sm  ">
-              <thead>
-                <tr className="bg-red-200 text-red-800 ">
-                  <MotionTh label="STT" icon={IconClock} delay={0} />
-                  <MotionTh label="Họ tên" icon={IconUser} delay={0.05} />
-                  <MotionTh label="Ngày sinh" icon={IconCalendar} delay={0.1} />
-                  <MotionTh label="SĐT" icon={IconPhone} delay={0.15} />
-                  <MotionTh label="Vai trò" icon={IconUserCircle} delay={0.2} />
-                  <MotionTh label="Nhóm máu" icon={IconDroplet} delay={0.25} />
-                  <MotionTh label="Địa điểm" icon={IconMapPin} delay={0.3} />
-                  <MotionTh label="Trạng thái" icon={IconClock} delay={0.35} />
-                </tr>
-              </thead>
-              <tbody>
-                {waitingList.map((item, index) => (
-                  <motion.tr
-                    key={index}
-                    className="hover:bg-red-50"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: index * 0.1 }}
-                  >
-                    <td className="border px-3 py-2">{index + 1}</td>
-                    <td className="border px-3 py-2">{item.fullName}</td>
-                    <td className="border px-3 py-2">{item.dob}</td>
-                    <td className="border px-3 py-2">{item.phone}</td>
-                    <td className="border px-3 py-2">{item.roleDonation}</td>
-                    <td className="border px-3 py-2">{item.bloodType}</td>
-                    <td className="border px-3 py-2">{item.location}</td>
-                    <td className="border px-3 py-2 text-orange-500 font-semibold">
-                      {item.status}
-                    </td>
-                  </motion.tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </motion.div>
+        <div className="col-span-13">
+            <ReceiverTable/>
+        </div>
       </div>
     </div>
   );

@@ -1,10 +1,9 @@
-import axios from "axios";
+import { api } from "../../components/config/axios/axiosInstance";
 import { useAuth } from "../User/useAuth";
 
 const API_URL = "http://localhost:3000/api/v1/donate-bloods";
 
 export interface DonateBloodPayload {
-  blood_id: string;
   date_donate: string; // ISO format
   centralBlood_id: number;
 }
@@ -27,19 +26,19 @@ export default function useDonateBloodService() {
     const url = `${API_URL}?current=${current}&pageSize=${pageSize}${
       qs ? `&qs=${qs}` : ""
     }`;
-    const res = await axios.get(url, authHeaders);
+    const res = await api.get(url, authHeaders);
     return res.data;
   };
 
   // POST - create new donate blood record
   const createDonateBlood = async (payload: DonateBloodPayload) => {
-    const res = await axios.post(API_URL, payload, authHeaders);
+    const res = await api.post(API_URL, payload, authHeaders);
     return res.data;
   };
 
   // GET by ID
   const getDonateBloodById = async (id: string) => {
-    const res = await axios.get(`${API_URL}/${id}`, authHeaders);
+    const res = await api.get(`${API_URL}/${id}`, authHeaders);
     return res.data;
   };
 
@@ -48,21 +47,25 @@ export default function useDonateBloodService() {
     id: string,
     payload: Partial<DonateBloodPayload>
   ) => {
-    const res = await axios.patch(`${API_URL}/${id}`, payload, authHeaders);
+    const res = await api.patch(`${API_URL}/${id}`, payload, authHeaders);
     return res.data;
   };
 
   // DELETE by ID
   const deleteDonateBlood = async (id: string) => {
-    const res = await axios.delete(`${API_URL}/${id}`, authHeaders);
+    const res = await api.delete(`${API_URL}/${id}`, authHeaders);
     return res.data;
   };
-
+  const getDonateHistoryByUser = async () => {
+    const res = await api.get(`${API_URL}/history/user`, authHeaders);
+    return res.data;
+  };
   return {
     getAllDonateBloods,
     createDonateBlood,
     getDonateBloodById,
     updateDonateBlood,
     deleteDonateBlood,
+    getDonateHistoryByUser
   };
 }

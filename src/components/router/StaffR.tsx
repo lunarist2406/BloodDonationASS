@@ -1,5 +1,10 @@
 import { Routes, Route } from "react-router-dom";
 import { Suspense, lazy } from "react";
+import ControllingDonate from "../staff/ControllingDonation/ControllingDonation";
+import StaffProfile from "../staff/profile/Profile";
+import ControllingStorage from "../staff/ControllingStorage/ControllingStorage";
+import ControllingHealth from "../staff/ControllingHealth/ControllingHealth";
+import ControllingReceiver from "../staff/ControllingReceiver/ControllingReceiver";
 
 // Lazy load components
 const HomePage = lazy(() => import("../../page/HomePage"));
@@ -12,6 +17,15 @@ export default function StaffR() {
         <Route path="/*">
           <Route index element={<HomePage />} />
           <Route path=":staff" element={<HomePage />} />
+          <Route path="donate-controlling" element={<ControllingDonate />} />
+          <Route path="receiver-controlling" element={<ControllingReceiver />} />
+
+          <Route path="health-controlling" element={<ControllingHealth />} />
+
+          <Route path="storage-controlling" element={<ControllingStorage />} />
+
+          <Route path="staff-profile" element={<StaffProfile />} />
+
           <Route path="business-systems" element={<BusinessSystems />} />
         </Route>
       </Routes>

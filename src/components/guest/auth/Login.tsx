@@ -1,7 +1,13 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { IconLogin, IconMail, IconLock, IconEyeOff, IconEye } from "@tabler/icons-react";
+import {
+  IconLogin,
+  IconMail,
+  IconLock,
+  IconEyeOff,
+  IconEye,
+} from "@tabler/icons-react";
 import logo from "../../../assets/logo.png";
 import backgroundImage from "../../../assets/background.png";
 import { api } from "../../../components/config/axios/axiosInstance";
@@ -191,19 +197,19 @@ export default function Login() {
             </div>
 
             <div className="flex items-center justify-between text-sm">
-  <label className="flex items-center gap-2">
-    <input type="checkbox" className="mr-6" />
-    Ghi nhớ đăng nhập
-  </label>
-  <button
-    type="button"
-    onClick={handleForgotPassword}
-    style={{ color: '#FF0000' }}
-    className="hover:text-[#CC0000] hover:underline font-medium cursor-pointer"
-  >
-    Quên mật khẩu?
-  </button>
-</div>
+              <label className="flex items-center gap-2">
+                <input type="checkbox" className="mr-6" />
+                Ghi nhớ đăng nhập
+              </label>
+              <button
+                type="button"
+                onClick={handleForgotPassword}
+                style={{ color: '#FF0000' }}
+                className="hover:text-[#CC0000] hover:underline font-medium cursor-pointer"
+              >
+                Quên mật khẩu?
+              </button>
+            </div>
 
             {error && (
               <div className="text-red-600 text-sm text-center">{error}</div>

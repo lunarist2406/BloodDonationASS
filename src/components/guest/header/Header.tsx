@@ -13,6 +13,9 @@ import {
   IconBuildingBank,
   IconUserCog,
   IconShieldCheck,
+  IconUserBolt,
+  IconUser,
+  IconUserCancel,
 } from "@tabler/icons-react";
 import img1 from "../../../assets/Blood-Donation-1.webp";
 import { useAuth } from "../../../hooks/User/useAuth";
@@ -125,7 +128,7 @@ const handleMarkAllAsRead = () => {
   }, [showDropdown]);
 
   const renderMemberLinks = () => (
-    <div className="grid grid-cols-4 gap-2 p-5">
+    <div className="grid grid-cols-5  p-5">
       <motion.div className="space-y-2">
         <motion.h3
           className="font-bold flex items-center"
@@ -181,6 +184,20 @@ const handleMarkAllAsRead = () => {
           onClick={() => setShowDropdown(false)}
         />
       </motion.div>
+      <motion.div className="space-y-2">
+        <motion.h3
+          className="font-bold flex items-center"
+          whileHover={{ y: -5, color: "#ff0000" }}
+        >
+          <IconUserBolt size={18} className="mr-2" />
+          Tài Khoản
+        </motion.h3>
+        <DropdownLink
+          to={`/${encodedName}/user-profile`}
+          label="Thông Tin Tài Khoản"
+          onClick={() => setShowDropdown(false)}
+        />
+      </motion.div>
 
       <motion.div
         whileHover={{
@@ -192,7 +209,7 @@ const handleMarkAllAsRead = () => {
         <img
           src={img1}
           alt="promo"
-          className="w-full h-45 object-cover rounded-md"
+          className="w-full h-38 object-cover rounded-md"
         />
       </motion.div>
     </div>
@@ -224,7 +241,7 @@ const handleMarkAllAsRead = () => {
   );
 
   const renderStaffLinks = () => (
-    <motion.div className="p-6 space-y-5">
+    <motion.div className="p-6 space-y-10">
       <motion.h3
         className="font-bold text-lg flex items-center text-red-700"
         whileHover={{ y: -3 }}
@@ -232,11 +249,11 @@ const handleMarkAllAsRead = () => {
         <IconShieldCheck size={20} className="mr-2" />
         Quản Lý Hệ Thống Cấp Thấp
       </motion.h3>
-      <div className="flex gap-8 flex-wrap mt-5">
-        {staffLinks.map(({ label, icon: Icon }) => (
+      <div className="grid grid-cols-3 gap-8 flex-wrap mt-5">
+        {staffLinks.map(({ to, label, icon: Icon }) => (
           <Link
             key={label}
-            to={`/${encodedName}/business-systems`}
+            to={`/${encodedName}/${to}`}
             className="flex items-center gap-2 hover:scale-105 hover:text-red-500 transition-all duration-200 font-semibold"
             onClick={() => setShowDropdown(false)}
           >
@@ -317,8 +334,8 @@ const handleMarkAllAsRead = () => {
 }
 
 const labelMap: Record<string, string> = {
-  "register-blood": "Đăng ký Nhóm Máu",
-  "register-blood-emergency": "Đăng ký Nhóm Máu Khẩn Cấp",
+  "register-blood": "Đăng ký Hiến Máu",
+  "register-blood-emergency": "Đăng ký Nhận Máu Khẩn Cấp",
   "donate-blood": "Hiến Máu",
   "receiver-blood": "Nhận Máu",
 };
@@ -337,13 +354,36 @@ const adminLinks = [
     label: "Quản Lý Trung Tâm Hiến Máu",
     icon: IconBuildingBank,
   },
-  { to: "controlling-user", label: "Quản Lý Kho Máu", icon: IconDatabase },
-  { to: "controlling-user", label: "Quản Lý Hệ Thống", icon: IconSettings2 },
+  { to: "controlling-storage", label: "Quản Lý Kho Máu", icon: IconDatabase },
+  { to: "admin-profile", label: "Tài Khoản", icon: IconUserBolt },
 ];
 
 const staffLinks = [
-  { label: "Quản Lý Đơn Đăng ký Hiến Máu", icon: IconUserCog },
-  { label: "Quản Lý Đơn Yêu Cầu Nhận Máu", icon: IconBuildingBank },
-  { label: "Quản Lý Đơn Vị Kho Máu của Trung Tâm", icon: IconDatabase },
-  { label: "Quản Lý Hệ Thống Nghiệp Vụ Máu", icon: IconSettings2 },
+    {
+    to: "health-controlling",
+    label: "Quản Lý Thông Tin Sức Khỏe",
+    icon: IconUserCog,
+  },
+  {
+    to: "donate-controlling",
+    label: "Quản Lý Đơn Đăng ký Hiến Máu",
+    icon: IconUserCancel,
+  },
+
+  {
+    to: "receiver-controlling",
+    label: "Quản Lý Đơn Yêu Cầu Nhận Máu",
+    icon: IconBuildingBank,
+  },
+  {
+    to: "storage-controlling",
+    label: "Quản Lý Đơn Vị Kho Máu của Trung Tâm",
+    icon: IconDatabase,
+  },
+  { to: "staff-profile", label: "Tài Khoản", icon: IconUserBolt },
+  {
+    to: "business-systems",
+    label: "Quản Lý Hệ Thống Nghiệp Vụ Máu",
+    icon: IconSettings2,
+  },
 ];

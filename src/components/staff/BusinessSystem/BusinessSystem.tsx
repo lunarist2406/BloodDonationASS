@@ -4,16 +4,12 @@ import {
   IconNews,
   IconClock,
   IconDroplet,
-  IconDropletHalf2,
-  IconTestPipe,
   IconHeartHandshake,
 } from "@tabler/icons-react";
 
 import NewsManagement from "./News/NewsManagement";
 import WorkingTimeManagement from "./WorkingTimeManagement/WorkingTimeManagement";
 import BloodManagement from "./Blood/BloodManagement";
-import BloodTypeManagement from "./BloodTypeManagement";
-import RhManagement from "./RhManagement";
 
 const tabList = [
   {
@@ -34,18 +30,6 @@ const tabList = [
     icon: <IconDroplet size={18} />,
     component: <BloodManagement />,
   },
-  {
-    key: "bloodType",
-    label: "Blood Type",
-    icon: <IconDropletHalf2 size={18} />,
-    component: <BloodTypeManagement />,
-  },
-  {
-    key: "rh",
-    label: "Rh",
-    icon: <IconTestPipe size={18} />,
-    component: <RhManagement />,
-  },
 ];
 
 export default function BusinessSystems() {
@@ -56,15 +40,15 @@ export default function BusinessSystems() {
   return (
     <div className="p-6">
       {/* Title with motion */}
-      <motion.h4
+      <motion.h2
         initial={{ x: 0, color: "#000" }}
         whileHover={{ x: 8, color: "#f43f5e" }}
         transition={{ type: "spring", stiffness: 300 }}
-        className="self-start text-lg font-bold flex items-center gap-2 mb-8"
+        className="self-start text-base font-bold flex items-center gap-2 "
       >
-        <IconHeartHandshake size={24} className="text-red-500" />
-        Quản Lý Hệ Thống Nghiệp Vụ Máu
-      </motion.h4>
+        <IconHeartHandshake size={20} className="text-red-500" />
+        Quản Lý Đơn Vị Kho Máu Trung Tâm
+      </motion.h2>
 
       {/* Tab selection */}
       <div className="flex flex-wrap gap-4 mb-6">

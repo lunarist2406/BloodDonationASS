@@ -1,391 +1,262 @@
+import React, { useEffect, useState } from "react";
 import {
   IconUser,
-  IconCalendar,
   IconPhone,
   IconMapPin,
-  IconDroplet,
-  IconUserHeart,
   IconGenderMale,
   IconGenderFemale,
-  IconMail,
-  IconNumbers,
-  IconBuildingHospital,
-  IconListDetails,
+  IconClockHour8,
 } from "@tabler/icons-react";
-import { Input, notification, Select } from "antd";
-import { Option } from "antd/es/mentions";
+import { Input, message, Select, DatePicker } from "antd";
 import { motion } from "framer-motion";
 import useUser from "../../../../hooks/User/useUser";
+import useCentralService from "../../../../hooks/CentralBlood/useCentralService";
+import dayjs from "dayjs";
+import useDonateBloodService from "../../../../hooks/RegistrationForm/useDonateBloodService";
+
+const { Option } = Select;
 
 export default function FormRegisterBlood() {
   const { userData } = useUser();
-  // const {infor}
-  // const handleChange = (e) => {
-  //   const { name, value } = e.target;
-  //   setFormData((prev) => ({
-  //     ...prev,
-  //     [name]: value,
-  //   }));
-  // };
+  const { getAllCentral } = useCentralService();
+  const { createDonateBlood } = useDonateBloodService();
 
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-  //   console.log("📋 Form Submitted:", formData);
-  //   if (
-  //     !formData.fullName ||
-  //     !formData.dob ||
-  //     !formData.phone ||
-  //     !formData.roleDonation ||
-  //     !formData.bloodType ||
-  //     !formData.location
-  //   ) {
-  //     notification.error({
-  //       message: "Lỗi Đăng Ký",
-  //       description: "Vui lòng điền đầy đủ thông tin.",
-  //     });
-  //     return;
-  //   }
+  const [centers, setCenters] = useState([]);
+  const [selectedCenter, setSelectedCenter] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(dayjs());
+  const [loading, setLoading] = useState(false);
 
-  //   setWaitingList((prevList) => [
-  //     ...prevList,
-  //     { ...formData, status: "Đang chờ xác nhận" },
-  //   ]);
+  useEffect(() => {
+    const fetchCenters = async () => {
+      try {
+        const res = await getAllCentral(1, 10);
+        setCenters(res.data.result);
+      } catch (err) {
+        console.error("Lỗi khi tải trung tâm:", err);
+        message.error("Lỗi tải danh sách trung tâm");
+      }
+    };
+    fetchCenters();
+  }, []);
 
-  //   setFormData({
-  //     fullName: formData.fullName,
-  //     dob: formData.dob,
-  //     phone: formData.phone,
-  //     roleDonation: formData.roleDonation,
-  //     bloodType: formData.bloodType,
-  //     location: formData.location,
-  //     statusHealth: {
-  //       height: "",
-  //       weight: "",
-  //       bloodPressure: "",
-  //       medicalHistory: "",
-  //       currentCondition: "",
-  //       medication: "",
-  //       lastDonationDate: "",
-  //       cccd: "",
-  //       imgHealth: "",
-  //     },
-  //     status: "",
-  //     hospital: "",
-  //   });
-  // };
-  // const handleSelectChange = (value, fieldName) => {
-  //   setFormData((prev) => ({
-  //     ...prev,
-  //     [fieldName]: value,
-  //   }));
-  // };
-  const handleSubmit = () => {
-    // try {
-    //   const payload = {
-    //     blood_id :
-    //   };
-    // } catch (error) {}
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!selectedCenter) {
+      return message.error("Vui lòng chọn trung tâm hiến máu");
+    }
+    if (!selectedDate) {
+      return message.error("Vui lòng chọn thời gian hiến máu");
+    }
+    setLoading(true);
+    const payload = {
+      date_donate: selectedDate.toISOString(),
+      centralBlood_id: selectedCenter,
+    };
+    console.log("Payload gửi API:", payload);
+    try {
+      const res = await createDonateBlood(payload);
+      console.log("Kết quả trả về:", res);
+      message.success("Đăng ký hiến máu thành công!");
+    } catch (err) {
+      console.error("Lỗi đăng ký hiến máu:", err);
+      message.error("Lỗi đăng ký hiến máu: " + (err.message || ""));
+    } finally {
+      setLoading(false);
+    }
   };
-  const handleChange = () => {};
+
   const inputStyle =
     "w-full px-3 py-2 border rounded pl-10 bg-white text-gray-800";
   const inputWrapper = "relative mb-4";
-  const iconMotion = {
-    initial: { opacity: 0, y: -4 },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.3 },
-  };
   const iconClass = "absolute top-2.5 left-3 text-red-400 w-4 h-4";
+
   return (
     <div className="bg-white rounded-xl shadow-lg p-6 text-sm">
-      <h2 className="text-lg font-bold mb-4 text-red-600 flex items-center justify-center gap-2">
-        Đăng Ký Nhóm Máu
+      <h2 className="text-lg font-bold mb-4 text-red-600 text-center">
+        Đăng Ký Hiến Máu
       </h2>
       <form onSubmit={handleSubmit}>
-        {/* Họ và tên */}
         <div className={inputWrapper}>
           <label className="block font-semibold mb-1">Họ và tên</label>
-          <div className="relative">
-            {/* <motion.div {...iconMotion}>
-              <IconUser className={iconClass} />
-            </motion.div> */}
+          <Input
+            type="text"
+            name="fullName"
+            value={userData?.data.fullname || ""}
+            className={inputStyle}
+            disabled
+          />
+        </div>
+
+        <div className="flex gap-4">
+          <div className={`${inputWrapper} w-1/2`}>
+            <label className="block font-semibold mb-1">Ngày sinh</label>
             <Input
-              type="text"
-              name="fullName"
-              value={userData?.data.fullname}
+              value={
+                userData?.data.dob
+                  ? new Date(userData.data.dob).toLocaleDateString("vi-VN")
+                  : ""
+              }
               className={inputStyle}
-              placeholder="Nhập họ và tên"
               disabled
             />
           </div>
-        </div>
-
-        {/* Ngày sinh và Giới tính */}
-        <div className="flex gap-4">
-          <div className={inputWrapper + " w-1/2"}>
-            <label className="block font-semibold mb-1">Ngày sinh</label>
-            <div className="relative">
-              <Input
-                name="dob"
-                value={
-                  userData?.data.dob
-                    ? new Date(userData.data.dob).toLocaleDateString("vi-VN")
-                    : ""
-                }
-                onChange={handleChange}
-                className={inputStyle}
-                disabled
-              />
-            </div>
-          </div>
-
-          <div className={inputWrapper + " w-1/2"}>
+          <div className={`${inputWrapper} w-1/2`}>
             <label className="block font-semibold mb-1">Giới tính</label>
-
             <Select
               value={userData?.data.gender}
-              className="w-full text-sm pl-10"
-              styles={{ popup: { root: { fontSize: "12px" } } }}
-              placeholder="Lựa chọn"
+              className="w-full text-sm"
               disabled
             >
               <Option value="male">
-                <IconGenderMale className="inline mr-1 text-red-400 w-4 h-4" />
+                <IconGenderMale className="inline mr-1 text-red-400 w-4 h-4" />{" "}
                 Nam
               </Option>
               <Option value="female">
-                <IconGenderFemale className="inline mr-1 text-red-400 w-4 h-4" />
+                <IconGenderFemale className="inline mr-1 text-red-400 w-4 h-4" />{" "}
                 Nữ
               </Option>
             </Select>
           </div>
         </div>
-        <div className="mb-4 flex gap-4">
-          {/* Số điện thoại */}
+
+        <div className="flex gap-4">
           <div className="w-1/2">
             <label className="block font-semibold mb-1">Số điện thoại</label>
             <div className="relative">
-              <motion.div {...iconMotion}>
-                <IconPhone className={iconClass} />
-              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+              ></motion.div>
               <Input
                 type="tel"
                 name="phone"
-                value={userData?.data.phone}
-                onChange={handleChange}
+                value={userData?.data.phone || ""}
                 className={inputStyle}
-                placeholder="Nhập số điện thoại liện hệ"
-              />
-            </div>
-          </div>
-
-          {/* Email */}
-          <div className="w-1/2">
-            <label className="block font-semibold mb-1">Email</label>
-            <div className="relative">
-              {/* <motion.div {...iconMotion}>
-                <IconMail className={iconClass} />
-              </motion.div> */}
-              <Input
-                type="email"
-                name="email"
-                value={userData?.data.email}
-                onChange={handleChange}
-                className={inputStyle}
-                placeholder="Nhập email liên hệ"
                 disabled
               />
             </div>
           </div>
-        </div>
 
-        {/* Vai trò & thời gian cần máu */}
-        {/* <div className="mb-4 flex gap-4">
-          <div className="w-1/2 relative">
-            <label className="block font-semibold mb-1">Vai trò</label>
-            <Select
-              value={formData.roleDonation}
-              onChange={(value) => handleSelectChange(value, "roleDonation")}
-              className="w-full text-sm pl-10"
-              placeholder="Lựa chọn"
-              suffixIcon={<IconUserHeart className="text-red-400 w-4 h-4 " />}
-            >
-              <Option value="">Chọn Vai Trò</Option>
-
-              <Option value="Người Hiến Máu">
-                <span className="flex items-center gap-1">
-                  <IconUserHeart className="text-red-400 w-4 h-4 " />
-                  Người Hiến Máu
-                </span>
-              </Option>
-              <Option value="Người Cần Máu">
-                <span className="flex items-center gap-1">
-                  <IconUserHeart className="text-red-400 w-4 h-4 " />
-                  Người Cần Cần Máu
-                </span>
-              </Option>
-            </Select>
-          </div>
-
-          <div className="w-1/2 relative">
-            <label className="block font-semibold mb-1">
-              Thời gian thực hiện
-            </label>
-            <motion.div {...iconMotion}></motion.div>
+          <div className="w-1/2">
+            <label className="block font-semibold mb-1">Email</label>
             <Input
-              type="datetime-local"
-              name="neededTime"
-              value={formData.neededTime}
-              onChange={handleChange}
+              type="email"
+              name="email"
+              value={userData?.data.email || ""}
               className={inputStyle}
-              placeholder="Giờ"
-            />
-          </div>
-        </div> */}
-
-        {/* Nhóm máu & số lượng */}
-        {/* <div className="mb-4 flex gap-4">
-          <div className="w-3/8 relative">
-            <label className="block font-semibold mb-1 ">Nhóm máu</label>
-            <Select
-              value={formData.bloodType}
-              onChange={(value) => handleSelectChange(value, "bloodType")}
-              className="w-full text-sm pl-10"
-              placeholder="Chọn nhóm máu"
-              suffixIcon={<IconDroplet className="text-red-400 w-4 h-4" />}
-            >
-              <Option value="">Chọn nhóm máu</Option>
-
-              <Option value="A">
-                <span className="flex items-center gap-1">
-                  <IconDroplet className="text-red-400 w-4 h-4" />
-                  Máu (A)
-                </span>
-              </Option>
-              <Option value="B">
-                <span className="flex items-center gap-1">
-                  <IconDroplet className="text-red-400 w-4 h-4" />
-                  Máu (B)
-                </span>
-              </Option>
-              <Option value="AB">
-                <span className="flex items-center gap-1">
-                  <IconDroplet className="text-red-400 w-4 h-4" />
-                  Máu (AB)
-                </span>
-              </Option>
-              <Option value="O">
-                <span className="flex items-center gap-1">
-                  <IconDroplet className="text-red-400 w-4 h-4" />
-                  Máu (O)
-                </span>
-              </Option>
-            </Select>
-          </div>
-          <div className="w-3/8 relative">
-            <label className="block font-semibold mb-1 ">Loại Rh</label>
-            <Select
-              value={formData.rh}
-              onChange={(value) => handleSelectChange(value, "bloodType")}
-              className="w-full text-sm pl-10"
-              placeholder="Chọn nhóm máu"
-              suffixIcon={<IconDroplet className="text-red-400 w-4 h-4" />}
-            >
-              <Option value="">Chọn Rh</Option>
-
-              <Option value="Rh+">
-                <span className="flex items-center gap-1">
-                  <IconDroplet className="text-red-400 w-4 h-4" />
-                  RH (+)
-                </span>
-              </Option>
-              <Option value="Rh-">
-                <span className="flex items-center gap-1">
-                  <IconDroplet className="text-red-400 w-4 h-4" />
-                  RH (-)
-                </span>
-              </Option>
-            </Select>
-          </div>
-          <div className="w-2/8 relative">
-            <label className="block font-semibold mb-1">Số lượng (ml)</label>
-
-            <Input
-              type="number"
-              name="quantity"
-              value={formData.quantity}
-              onChange={handleChange}
-              className={inputStyle}
-              placeholder="ml"
-              min="150"
-              suffix={<IconNumbers className="text-red-400 w-4 h-4" />}
-            />
-          </div>
-        </div> */}
-
-        {/* Địa điểm hiến máu */}
-        <div className={inputWrapper}>
-          <label className="block font-semibold mb-1">Địa điểm</label>
-          <div className="relative">
-            <motion.div {...iconMotion}>
-              <IconMapPin className={iconClass} />
-            </motion.div>
-            <input
-              type="text"
-              name="location"
-              value={userData?.data.location_id.district}
-              onChange={handleChange}
-              className={inputStyle}
-              placeholder="Nhập địa điểm"
+              disabled
             />
           </div>
         </div>
-
-        {/* <div className="flex gap-4">
-          <div className="w-5/8">
-            <label className="block font-semibold mb-1">Bệnh viện</label>
+        <div className="flex gap-4">
+          <div className="w-1/2">
+            <label className="block font-semibold mb-1">Số nhà </label>
             <div className="relative">
-              <motion.div {...iconMotion}>
-                <IconBuildingHospital className={iconClass} />
-              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+              ></motion.div>
               <Input
-                type="text"
-                name="hospital"
-                value={formData.hospital}
-                onChange={handleChange}
+                type="tel"
+                name="phone"
+                value={userData?.data.location_id.house_number || ""}
                 className={inputStyle}
-                placeholder="Tên bệnh viện"
+                disabled
               />
             </div>
           </div>
 
-          <div className="w-3/8">
-            <label className="block font-semibold mb-1">
-              Mức độ thực hiện{" "}
-            </label>
+          <div className="w-1/2">
+            <label className="block font-semibold mb-1">Đường</label>
+            <Input
+              type="email"
+              name="email"
+              value={userData?.data.location_id.road || ""}
+              className={inputStyle}
+              disabled
+            />
+          </div>
+        </div>
+        <div className="flex gap-4">
+          <div className="w-1/2">
+            <label className="block font-semibold mb-1">Quận</label>
             <div className="relative">
-              <motion.div {...iconMotion}>
-                <IconListDetails className={iconClass} />
-              </motion.div>
-              <Select
-                value={formData.department}
-                onChange={(value) => handleSelectChange(value, "department")}
-                className="w-full"
-                placeholder="Chọn mức độ"
-              >
-                <Option value="1">Gấp</Option>
-                <Option value="2">Thông thường</Option>
-                <Option value="3">Dự phòng</Option>
-              </Select>
+              <motion.div
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+              ></motion.div>
+              <Input
+                type="tel"
+                name="phone"
+                value={userData?.data.location_id.district || ""}
+                className={inputStyle}
+                disabled
+              />
             </div>
           </div>
-        </div> */}
 
-        {/* Submit */}
+          <div className="w-1/2">
+            <label className="block font-semibold mb-1">Thành Phố </label>
+            <Input
+              type="email"
+              name="email"
+              value={userData?.data.location_id.city || ""}
+              className={inputStyle}
+              disabled
+            />
+          </div>
+        </div>
+
+        <div className={inputWrapper}>
+          <label className="block font-semibold mb-1">
+            Chọn Trung Tâm Hiến Máu
+          </label>
+          <Select
+            value={selectedCenter}
+            onChange={(value) => setSelectedCenter(value)}
+            className="w-full"
+            placeholder="Chọn địa điểm"
+            loading={loading}
+          >
+            {centers.map((center) => (
+              <Option
+                key={center.centralBlood_id}
+                value={center.centralBlood_id}
+              >
+                {center.centralBlood_name} - {center.centralBlood_address}
+              </Option>
+            ))}
+          </Select>
+        </div>
+
+        <div className={inputWrapper}>
+          <label className="block font-semibold mb-1">
+            Chọn thời gian hiến máu
+          </label>
+          <div className="relative">
+            <motion.div
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              <IconClockHour8 className={iconClass} />
+            </motion.div>
+            <DatePicker
+              className="w-full pl-10"
+              showTime
+              format="YYYY-MM-DD HH:mm"
+              value={selectedDate}
+              onChange={(date) => setSelectedDate(date)}
+              disabledDate={(current) =>
+                current && current < dayjs().startOf("day")
+              }
+            />
+          </div>
+        </div>
+
         <button
           type="submit"
-          className="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 transition-all mt-4 text-sm cursor-pointer"
-          style={{ color: '#FFFFFF' }}
+          className="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 transition-all mt-4 text-sm"
+          disabled={loading}
         >
           Gửi đăng ký
         </button>

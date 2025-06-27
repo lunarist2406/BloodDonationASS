@@ -1,173 +1,283 @@
-import React from "react";
-import { Table } from "antd";
-import type { ColumnsType } from "antd/es/table";
-import { motion } from "framer-motion";
+import React, { useEffect, useState } from "react";
+import { Table, Tag, Pagination, Input } from "antd";
 import {
-  IconCalendar,
   IconClock,
+  IconUser,
   IconDroplet,
   IconMapPin,
-  IconPhone,
-  IconUser,
-  IconUserCircle,
-  IconBuildingHospital,
-  IconActivityHeartbeat,
+  IconCalendar,
+  IconSearch,
+  IconReload,
+  IconTypeface,
+  IconStatusChange,
 } from "@tabler/icons-react";
-import type { RegisterBlood } from "../../../../hooks/RegistrationForm/useRegisterBlood";
+import useBloodService from "../../../../hooks/Blood/useBloodService";
+import useReceiverService from "../../../../hooks/Receiver/useReceiverService";
 
-interface Props {
-  formData: RegisterBlood[];
-}
+export default function FormViewReceiver() {
+  const { getAllReceiverBloods } = useReceiverService();
+  const { getBloodById } = useBloodService();
 
-export default function FormViewReceiver({ formData }: Props) {
-  const columns: ColumnsType<RegisterBlood & { key: string; index: number }> = [
+  const [data, setData] = useState<any[]>([]);
+  const [filteredData, setFilteredData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [searchText, setSearchText] = useState("");
+
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: 0,
+  });
+
+  useEffect(() => {
+    fetchData(pagination.current, pagination.pageSize);
+  }, []);
+  async function fetchData(page: number, pageSize: number) {
+    setLoading(true);
+    try {
+      const res = await getAllReceiverBloods({ current: 1, pageSize: 10000 });
+
+    const rawList = await Promise.all(
+      res.data.results.map(async (item: any) => {
+        let bloodDisplay = "Chưa có nhóm máu";
+        if (item.blood_id?.blood_id) {
+          try {
+            const bloodRes = await getBloodById(item.blood_id.blood_id);
+            const bloodData = bloodRes.data;
+            if (
+              bloodData?.blood_type_id?.blood_name &&
+              bloodData?.rh_id?.blood_Rh
+            ) {
+              bloodDisplay =
+                bloodData.blood_type_id.blood_name + bloodData.rh_id.blood_Rh;
+            }
+          } catch (err) {
+            console.error("Lỗi khi lấy nhóm máu:", err);
+          }
+        }
+
+        return {
+          donate_id: item.receiver_id,
+          fullName: item.user_id?.fullname || "Chưa có tên",
+          email: item.user_id?.email || "Chưa có email",
+          registerDate: item.date_register || null,
+          donateDate: item.date_receiver || null,
+          bloodType: bloodDisplay,
+          type: item.type || "Không xác định",
+          ml: item.ml || 0,
+          unit: item.unit || 0,
+          status: item.status_regist || "Chưa có trạng thái",
+          statusReceiver: item.status_receiver || "Chưa có trạng thái",
+          location:
+            item.centralBlood_id?.centralBlood_name || "Chưa có địa điểm",
+        };
+      })
+    );
+
+      // 🔥 Sort theo ngày thực hiện (donateDate)
+      const sortedList = rawList.sort(
+        (a, b) =>
+          new Date(a.donateDate).getTime() - new Date(b.donateDate).getTime()
+      );
+
+      // 🧠 Gán STT theo vị trí sau khi sort
+      const formattedList = sortedList.map((item, index) => ({
+        ...item,
+        key: item.donate_id,
+        stt: index + 1,
+      }));
+
+      // 🪄 Phân trang thủ công
+      const startIndex = (page - 1) * pageSize;
+      const pagedData = formattedList.slice(startIndex, startIndex + pageSize);
+
+      setData(formattedList); // full data để tìm kiếm
+      setFilteredData(pagedData); // hiển thị theo trang
+      setPagination({
+        current: page,
+        pageSize: pageSize,
+        total: formattedList.length,
+      });
+    } catch (error) {
+      console.error("Lỗi lấy danh sách hiến máu:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Tìm kiếm theo tên
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchText(value);
+    const filtered = data
+      .filter((item) =>
+        item.fullName.toLowerCase().includes(value.toLowerCase())
+      )
+      .slice(
+        (pagination.current - 1) * pagination.pageSize,
+        pagination.current * pagination.pageSize
+      ); // paged lại sau khi search
+    setFilteredData(filtered);
+  };
+
+  // Cột table
+  const columns = [
     {
       title: (
-        <div className="flex items-center gap-1">
+        <span className="flex items-center justify-center gap-1 text-red-800">
           <IconClock size={16} /> STT
-        </div>
+        </span>
       ),
-      dataIndex: "index",
-      key: "index",
+      dataIndex: "stt",
+      key: "stt",
       width: 60,
-      render: (_, __, index) => index + 1,
-      fixed: "left",
+      align: "center" as const,
     },
     {
       title: (
-        <div className="flex items-center gap-1">
+        <span className="flex items-center justify-center gap-1 text-red-800">
           <IconUser size={16} /> Họ tên
-        </div>
+        </span>
       ),
       dataIndex: "fullName",
       key: "fullName",
+      align: "center" as const,
     },
     {
       title: (
-        <div className="flex items-center gap-1">
-          <IconCalendar size={16} /> Ngày sinh
-        </div>
+        <span className="flex items-center justify-center gap-1 text-red-800">
+          <IconCalendar size={16} /> Ngày đăng ký
+        </span>
       ),
-      dataIndex: "dob",
-      key: "dob",
+      dataIndex: "registerDate",
+      key: "registerDate",
+      align: "center" as const,
+      render: (date: string) =>
+        date ? new Date(date).toLocaleString("vi-VN") : "Không có",
     },
     {
       title: (
-        <div className="flex items-center gap-1">
-          <IconPhone size={16} /> SĐT
-        </div>
+        <span className="flex items-center justify-center gap-1 text-red-800">
+          <IconCalendar size={16} /> Ngày thực hiện
+        </span>
       ),
-      dataIndex: "phone",
-      key: "phone",
+      dataIndex: "donateDate",
+      key: "donateDate",
+      align: "center" as const,
+      render: (date: string) =>
+        date ? new Date(date).toLocaleString("vi-VN") : "Không có",
+      sorter: (a: any, b: any) =>
+        new Date(a.donateDate).getTime() - new Date(b.donateDate).getTime(),
     },
     {
       title: (
-        <div className="flex items-center gap-1">
-          <IconUserCircle size={16} /> Vai trò
-        </div>
+        <span className="flex items-center justify-center gap-1 text-red-800">
+          <IconStatusChange size={16} /> Loại
+        </span>
       ),
-      dataIndex: "roleDonation",
-      key: "roleDonation",
+      dataIndex: "type",
+      key: "type",
+      align: "center" as const,
+      render: (type: string) => {
+        const isEmergency = type === "EMERGENCY";
+        const color = isEmergency ? "#f87171" : "#3b82f6"; // đỏ hoặc xanh
+        const label = isEmergency ? "Khẩn cấp" : "Thông thường";
+
+        return (
+          <span className="flex items-center justify-center gap-1 font-medium" style={{ color }}>
+            {label}
+          </span>
+        );
+      },
     },
     {
       title: (
-        <div className="flex items-center gap-1">
-          <IconDroplet size={16} /> Nhóm máu
-        </div>
-      ),
-      dataIndex: "bloodType",
-      key: "bloodType",
-    },
-    {
-      title: (
-        <div className="flex items-center gap-1">
+        <span className="flex items-center justify-center gap-1 text-red-800">
           <IconMapPin size={16} /> Địa điểm
-        </div>
+        </span>
       ),
       dataIndex: "location",
       key: "location",
+      align: "center" as const,
     },
     {
       title: (
-        <div className="flex items-center gap-1">
+        <span className="flex items-center justify-center gap-1 text-red-800">
           <IconClock size={16} /> Trạng thái
-        </div>
+        </span>
       ),
       dataIndex: "status",
       key: "status",
-      render: (status) => (
-        <span className="text-orange-500 font-semibold">{status}</span>
-      ),
-    },
-    {
-      title: (
-        <div className="flex items-center gap-1">
-          <IconActivityHeartbeat size={16} /> Cấp độ
-        </div>
-      ),
-      dataIndex: "level",
-      key: "level",
-      render: (level) => (
-        <span className="text-green-600 font-medium">
-          {level || "Chưa phân loại"}
-        </span>
-      ),
-    },
-    {
-      title: (
-        <div className="flex items-center gap-1">
-          <IconBuildingHospital size={16} /> Bệnh viện
-        </div>
-      ),
-      dataIndex: "hospital",
-      key: "hospital",
-      render: (hospital) => (
-        <span className="text-blue-600 font-medium">
-          {hospital || "Chưa chọn"}
-        </span>
-      ),
+      align: "center" as const,
+      render: (status: string) => {
+        let color = "orange";
+        if (status === "APPROVED") color = "green";
+        return (
+          <Tag color={color} className="font-semibold">
+            {status}
+          </Tag>
+        );
+      },
     },
   ];
 
-  const dataSource = formData.map((item, index) => ({
-    ...item,
-    key: `${index}`,
-    index,
-  }));
-
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 40 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
-      <div className="bg-white rounded-xl shadow-lg p-4 h-[90%]">
-        <h2 className="text-2xl font-bold mb-4 text-red-700 flex items-center gap-2">
+    <div className="bg-white rounded-xl shadow-lg p-4 h-full flex flex-col">
+      <div className="flex items-center justify-between mb-4">
+        {/* Tiêu đề */}
+        <h2 className="text-2xl font-bold text-red-700 flex items-center gap-2">
           <IconClock size={24} className="text-red-700" />
-          Danh Sách Người Đăng Ký Nhận Máu
+          Danh Sách Đăng Ký Hiến Máu
         </h2>
+
+        {/* Nút reload */}
+        <button
+          onClick={() => fetchData(pagination.current, pagination.pageSize)}
+          className=" hover:bg-red-400 text-white font-medium px-4 py-1.5 rounded-lg shadow flex items-center gap-2"
+        >
+          <IconReload /> Tải lại
+        </button>
+      </div>
+
+      {/* Ô tìm kiếm */}
+      <div className="flex items-center gap-2 mb-4">
+        <IconSearch size={20} className="text-gray-500" />
+        <Input
+          placeholder="Tìm kiếm theo tên..."
+          value={searchText}
+          onChange={handleSearch}
+          allowClear
+          className="w-64"
+        />
+      </div>
+
+      <div className="flex-grow overflow-auto">
         <Table
           columns={columns}
-          dataSource={dataSource}
-          pagination={{ pageSize: 10 }}
-          scroll={{ x: "max-content" }}
+          dataSource={filteredData}
+          loading={loading}
+          pagination={false}
+          rowClassName={() => "hover:bg-red-50"}
+          size="small"
           bordered
-          size="middle"
-          style={{
-            minHeight: "590px",
-          }}
-          className="text-center"
+          scroll={{ x: "max-content" }}
         />
-        <style>
-          {`
-        .ant-table-thead > tr > th,
-        .ant-table-tbody > tr > td {
-          text-align: center !important;
-          vertical-align: middle !important;
-        }
-        `}
-        </style>
       </div>
-    </motion.div>
+
+      <div className="mt-auto pt-4 flex justify-center">
+        <Pagination
+          current={pagination.current}
+          pageSize={pagination.pageSize}
+          total={pagination.total}
+          showSizeChanger
+          pageSizeOptions={["5", "10", "20", "50"]}
+          onChange={(page, size) => fetchData(page, size)}
+          onShowSizeChange={(current, size) => fetchData(1, size)}
+          showTotal={(total, range) =>
+            `${range[0]}-${range[1]} / ${total} bản ghi`
+          }
+        />
+      </div>
+    </div>
   );
 }

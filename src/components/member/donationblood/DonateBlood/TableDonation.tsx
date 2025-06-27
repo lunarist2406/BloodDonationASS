@@ -1,47 +1,138 @@
+import React, { useEffect, useState } from "react";
+import { Form, Input, Row, Col, Typography, Button, Spin } from "antd";
 import {
-  Form,
-  Input,
-  Row,
-  Col,
-  Typography,
-  Divider,
-  Button,
-  Modal,
-} from "antd";
-import {
-  IconUser,
-  IconCalendar,
-  IconPhone,
+
   IconMail,
-  // IconHandHeart,
-  // IconDropletBlood,
   IconMapPin,
   IconActivityHeartbeat,
   IconBuildingHospital,
-  IconStar,
-  IconArrowBigUpLine,
-  IconWeight,
-  IconHeartRateMonitor,
-  IconHeartbeat,
-  IconHistory,
-  IconPill,
-  IconCalendarTime,
-  IconVirus,
   IconDroplet,
-  IconHeart,
+  IconHistory,
+
 } from "@tabler/icons-react";
 import { motion } from "framer-motion";
-import { useState } from "react";
-import type { RegisterBlood } from "../../../../hooks/RegistrationForm/useRegisterBlood";
+import useDonateBloodService from "../../../../hooks/RegistrationForm/useDonateBloodService";
+import useBloodService from "../../../../hooks/Blood/useBloodService";
 
 const { Title } = Typography;
 
-interface Props {
-  data: RegisterBlood[];
-}
+export default function TableDonateBlood() {
+  const { getDonateHistoryByUser } = useDonateBloodService();
+  const [data, setData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const { getBloodById } = useBloodService();
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const res = await getDonateHistoryByUser();
 
-export default function TableDonateBlood({ data }: Props) {
-  const [visibleIndex, setVisibleIndex] = useState<number | null>(null);
+      // lọc đơn trạng thái PENDING (dựa vào status_regist)
+      const pendingList = res.data
+        .filter((item: any) => item.status_regist === "PENDING")
+        .sort(
+          (a: any, b: any) =>
+            new Date(b.date_register).getTime() -
+            new Date(a.date_register).getTime()
+        );
+
+      // map dữ liệu đúng structure hiện tại của API
+      const mappedData = await Promise.all(
+        pendingList.map(async (item: any) => {
+          let bloodDisplay = "Chưa có nhóm máu";
+
+          if (item.blood_id?.blood_id) {
+            try {
+              const res = await getBloodById(item.blood_id.blood_id);
+              const blood = res.data;
+              if (blood?.blood_type_id?.blood_name && blood?.rh_id?.blood_Rh) {
+                bloodDisplay =
+                  blood.blood_type_id.blood_name + blood.rh_id.blood_Rh;
+              }
+            } catch (err) {
+              console.error("Lỗi lấy nhóm máu:", err);
+            }
+          }
+
+          return {
+            id: item.donate_id,
+            dateRegister: item.date_register,
+            fullName: item.infor_health?.user_id?.fullname || "Chưa có tên",
+            gender: item.infor_health?.user_id?.gender || "Chưa có giới tính",
+            email: item.infor_health?.user_id?.email || "Chưa có email",
+            bloodType: bloodDisplay,
+            location:
+              item.centralBlood_id?.centralBlood_name || "Chưa có khu vực",
+            status: item.status_regist || "Chưa có trạng thái",
+            hospital:
+              item.centralBlood_id?.centralBlood_name || "Chưa xác định",
+            level: item.level || "Chưa phân loại",
+            dateDonate: item.date_donate,
+            cccd: item.infor_health?.user_id?.cccd || "",
+            statusHealth: {
+              height: item.infor_health?.height || "",
+              weight: item.infor_health?.weight_decimal || "",
+              bloodPressure: item.infor_health?.blood_pressure || "",
+              currentCondition: item.infor_health?.status_health || "",
+              medicalHistory: item.infor_health?.medical_history || "",
+              medication: item.infor_health?.medication || "",
+              lastDonationDate: item.infor_health?.latest_donate
+                ? new Date(item.infor_health.latest_donate).toLocaleDateString(
+                    "vi-VN"
+                  )
+                : "",
+              diseases: item.infor_health?.diseases || [],
+              imgHealth: item.infor_health?.img_health || "",
+            },
+          };
+        })
+      );
+
+      console.log("Lịch sử hiến máu:", mappedData);
+      setData(mappedData.slice(0, 1));
+    } catch (error) {
+      console.error("Lấy lịch sử hiến máu lỗi:", error);
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  if (loading)
+    return (
+      <div className="flex justify-center items-center p-10">
+        <Spin size="large" />
+      </div>
+    );
+
+  if (data.length === 0)
+    return (
+      <div className="flex flex-col items-center justify-center p-10 bg-white rounded-xl shadow-lg">
+        <IconHistory size={48} color="#f87171" className="mb-4" />
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{
+            duration: 1,
+            repeat: Infinity,
+            repeatType: "reverse",
+            ease: "easeInOut",
+          }}
+        >
+          <h5 className="text-[#d32f2f] text-base font-semibold mb-2 text-center">
+            Không có đơn đăng ký hiến máu đang chờ duyệt
+          </h5>
+        </motion.div>
+        <p className="text-gray-500 mb-4 text-center">
+          Bạn chưa có đơn đăng ký hiến máu nào ở trạng thái <b>PENDING</b>.
+          <br />
+          Hãy đăng ký để tham gia hiến máu và giúp đỡ cộng đồng!
+        </p>
+      </div>
+    );
 
   return (
     <motion.div
@@ -51,7 +142,7 @@ export default function TableDonateBlood({ data }: Props) {
       className="bg-white p-6 rounded-xl shadow-lg"
     >
       <Title level={3} style={{ color: "#d32f2f", marginBottom: 24 }}>
-        Thông tin đã đăng ký hiến máu
+        Đơn Gần Nhất đang chờ duyệt
       </Title>
 
       {data.map((item, index) => (
@@ -59,51 +150,47 @@ export default function TableDonateBlood({ data }: Props) {
           key={item.id}
           className="mb-8 border border-gray-200 rounded-lg p-4"
         >
-          <Title level={4}>Người đăng ký #{index + 1}</Title>
+          <Title level={4} style={{ color: "#d32f2f" }}>
+            Họ tên: {item.fullName}
+          </Title>
+          <div className="grid grid-cols-1 gap-2 mb-4">
+            <div>
+              <span className="text-red-300 font-medium">
+                Thời gian đăng ký:
+              </span>{" "}
+              <span className="text-red-700">
+                {new Date(item.dateRegister).toLocaleString("vi-VN")}
+              </span>
+            </div>
+            <div>
+              <span className="text-red-300 font-medium">Giới tính:</span>{" "}
+              <span className="text-red-700">
+                {item.gender === "male"
+                  ? "Nam"
+                  : item.gender === "female"
+                  ? "Nữ"
+                  : item.gender}
+              </span>
+            </div>
+            <div>
+              <span className="text-red-300 font-medium">Ngày hiến máu:</span>{" "}
+              <span className="text-red-700">
+                {item.dateDonate
+                  ? new Date(item.dateDonate).toLocaleDateString("vi-VN")
+                  : "Chưa xác định"}
+              </span>
+            </div>
+          </div>
+
           <Form layout="vertical">
             <Row gutter={16}>
-              <Col span={12}>
-                <Form.Item label="Họ tên">
-                  <Input
-                    value={item.fullName}
-                    readOnly
-                    prefix={<IconUser size={16} color="#f87171" />}
-                  />
-                </Form.Item>
-              </Col>
-              <Col span={12}>
-                <Form.Item label="Ngày sinh">
-                  <Input
-                    value={item.dob}
-                    readOnly
-                    prefix={<IconCalendar size={16} color="#f87171" />}
-                  />
-                </Form.Item>
-              </Col>
-              <Col span={12}>
-                <Form.Item label="Số điện thoại">
-                  <Input
-                    value={item.phone}
-                    readOnly
-                    prefix={<IconPhone size={16} color="#f87171" />}
-                  />
-                </Form.Item>
-              </Col>
+              {/* Xóa ngày sinh và số điện thoại */}
               <Col span={12}>
                 <Form.Item label="Email">
                   <Input
                     value={item.email}
                     readOnly
                     prefix={<IconMail size={16} color="#f87171" />}
-                  />
-                </Form.Item>
-              </Col>
-              <Col span={12}>
-                <Form.Item label="Vai trò hiến máu">
-                  <Input
-                    value={item.roleDonation}
-                    readOnly
-                    prefix={<IconHeart size={16} color="#f87171" />}
                   />
                 </Form.Item>
               </Col>
@@ -134,7 +221,7 @@ export default function TableDonateBlood({ data }: Props) {
                   />
                 </Form.Item>
               </Col>
-              <Col span={12}>
+              <Col span={24}>
                 <Form.Item label="Bệnh viện tiếp nhận">
                   <Input
                     value={item.hospital || "Chưa xác định"}
@@ -143,142 +230,15 @@ export default function TableDonateBlood({ data }: Props) {
                   />
                 </Form.Item>
               </Col>
-              <Col span={12}>
-                <Form.Item label="Cấp độ">
-                  <Input
-                    value={item.level || "Chưa phân loại"}
-                    readOnly
-                    prefix={<IconStar size={16} color="#f87171" />}
-                  />
-                </Form.Item>
-              </Col>
             </Row>
 
-            <Button
-              type="primary"
-              danger
-              onClick={() => setVisibleIndex(index)}
-            >
-              Xem thông tin sức khỏe
-            </Button>
-
-            <Modal
-              title="Thông tin sức khỏe"
-              open={visibleIndex === index}
-              onCancel={() => setVisibleIndex(null)}
-              footer={null}
-            >
-              <Row gutter={16}>
-                <Col span={12}>
-                  <Form.Item label="Chiều cao">
-                    <Input
-                      value={item.statusHealth.height}
-                      readOnly
-                      prefix={<IconArrowBigUpLine size={16} color="#f87171" />}
-                    />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item label="Cân nặng">
-                    <Input
-                      value={item.statusHealth.weight}
-                      readOnly
-                      prefix={<IconWeight size={16} color="#f87171" />}
-                    />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item label="Huyết áp">
-                    <Input
-                      value={item.statusHealth.bloodPressure}
-                      readOnly
-                      prefix={
-                        <IconHeartRateMonitor size={16} color="#f87171" />
-                      }
-                    />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item label="Tình trạng hiện tại">
-                    <Input
-                      value={item.statusHealth.currentCondition}
-                      readOnly
-                      prefix={<IconHeartbeat size={16} color="#f87171" />}
-                    />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item label="Lịch sử bệnh">
-                    <Input
-                      value={item.statusHealth.medicalHistory}
-                      readOnly
-                      prefix={<IconHistory size={16} color="#f87171" />}
-                    />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item label="Thuốc đang dùng">
-                    <Input
-                      value={item.statusHealth.medication}
-                      readOnly
-                      prefix={<IconPill size={16} color="#f87171" />}
-                    />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item label="Ngày hiến gần nhất">
-                    <Input
-                      value={item.statusHealth.lastDonationDate}
-                      readOnly
-                      prefix={<IconCalendarTime size={16} color="#f87171" />}
-                    />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item label="Các bệnh mắc phải">
-                    <Input
-                      value={item.statusHealth.diseases.join(", ")}
-                      readOnly
-                      prefix={<IconVirus size={16} color="#f87171" />}
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
-
-              <Row gutter={16}>
-                <Col span={12}>
-                  <Form.Item label="Ảnh giấy khám sức khỏe">
-                    <img
-                      src={item.statusHealth.imgHealth}
-                      alt="Giấy khám sức khỏe"
-                      style={{
-                        width: "100%",
-                        maxHeight: 200,
-                        objectFit: "cover",
-                        borderRadius: 8,
-                      }}
-                    />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item label="Ảnh CCCD">
-                    <img
-                      src={item.cccd}
-                      alt="Ảnh CCCD"
-                      style={{
-                        width: "100%",
-                        maxHeight: 200,
-                        objectFit: "cover",
-                        borderRadius: 8,
-                      }}
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
-            </Modal>
           </Form>
         </div>
       ))}
+
+      <Button onClick={fetchData} className="mt-4" type="primary" danger block>
+        Reload Đơn Đăng Ký
+      </Button>
     </motion.div>
   );
 }
