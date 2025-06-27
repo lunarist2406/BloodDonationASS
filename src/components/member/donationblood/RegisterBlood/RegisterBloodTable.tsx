@@ -1,4 +1,4 @@
-import { Table, Tag, Button, Modal, Descriptions, Pagination } from "antd";
+import { Table, Tag, Button, Modal, Descriptions, Pagination, message } from "antd";
 import { useEffect, useState } from "react";
 import {
   IconClock,
@@ -10,6 +10,7 @@ import {
 } from "@tabler/icons-react";
 import useDonateBloodService from "../../../../hooks/RegistrationForm/useDonateBloodService";
 import useBloodService from "../../../../hooks/Blood/useBloodService";
+import { api } from "../../../config/axios/axiosInstance";
 
 export default function RegisterBloodTable() {
   const { getDonateHistoryByUser } = useDonateBloodService();
@@ -113,13 +114,42 @@ export default function RegisterBloodTable() {
       },
     },
     {
-      title: <span className="text-red-800">Hành động</span>,
-      key: "action",
-      align: "center" as const,
-      render: (_: any, record: any) => (
-        <Button type="link" onClick={() => openModal(record)}>Chi tiết</Button>
-      ),
-    },
+  title: <span className="text-red-800">Hành động</span>,
+  key: "action",
+  align: "center" as const,
+  render: (_: any, record: any) => (
+    <div className="flex gap-2 justify-center">
+      <Button type="link" onClick={() => openModal(record)}>Chi tiết</Button>
+      {record.status !== "CANCELLED" && (
+        <Button
+          type="link"
+          danger
+          disabled={record.raw?.status_donate === "CANCELLED"}
+          onClick={() => {
+            Modal.confirm({
+              title: "Xác nhận huỷ đăng ký?",
+              content: "Bạn có chắc chắn muốn huỷ đăng ký hiến máu này không?",
+              okText: "Huỷ đăng ký",
+              okType: "danger",
+              cancelText: "Không",
+              onOk: async () => {
+                try {
+                  await api.patch(`/api/v1/donate-bloods/cancel-donate-schedule/${record.key}`);
+                  message.success("Huỷ đăng ký thành công!");
+                  fetchData(pagination.current, pagination.pageSize);
+                } catch (err) {
+                  message.error("Huỷ đăng ký thất bại!");
+                }
+              },
+            });
+          }}
+        >
+          Huỷ đăng ký
+        </Button>
+      )}
+    </div>
+  ),
+},
   ];
 
   const openModal = (record: any) => {
@@ -202,6 +232,9 @@ export default function RegisterBloodTable() {
             </Descriptions.Item>
             <Descriptions.Item label="Trạng thái đăng ký">
               {selectedRecord.status_regist}
+            </Descriptions.Item>
+            <Descriptions.Item label="Trạng thái hiến máu">
+              {selectedRecord.status_donate}
             </Descriptions.Item>
             <Descriptions.Item label="Tiền sử bệnh lý">
               {selectedRecord.infor_health?.medical_history}

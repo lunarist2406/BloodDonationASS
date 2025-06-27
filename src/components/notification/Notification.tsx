@@ -27,11 +27,11 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps & { userId
     const fetchNotifications = async () => {
       try {
         const res = await api.get('/api/v1/notifications', {
-          params: { current: 1, pageSize: 20, qs: '' },
+          params: { current: 1, pageSize: 10, qs: '' },
         });
         // Map dữ liệu từ BE sang FE
         setNotifications(
-          res.data.result.map((n: any) => ({
+          res.data.data.result.map((n: any) => ({
             id: n.notification_id,
             message: n.message,
             type: n.type,
@@ -74,19 +74,34 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps & { userId
     };
   }, [userId]);
 
-  // Đánh dấu đã đọc 1 thông báo
-  const handleMarkAsRead = (id: string) => {
-  setNotifications(prev =>
-    prev.map(n => (n.id === id ? { ...n, isRead: true } : n))
-  );
-  if (onMarkAsRead) onMarkAsRead(id);
+// Đánh dấu đã đọc 1 thông báo
+const handleMarkAsRead = async (id: string) => {
+  try {
+    await api.patch(`/api/v1/notifications/mark-read/${id}`);
+    setNotifications(prev =>
+      prev.map(n => (n.id === id ? { ...n, isRead: true } : n))
+    );
+    if (onMarkAsRead) onMarkAsRead(id);
+  } catch (err) {
+    // Xử lý lỗi nếu cần
+  }
 };
 
-  // Đánh dấu tất cả đã đọc
-  const handleMarkAllAsRead = () => {
-  setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
-  if (onMarkAllAsRead) onMarkAllAsRead();
-};
+// Đánh dấu tất cả đã đọc
+const handleMarkAllAsRead = async () => {
+  try {
+    await api.patch(`/api/v1/notifications/mark-all-read`);
+    setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+    if (onMarkAllAsRead) onMarkAllAsRead();
+  } catch (err) {
+    console.error('Lỗi mark-all-read:', err);
+    // Nếu muốn xem rõ hơn:
+    if (err.response) {
+      console.error('Response:', err.response);
+    }
+    // Có thể alert hoặc toast cho user nếu cần
+  }
+}
 
   const unreadCount = notifications.filter(n => !n.isRead).length;
 

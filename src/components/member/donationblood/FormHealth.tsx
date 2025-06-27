@@ -106,6 +106,9 @@ export default function FormHealth() {
         ? dayjs(values.latest_donate).toISOString()
         : "",
       img_health: fileList?.[0] || null,
+      medical_history: Array.isArray(values.medical_history)
+    ? values.medical_history.join(",")
+    : values.medical_history,
     };
 
     try {
@@ -127,6 +130,9 @@ export default function FormHealth() {
         ? dayjs(values.latest_donate).toISOString()
         : "",
       img_health: fileList?.[0] || null,
+      medical_history: Array.isArray(values.medical_history)
+    ? values.medical_history.join(",")
+    : values.medical_history,
     };
 
     try {

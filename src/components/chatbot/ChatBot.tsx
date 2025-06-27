@@ -90,7 +90,7 @@ const ChatBot: React.FC = () => {
           onMouseLeave={() => setHoverMessage('')}
           onClick={toggleChat}
         >
-          <img src="src\assets\bot_icon.png" alt="Chat Icon" className={cx('bot-img')} />
+          <img src="/bot_icon.png" alt="Chat Icon" className={cx('bot-img')} />
           {hoverMessage && <div className={cx('hover-message')}>{hoverMessage}</div>}
         </div>
       )}
