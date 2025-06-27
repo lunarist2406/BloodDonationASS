@@ -144,6 +144,15 @@ const handleSubmit = async (values) => {
       }
   };
 
+  console.log("registerData gửi lên:", registerData);
+console.log("Địa chỉ đầy đủ:", [
+  registerData.location.house_number,
+  registerData.location.road,
+  registerData.location.ward,
+  registerData.location.district,
+  registerData.location.city
+].filter(Boolean).join(', '));
+
     await api.post("/api/v1/auth/register", registerData);
     Modal.success({
       title: 'Đăng ký thành công!',
@@ -374,11 +383,21 @@ const handleSubmit = async (values) => {
 
 <Form.Item
   label="Số nhà"
+  name={['location', 'house_number']}
+>
+  <Input
+    prefix={<EnvironmentOutlined />}
+    placeholder="Số nhà"
+    size="middle"
+  />
+</Form.Item>
+<Form.Item
+  label="Tên đường"
   name={['location', 'road']}
 >
   <Input
     prefix={<EnvironmentOutlined />}
-    placeholder="Số nhà, tên đường"
+    placeholder="Tên đường"
     size="middle"
   />
 </Form.Item>

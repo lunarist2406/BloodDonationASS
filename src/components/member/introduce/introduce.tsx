@@ -216,7 +216,7 @@ export default function GuestIntroduce() {
         animate="visible"
         transition={{ duration: 0.6, ease: "easeOut" }}
         variants={fadeInUp}
-        className="mt-10 text-3xl font-bold text-center mb-12 leading-relaxed"
+        className="mt-10 text-3xl font-bold text-center mb-12 leading-relaxed pt-12"
       >
         <IconNews className="inline-block mr-2 gap-2" size={32} /> Thông tin Hệ Thống
         Hỗ Trợ Hiến Máu

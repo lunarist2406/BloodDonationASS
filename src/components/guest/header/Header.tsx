@@ -19,6 +19,9 @@ import {
 } from "@tabler/icons-react";
 import img1 from "../../../assets/Blood-Donation-1.webp";
 import { useAuth } from "../../../hooks/User/useAuth";
+import NotificationDropdown from "../../notification/Notification";
+import type { Notification } from "../../notification/types/notification";
+import { io, type Socket } from "socket.io-client";
 
 const DropdownLink = ({
   to,
@@ -50,7 +53,49 @@ export default function GuestHeader() {
 
   const isAdmin = () => role === "ADMIN";
   const isStaff = () => role === "STAFF";
-  const isMember = () => role === "MEMBER";
+  const isMember = role === "MEMBER";
+
+
+
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const socketRef = useRef<Socket | null>(null);
+
+  const handleMarkAsRead = (id: string) => {
+  setNotifications((prev) =>
+    prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
+  );
+};
+
+const handleMarkAllAsRead = () => {
+  setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+};
+
+  useEffect(() => {
+    if (isAuthenticated() && isMember) {
+      // Kết nối socket khi là MEMBER
+      socketRef.current = io("http://localhost:3000/notification", {
+        transports: ["websocket"],
+        auth: {
+          userId: user?.user_id || "anonymous",
+        },
+      });
+
+      // Lắng nghe sự kiện notification mới
+      socketRef.current.on("newNotification", (data: Notification) => {
+        setNotifications((prev) => [data, ...prev]);
+      });
+
+      // Lấy danh sách notification cũ nếu backend hỗ trợ
+      socketRef.current.on("notificationList", (data: Notification[]) => {
+        setNotifications(data);
+      });
+
+      // Cleanup khi unmount hoặc logout
+      return () => {
+        socketRef.current?.disconnect();
+      };
+    }
+  }, [isAuthenticated, isMember, user?.user_id]);
 
   const handleLogoClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -235,7 +280,7 @@ export default function GuestHeader() {
             onClick={() => setShowDropdown(!showDropdown)}
           >
             <span className="font-bold text-xl">LUNARIST</span>
-            {(isMember() || isAdmin() || isStaff()) && (
+            {(isMember || isAdmin() || isStaff()) && (
               <IconChevronDown size={25} />
             )}
           </div>
@@ -243,10 +288,19 @@ export default function GuestHeader() {
 
         {isAuthenticated() && (
           <div className="flex items-center gap-4">
+            {isMember && (
+              <NotificationDropdown
+                notifications={notifications}
+                onMarkAsRead={handleMarkAsRead}
+                onMarkAllAsRead={handleMarkAllAsRead}
+                userId={user?.user_id || ""}
+              />
+            )}
             <span className="text-white">Xin chào, {fullname}</span>
             <motion.button
               onClick={handleSignOut}
-              className="px-4 py-2 bg-red-700 text-white text-3xs rounded-lg font-bold flex items-center hover:bg-red-500 gap-2"
+              className="px-4 py-2 bg-red-700 text-3xs rounded-lg font-bold flex items-center hover:bg-red-500 gap-2 cursor-pointer"
+              style={{ color: "white" }}
               whileHover={{
                 y: -5,
                 scale: 1.05,
@@ -269,7 +323,7 @@ export default function GuestHeader() {
             exit={{ height: 0, opacity: 0 }}
             className="absolute top-full left-0 w-full bg-white text-black shadow-lg z-50 px-20 rounded-md"
           >
-            {isMember() && renderMemberLinks()}
+            {isMember && renderMemberLinks()}
             {isAdmin() && renderAdminLinks()}
             {isStaff() && renderStaffLinks()}
           </motion.div>

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { FaTimes, FaPaperPlane } from 'react-icons/fa';
 import classNames from 'classnames/bind';
 import styles from './ChatBot.module.css';
@@ -18,12 +19,16 @@ const suggestions = [
   'Tôi muốn tìm nơi hiến máu gần nhất.',
 ];
 
+const user = JSON.parse(localStorage.getItem('user') || '{}');
 const socket: Socket = io('http://localhost:3000/chatbot', {
   transports: ['websocket'],
   auth: {
-    userId: 'anonymous',
+    userID: user?.user_id || 'anonymous'
   },
 });
+
+// Danh sách các trang không hiển thị chatbot
+const hiddenPages = ['/', '/register', '/verify-code', '/forgot-password'];
 
 const ChatBot: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -32,7 +37,11 @@ const ChatBot: React.FC = () => {
   const [chat, setChat] = useState<{ sender: 'bot' | 'user'; text: string }[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const messagesEndRef = useRef<HTMLDivElement | null>(null); // ✅ Ref để cuộn
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const location = useLocation();
+
+  // Kiểm tra xem có nên ẩn chatbot không
+  const shouldHideChatBot = hiddenPages.includes(location.pathname);
 
   const toggleChat = () => setIsOpen((prev) => !prev);
 
@@ -51,7 +60,6 @@ const ChatBot: React.FC = () => {
     };
   }, []);
 
-  // ✅ Tự động cuộn khi chat hoặc loading thay đổi
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chat, loading]);
@@ -65,6 +73,11 @@ const ChatBot: React.FC = () => {
     setLoading(true);
     socket.emit('askAI', { message });
   };
+
+  // Không render chatbot nếu đang ở trang cần ẩn
+  if (shouldHideChatBot) {
+    return null;
+  }
 
   return (
     <div className={cx('chatbot')}>
@@ -95,7 +108,7 @@ const ChatBot: React.FC = () => {
             </div>
           ))}
           {loading && <div className={cx('bot-msg')}>Đang soạn câu trả lời...</div>}
-          <div ref={messagesEndRef} /> {/* ✅ Vị trí cuộn tới */}
+          <div ref={messagesEndRef} />
         </div>
 
         <div className={cx('chat-footer')}>

@@ -107,6 +107,10 @@ export default function Login() {
     navigate("register");
   };
 
+  const handleForgotPassword = () => {
+    navigate("forgot-password");
+  };
+
   return (
     <div className="min-h-screen relative">
       {/* Full screen background image */}
@@ -199,8 +203,9 @@ export default function Login() {
               </label>
               <button
                 type="button"
-                onClick={() => navigate("verify-notice")}
-                className="text-red-600 hover:underline hover:text-red-800 bg-transparent p-0 m-0 border-none cursor-pointer"
+                onClick={handleForgotPassword}
+                style={{ color: '#FF0000' }}
+                className="hover:text-[#CC0000] hover:underline font-medium cursor-pointer"
               >
                 Quên mật khẩu?
               </button>
