@@ -21,7 +21,7 @@
 }
 
 .chat-icon:hover .bot-img {
-  content: url('src/assets/bot_icon.png');
+  content: url('/bot_icon.png');
   object-fit: cover;
 }
 
