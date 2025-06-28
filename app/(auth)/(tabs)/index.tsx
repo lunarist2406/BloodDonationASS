@@ -59,6 +59,44 @@ export default function HomeScreen() {
     { label: 'Sinh mạng cứu sống', value: '856', icon: 'heart' },
   ];
 
+  const donationSteps = [
+    {
+      id: 1,
+      title: 'Đăng ký',
+      description: 'Điền thông tin cá nhân và lịch sử sức khỏe',
+      icon: 'clipboard-outline',
+      color: '#2196F3',
+    },
+    {
+      id: 2,
+      title: 'Kiểm tra sức khỏe',
+      description: 'Đo huyết áp, cân nặng và kiểm tra sức khỏe tổng quát',
+      icon: 'fitness-outline',
+      color: '#4CAF50',
+    },
+    {
+      id: 3,
+      title: 'Xét nghiệm máu',
+      description: 'Kiểm tra nhóm máu và các chỉ số cần thiết',
+      icon: 'water-outline',
+      color: '#FF9800',
+    },
+    {
+      id: 4,
+      title: 'Hiến máu',
+      description: 'Quá trình hiến máu an toàn và nhanh chóng',
+      icon: 'heart-outline',
+      color: '#E91E63',
+    },
+    {
+      id: 5,
+      title: 'Nghỉ ngơi',
+      description: 'Thư giãn và bổ sung dinh dưỡng sau khi hiến máu',
+      icon: 'cafe-outline',
+      color: '#9C27B0',
+    },
+  ];
+
   const newsItems = [
     {
       id: 1,
@@ -119,37 +157,36 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {/* Video Banner */}
-        {/* Blood Banner Title */}
-        <View
-          style={{
-            borderWidth: 1,
-            borderColor: '#C2185B',
-            borderRadius: 12,
-            paddingVertical: 10,
-            paddingHorizontal: 16,
-            marginHorizontal: 32,
-            backgroundColor: '#fff0f6',
-            alignSelf: 'center',
-            marginTop: 24,
-            marginBottom: 12,
-          }}
-        >
-          <Text
-            style={{
-              fontSize: 18,
-              fontWeight: '600',
-              color: '#C2185B',
-              textAlign: 'center',
-              letterSpacing: 1.2,
-              textTransform: 'uppercase',
-              fontStyle: 'italic',
-            }}
-          >
-            Donation Blood Systems LUNARIST 
-          </Text>
+        {/* Beautiful Video Title */}
+        <View style={styles.videoTitleContainer}>
+          <View style={styles.titleDecoration}>
+            <View style={styles.heartIcon}>
+              <Ionicons name="heart" size={16} color="#E91E63" />
+            </View>
+            <View style={styles.titleLine} />
+            <View style={styles.heartIcon}>
+              <Ionicons name="heart" size={16} color="#E91E63" />
+            </View>
+          </View>
+          
+          <View style={styles.mainTitleContainer}>
+            <Text style={styles.mainTitle}>LUNARIST</Text>
+            <Text style={styles.subTitle}>Blood Donation System</Text>
+            <Text style={styles.motto}>💝 Mỗi giọt máu - Một sự sống 💝</Text>
+          </View>
+          
+          <View style={styles.titleDecoration}>
+            <View style={styles.heartIcon}>
+              <Ionicons name="heart" size={16} color="#E91E63" />
+            </View>
+            <View style={styles.titleLine} />
+            <View style={styles.heartIcon}>
+              <Ionicons name="heart" size={16} color="#E91E63" />
+            </View>
+          </View>
         </View>
 
+        {/* Video Banner */}
         <View style={styles.videoBanner}>
           <WebView
             style={styles.video}
@@ -169,6 +206,38 @@ export default function HomeScreen() {
               <Text style={styles.statLabel}>{stat.label}</Text>
             </View>
           ))}
+        </View>
+
+        {/* Blood Donation Steps */}
+        <View style={styles.stepsContainer}>
+          <Text style={styles.sectionTitle}>Quy trình hiến máu</Text>
+          <Text style={styles.sectionSubtitle}>5 bước đơn giản để trở thành người hiến máu</Text>
+          
+          <View style={styles.stepsWrapper}>
+            {donationSteps.map((step, index) => (
+              <View key={step.id} style={styles.stepItem}>
+                <View style={styles.stepLeft}>
+                  <View style={[styles.stepIconContainer, { backgroundColor: step.color + '20' }]}>
+                    <Ionicons name={step.icon} size={24} color={step.color} />
+                  </View>
+                  {index < donationSteps.length - 1 && <View style={styles.stepConnector} />}
+                </View>
+                
+                <View style={styles.stepContent}>
+                  <View style={styles.stepHeader}>
+                    <Text style={styles.stepNumber}>Bước {step.id}</Text>
+                    <Text style={styles.stepTitle}>{step.title}</Text>
+                  </View>
+                  <Text style={styles.stepDescription}>{step.description}</Text>
+                </View>
+              </View>
+            ))}
+          </View>
+          
+          <TouchableOpacity style={styles.startDonationButton}>
+            <Ionicons name="heart" size={20} color="#fff" style={styles.buttonIcon} />
+            <Text style={styles.startDonationText}>Bắt đầu hiến máu</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Main Features */}
@@ -320,44 +389,80 @@ const styles = StyleSheet.create({
   filterIcon: {
     padding: 5,
   },
+  // Beautiful Video Title Styles
+  videoTitleContainer: {
+    marginHorizontal: 20,
+    marginTop: 24,
+    marginBottom: 16,
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  titleDecoration: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 8,
+  },
+  heartIcon: {
+    backgroundColor: '#fce4ec',
+    borderRadius: 12,
+    padding: 6,
+  },
+  titleLine: {
+    flex: 1,
+    height: 2,
+    backgroundColor: '#E91E63',
+    marginHorizontal: 12,
+    borderRadius: 1,
+  },
+  mainTitleContainer: {
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  mainTitle: {
+    fontSize: 28,
+    fontWeight: '800',
+    color: '#E91E63',
+    letterSpacing: 3,
+    textShadowColor: 'rgba(233, 30, 99, 0.3)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
+  },
+  subTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#666',
+    marginTop: 4,
+    letterSpacing: 1,
+  },
+  motto: {
+    fontSize: 14,
+    color: '#E91E63',
+    marginTop: 8,
+    fontStyle: 'italic',
+    textAlign: 'center',
+  },
   videoBanner: {
     margin: 20,
     borderRadius: 15,
     overflow: 'hidden',
     height: 200,
     position: 'relative',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 8,
   },
   video: {
     width: '100%',
     height: '100%',
-  },
-  videoOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  videoTitle: {
-    color: '#fff',
-    fontSize: 24,
-    fontWeight: '700',
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  videoSubtitle: {
-    color: '#fff',
-    fontSize: 16,
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  playButton: {
-    backgroundColor: 'rgba(233, 30, 99, 0.8)',
-    borderRadius: 30,
-    padding: 15,
   },
   statsContainer: {
     flexDirection: 'row',
@@ -393,6 +498,94 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#666',
     textAlign: 'center',
+  },
+  // Blood Donation Steps Styles
+  stepsContainer: {
+    backgroundColor: '#fff',
+    marginHorizontal: 20,
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  sectionSubtitle: {
+    fontSize: 14,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  stepsWrapper: {
+    marginBottom: 20,
+  },
+  stepItem: {
+    flexDirection: 'row',
+    marginBottom: 20,
+  },
+  stepLeft: {
+    alignItems: 'center',
+    marginRight: 15,
+  },
+  stepIconContainer: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  stepConnector: {
+    width: 2,
+    flex: 1,
+    backgroundColor: '#e0e0e0',
+    marginTop: -8,
+  },
+  stepContent: {
+    flex: 1,
+    paddingTop: 5,
+  },
+  stepHeader: {
+    marginBottom: 8,
+  },
+  stepNumber: {
+    fontSize: 12,
+    color: '#E91E63',
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  stepTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#333',
+  },
+  stepDescription: {
+    fontSize: 14,
+    color: '#666',
+    lineHeight: 20,
+  },
+  startDonationButton: {
+    backgroundColor: '#E91E63',
+    borderRadius: 15,
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#E91E63',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  buttonIcon: {
+    marginRight: 8,
+  },
+  startDonationText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '700',
   },
   featuresContainer: {
     paddingHorizontal: 20,
