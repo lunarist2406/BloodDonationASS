@@ -77,29 +77,58 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps & { userId
 // Đánh dấu đã đọc 1 thông báo
 const handleMarkAsRead = async (id: string) => {
   try {
-    await api.patch(`/api/v1/notifications/mark-read/${id}`);
+    const token = localStorage.getItem('token');
+    await api.patch(
+      `/api/v1/notifications/mark-read/${id}`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
     setNotifications(prev =>
       prev.map(n => (n.id === id ? { ...n, isRead: true } : n))
     );
+
     if (onMarkAsRead) onMarkAsRead(id);
   } catch (err) {
-    // Xử lý lỗi nếu cần
+    console.error('Mark as read error:', err);
   }
 };
+
 
 // Đánh dấu tất cả đã đọc
 const handleMarkAllAsRead = async () => {
   try {
-    await api.patch(`/api/v1/notifications/mark-all-read`);
+    const token = localStorage.getItem('token');
+    const userStr = localStorage.getItem('user');
+    const user = userStr ? JSON.parse(userStr) : null;
+    const userId = user?.user_id;
+    console.log('🔑 Token exists:', !!token);
+    console.log('🔑 Token value:', token?.substring(0, 20) + '...');
+    console.log('👤 userId:', userId);
+
+    if (!token || !userId) {
+      console.error('❌ Token hoặc userId bị thiếu!');
+      return;
+    }
+
+    const response = await api.patch(`/api/v1/notifications/mark-all-read`,{},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
     setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
     if (onMarkAllAsRead) onMarkAllAsRead();
+    console.log('✅ Response:', response);
   } catch (err) {
     console.error('Lỗi mark-all-read:', err);
-    // Nếu muốn xem rõ hơn:
     if (err.response) {
       console.error('Response:', err.response);
     }
-    // Có thể alert hoặc toast cho user nếu cần
   }
 }
 

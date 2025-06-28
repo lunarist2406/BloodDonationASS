@@ -8,15 +8,6 @@ export const api = axios.create({
   },
 });
 
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers = config.headers || {};
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
 // // Thêm interceptor để tự động thêm token vào header
 // api.interceptors.request.use(
 //   (config) => {
