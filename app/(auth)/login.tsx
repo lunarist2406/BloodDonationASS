@@ -44,7 +44,7 @@ export default function LoginScreen() {
     try {
       const { token, user } = await login(email.trim(), password.trim());
       if (token) {
-        router.replace("/(tabs)");
+        router.replace("/(auth)/(tabs)");
       } else {
         Alert.alert("Lỗi", "Không nhận được token từ server");
       }
