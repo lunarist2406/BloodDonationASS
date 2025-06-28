@@ -1,4 +1,4 @@
-import { useAuth } from "@/hooks/auth/useAuth";
+import { useAuth } from '@/hooks/auth/useAuthContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -32,7 +32,7 @@ export default function LoginScreen() {
     }
 
     try {
-      const { token, user } = await login(email.trim(), password.trim());
+    const { token, user } = await login(email.trim(), password.trim());
       if (token) {
         router.replace("/(auth)/(tabs)");
       } else {

@@ -11,8 +11,8 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
-import { useAuth } from '@/hooks/auth/useAuth';
 import { router } from 'expo-router';
+import { useAuth } from '@/hooks/auth/useAuthContext';
 
 export default function SettingScreen() {
   const { logout } = useAuth();

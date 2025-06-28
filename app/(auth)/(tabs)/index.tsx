@@ -1,3 +1,4 @@
+import useUser from '@/hooks/user/useUser';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import React, { useState } from 'react';
@@ -16,8 +17,8 @@ import { WebView } from 'react-native-webview';
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export default function HomeScreen() {
+  const {userData} = useUser();
   const [searchText, setSearchText] = useState('');
-
   const mainFeatures = [
     {
       id: 1,
@@ -130,7 +131,7 @@ export default function HomeScreen() {
             
             <View style={styles.headerInfo}>
               <Text style={styles.greeting}>Xin chào!</Text>
-              <Text style={styles.userName}>Ayushman</Text>
+              <Text style={styles.userName}>{userData?.data.fullname}</Text>
             </View>
             
             <TouchableOpacity style={styles.notificationIcon}>
