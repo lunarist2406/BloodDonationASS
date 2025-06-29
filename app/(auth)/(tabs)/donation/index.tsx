@@ -1,9 +1,11 @@
+import { useDonateBlood } from '@/hooks/Donate/useDonateBlood';
 import { useHealth } from '@/hooks/HealthInfor/useUser';
 import useUser from '@/hooks/user/useUser';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import React, { useEffect, useState } from 'react';
 import {
+  Alert,
     Animated,
     Dimensions,
     Modal,
@@ -16,6 +18,10 @@ import {
     View
 } from 'react-native';
 
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { Picker } from '@react-native-picker/picker';
+import useCentral from '@/hooks/central/useCentral';
+import Toast from 'react-native-toast-message';
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 export default function DonationScreen() {
@@ -998,7 +1004,52 @@ function HealthInfoForm({ onBack, onNext }: { onBack: () => void; onNext: () => 
 }
 
 
-function ConfirmForm({ onBack, onSubmit }: { onBack: () => void; onSubmit: () => void }) {
+
+export function ConfirmForm({ onBack, onSubmit }: { onBack: () => void; onSubmit: () => void }) {
+  const { createDonateBlood } = useDonateBlood();
+  const { central } = useCentral();
+
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [selectedCenter, setSelectedCenter] = useState<string | null>(null); // ép chuỗi ID
+
+  const handleSubmit = async () => {
+    if (!selectedCenter) {
+      Toast.show({
+        type: 'error',
+        text1: 'Vui lòng chọn trung tâm hiến máu!',
+        position: 'top',
+      });
+      return;
+    }
+
+    try {
+      const payload = {
+        date_donate: selectedDate.toISOString(),
+        centralBlood_id: Number(selectedCenter),
+      };
+
+      await createDonateBlood(payload);
+
+      Toast.show({
+        type: 'success',
+        text1: 'Đăng ký thành công 🎉',
+        text2: 'Cảm ơn bạn đã tham gia hiến máu 💖',
+        position: 'top',
+        visibilityTime: 3000,
+      });
+
+      onSubmit();
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Đã xảy ra lỗi khi gửi đơn',
+        text2: 'Vui lòng thử lại sau.',
+        position: 'top',
+      });
+      console.log("Lỗi khi gửi đơn:", error);
+    }
+  };
   return (
     <View style={styles.formContainer}>
       <TouchableOpacity style={styles.backButtonForm} onPress={onBack}>
@@ -1008,17 +1059,60 @@ function ConfirmForm({ onBack, onSubmit }: { onBack: () => void; onSubmit: () =>
 
       <Text style={styles.formTitle}>Xác nhận đơn đăng ký</Text>
 
-      <Text style={styles.confirmText}>
-        Vui lòng kiểm tra lại toàn bộ thông tin bạn đã nhập. Nếu đã chính xác, nhấn nút bên dưới để hoàn tất đăng ký.
-      </Text>
+      {/* Chọn ngày hiến máu */}
+      <View style={styles.inputGroup}>
+        <Text style={styles.inputLabel}>Ngày hiến máu</Text>
+        <TouchableOpacity
+          onPress={() => setShowDatePicker(true)}
+          style={[styles.inputContainer, { paddingVertical: 12 }]}
+        >
+          <Ionicons name="calendar" size={20} color="#E91E63" style={styles.inputIcon} />
+          <Text style={styles.textInput}>{selectedDate.toLocaleDateString()}</Text>
+        </TouchableOpacity>
+        {showDatePicker && (
+          <DateTimePicker
+        value={selectedDate}
+        mode="date"
+        display="default"
+        onChange={(event, date) => {
+          setShowDatePicker(false);
+          if (date) setSelectedDate(date);
+        }}
+          />
+        )}
+      </View>
 
-      <TouchableOpacity style={styles.submitButton} onPress={onSubmit}>
+      {/* Chọn trung tâm hiến máu */}
+      <View style={[styles.inputGroup, { minHeight: 100 }]}>
+        <Text style={styles.inputLabel}>Trung tâm hiến máu</Text>
+        <View style={[styles.inputContainer, { paddingVertical: 0, minHeight: 60 }]}>
+          <Ionicons name="business-outline" size={20} color="#E91E63" style={styles.inputIcon} />
+          <Picker
+        selectedValue={selectedCenter}
+        onValueChange={(itemValue) => setSelectedCenter(itemValue)}
+        style={{ flex: 1, height: 50 }}
+        dropdownIconColor="#E91E63"
+          >
+        <Picker.Item label="-- Chọn trung tâm --" value={null} />
+        {central?.map((item) => (
+          <Picker.Item
+            key={item.centralBlood_id}
+            label={`${item.centralBlood_name} - ${item.centralBlood_address}`}
+            value={String(item.centralBlood_id)}
+          />
+        ))}
+          </Picker>
+        </View>
+      </View>
+
+      <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
         <Ionicons name="checkmark-circle-outline" size={20} color="#fff" />
         <Text style={styles.submitButtonText}>Xác nhận và gửi đơn</Text>
       </TouchableOpacity>
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
