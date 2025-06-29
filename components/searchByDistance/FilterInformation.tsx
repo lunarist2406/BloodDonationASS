@@ -187,14 +187,14 @@ export default function FilterInformationUI({
           <Text style={styles.pickerLabel}>Hoặc chọn trung tâm</Text>
           <View style={styles.pickerWrapper}>
             <Picker
-              selectedValue={selectedCenter ?? "none"}
+              selectedValue={selectedCenter ?? null}
               onValueChange={(value) => {
-                handleCenterChange(value === "none" ? null : value);
+                handleCenterChange(value === null ? null : value);
               }}
               style={styles.picker}
               enabled={!useCurrentLocation}
             >
-              <Picker.Item label="Chọn trung tâm hiến máu" value="none" />
+              <Picker.Item label="Chọn trung tâm hiến máu" value={null} />
               {central.map((c) => (
                 <Picker.Item
                   key={c.centralBlood_id}
