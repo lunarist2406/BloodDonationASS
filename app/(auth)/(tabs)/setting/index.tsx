@@ -13,12 +13,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { useAuth } from '@/hooks/auth/useAuthContext';
+import { useHealth } from '@/hooks/HealthInfor/useUser';
 
 export default function SettingScreen() {
   const { logout } = useAuth();
   const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);
   const [locationEnabled, setLocationEnabled] = React.useState(true);
-
+  const {userHealth} = useHealth();
+  console.log("User Health:",userHealth)
   const handleLogoutConfirmed = async () => {
     await logout();
     console.log('Logged out');

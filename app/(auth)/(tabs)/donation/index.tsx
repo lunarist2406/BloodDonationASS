@@ -1,19 +1,20 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  StatusBar,
-  TextInput,
-  Modal,
-  Animated,
-  Dimensions,
-  FlatList,
-} from 'react-native';
+import { useHealth } from '@/hooks/HealthInfor/useUser';
+import useUser from '@/hooks/user/useUser';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
+import React, { useEffect, useState } from 'react';
+import {
+    Animated,
+    Dimensions,
+    Modal,
+    ScrollView,
+    StatusBar,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View
+} from 'react-native';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -622,11 +623,13 @@ function SortModal({ visible, onClose, sortBy, sortOrder, onSortChange }: any) {
 }
 
 // Register Modal Component (giữ nguyên như trước)
+type Step = 'healthInfo' | 'userInfo' | 'confirm';
+
 function RegisterModal({ visible, onClose }: { visible: boolean; onClose: () => void }) {
-  const [currentStep, setCurrentStep] = useState<'userInfo' | 'healthInfo'>('userInfo');
+  const [currentStep, setCurrentStep] = useState<Step>('healthInfo');
   const slideAnim = useState(new Animated.Value(SCREEN_HEIGHT))[0];
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (visible) {
       Animated.spring(slideAnim, {
         toValue: 0,
@@ -650,20 +653,15 @@ function RegisterModal({ visible, onClose }: { visible: boolean; onClose: () => 
       useNativeDriver: true,
     }).start(() => {
       onClose();
-      setCurrentStep('userInfo');
+      setCurrentStep('healthInfo');
     });
   };
 
   return (
     <Modal visible={visible} transparent animationType="fade">
       <View style={styles.modalOverlay}>
-        <Animated.View 
-          style={[
-            styles.modalContainer,
-            { transform: [{ translateY: slideAnim }] }
-          ]}
-        >
-          {/* Modal Header */}
+        <Animated.View style={[styles.modalContainer, { transform: [{ translateY: slideAnim }] }]}>
+          {/* Header */}
           <View style={styles.modalHeader}>
             <View style={styles.modalHandle} />
             <Text style={styles.modalTitle}>Đăng ký hiến máu</Text>
@@ -674,49 +672,51 @@ function RegisterModal({ visible, onClose }: { visible: boolean; onClose: () => 
 
           {/* Step Indicator */}
           <View style={styles.stepIndicator}>
-            <View style={styles.stepItem}>
-              <View style={[
-                styles.stepCircle,
-                currentStep === 'userInfo' && styles.activeStepCircle
-              ]}>
-                <Ionicons 
-                  name="person-outline" 
-                  size={16} 
-                  color={currentStep === 'userInfo' ? '#fff' : '#666'} 
-                />
-              </View>
-              <Text style={[
-                styles.stepLabel,
-                currentStep === 'userInfo' && styles.activeStepLabel
-              ]}>Thông tin cá nhân</Text>
-            </View>
-            
-            <View style={styles.stepConnector} />
-            
-            <View style={styles.stepItem}>
-              <View style={[
-                styles.stepCircle,
-                currentStep === 'healthInfo' && styles.activeStepCircle
-              ]}>
-                <Ionicons 
-                  name="heart-outline" 
-                  size={16} 
-                  color={currentStep === 'healthInfo' ? '#fff' : '#666'} 
-                />
-              </View>
-              <Text style={[
-                styles.stepLabel,
-                currentStep === 'healthInfo' && styles.activeStepLabel
-              ]}>Thông tin sức khỏe</Text>
-            </View>
+            {['healthInfo', 'userInfo', 'confirm'].map((step, index) => (
+              <React.Fragment key={step}>
+                <View style={styles.stepItem}>
+                  <View style={[styles.stepCircle, currentStep === step && styles.activeStepCircle]}>
+                    <Ionicons
+                      name={
+                        step === 'healthInfo'
+                          ? 'heart-outline'
+                          : step === 'userInfo'
+                          ? 'person-outline'
+                          : 'document-text-outline'
+                      }
+                      size={16}
+                      color={currentStep === step ? '#fff' : '#666'}
+                    />
+                  </View>
+                  <Text style={[styles.stepLabel, currentStep === step && styles.activeStepLabel]}>
+                    {step === 'healthInfo'
+                      ? 'Sức khỏe'
+                      : step === 'userInfo'
+                      ? 'Cá nhân'
+                      : 'Xác nhận'}
+                  </Text>
+                </View>
+                {index < 2 && <View style={styles.stepConnector} />}
+              </React.Fragment>
+            ))}
           </View>
 
-          {/* Content */}
+          {/* Form Content */}
           <ScrollView style={styles.modalContent} showsVerticalScrollIndicator={false}>
-            {currentStep === 'userInfo' ? (
-              <UserInfoForm onNext={() => setCurrentStep('healthInfo')} />
-            ) : (
-              <HealthInfoForm onBack={() => setCurrentStep('userInfo')} onSubmit={handleClose} />
+                {currentStep === 'healthInfo' && (
+                <HealthInfoForm
+                    onBack={handleClose}
+                    onNext={() => setCurrentStep('userInfo')} // ✅ đổi từ onSubmit sang onNext
+                />
+                )}
+            {currentStep === 'userInfo' && (
+              <UserInfoForm
+                onNext={() => setCurrentStep('confirm')}
+                onBack={() => setCurrentStep('healthInfo')}
+              />
+            )}
+            {currentStep === 'confirm' && (
+              <ConfirmForm onBack={() => setCurrentStep('userInfo')} onSubmit={handleClose} />
             )}
           </ScrollView>
         </Animated.View>
@@ -725,73 +725,127 @@ function RegisterModal({ visible, onClose }: { visible: boolean; onClose: () => 
   );
 }
 
+
 // User Info Form Component (giữ nguyên)
-function UserInfoForm({ onNext }: { onNext: () => void }) {
+function formatDate(iso: string): string {
+  const date = new Date(iso);
+  return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+}
+
+function UserInfoForm({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
+  const { userData } = useUser();
+  const user = userData?.data;
+
   return (
     <View style={styles.formContainer}>
+      <TouchableOpacity style={styles.backButtonForm} onPress={onBack}>
+        <Ionicons name="chevron-back" size={20} color="#E91E63" />
+        <Text style={styles.backButtonText}>Quay lại</Text>
+      </TouchableOpacity>
+
       <Text style={styles.formTitle}>Thông tin cá nhân</Text>
-      
+
+      {/* Họ và tên */}
       <View style={styles.inputGroup}>
         <Text style={styles.inputLabel}>Họ và tên *</Text>
         <View style={styles.inputContainer}>
           <Ionicons name="person-outline" size={20} color="#E91E63" style={styles.inputIcon} />
-          <TextInput
-            style={styles.textInput}
-            placeholder="Nhập họ và tên"
-            placeholderTextColor="#999"
-          />
+          <TextInput style={styles.textInput} value={user?.fullname} editable={false} />
         </View>
       </View>
 
+      {/* Ngày sinh và giới tính */}
       <View style={styles.inputRow}>
         <View style={styles.inputHalf}>
-          <Text style={styles.inputLabel}>Tuổi *</Text>
+          <Text style={styles.inputLabel}>Ngày sinh *</Text>
           <View style={styles.inputContainer}>
             <Ionicons name="calendar-outline" size={20} color="#E91E63" style={styles.inputIcon} />
             <TextInput
               style={styles.textInput}
-              placeholder="25"
-              keyboardType="numeric"
-              placeholderTextColor="#999"
+              value={user?.dob ? formatDate(user.dob) : ''}
+              editable={false}
             />
           </View>
         </View>
-        
+
         <View style={styles.inputHalf}>
-          <Text style={styles.inputLabel}>Nhóm máu *</Text>
+          <Text style={styles.inputLabel}>Giới tính *</Text>
           <View style={styles.inputContainer}>
-            <Ionicons name="water-outline" size={20} color="#E91E63" style={styles.inputIcon} />
-            <TextInput
-              style={styles.textInput}
-              placeholder="A+"
-              placeholderTextColor="#999"
-            />
+            <Ionicons name="transgender-outline" size={20} color="#E91E63" style={styles.inputIcon} />
+            <TextInput style={styles.textInput} value={user?.gender} editable={false} />
           </View>
         </View>
       </View>
 
+      {/* Số điện thoại */}
       <View style={styles.inputGroup}>
         <Text style={styles.inputLabel}>Số điện thoại *</Text>
         <View style={styles.inputContainer}>
           <Ionicons name="call-outline" size={20} color="#E91E63" style={styles.inputIcon} />
-          <TextInput
-            style={styles.textInput}
-            placeholder="0123456789"
-            keyboardType="phone-pad"
-            placeholderTextColor="#999"
-          />
+          <TextInput style={styles.textInput} value={user?.phone} editable={false} />
         </View>
       </View>
 
+      {/* Email */}
       <View style={styles.inputGroup}>
-        <Text style={styles.inputLabel}>Địa chỉ *</Text>
+        <Text style={styles.inputLabel}>Email *</Text>
         <View style={styles.inputContainer}>
-          <Ionicons name="location-outline" size={20} color="#E91E63" style={styles.inputIcon} />
-          <TextInput
-            style={styles.textInput}
-            placeholder="Nhập địa chỉ"
-            placeholderTextColor="#999"
-          />
+          <Ionicons name="mail-outline" size={20} color="#E91E63" style={styles.inputIcon} />
+          <TextInput style={styles.textInput} value={user?.email} editable={false} />
+        </View>
+      </View>
+
+      {/* Số nhà và đường */}
+      <View style={styles.inputRow}>
+        <View style={styles.inputHalf}>
+          <Text style={styles.inputLabel}>Số nhà *</Text>
+          <View style={styles.inputContainer}>
+            <Ionicons name="home-outline" size={20} color="#E91E63" style={styles.inputIcon} />
+            <TextInput
+              style={styles.textInput}
+              value={user?.location_id?.house_number || ''}
+              editable={false}
+            />
+          </View>
+        </View>
+
+        <View style={styles.inputHalf}>
+          <Text style={styles.inputLabel}>Đường *</Text>
+          <View style={styles.inputContainer}>
+            <Ionicons name="navigate-outline" size={20} color="#E91E63" style={styles.inputIcon} />
+            <TextInput
+              style={styles.textInput}
+              value={user?.location_id?.road || ''}
+              editable={false}
+            />
+          </View>
+        </View>
+      </View>
+
+      {/* Quận và Thành Phố */}
+      <View style={styles.inputRow}>
+        <View style={styles.inputHalf}>
+          <Text style={styles.inputLabel}>Quận *</Text>
+          <View style={styles.inputContainer}>
+            <Ionicons name="business-outline" size={20} color="#E91E63" style={styles.inputIcon} />
+            <TextInput
+              style={styles.textInput}
+              value={user?.location_id?.district || ''}
+              editable={false}
+            />
+          </View>
+        </View>
+
+        <View style={styles.inputHalf}>
+          <Text style={styles.inputLabel}>Thành Phố *</Text>
+          <View style={styles.inputContainer}>
+            <Ionicons name="map-outline" size={20} color="#E91E63" style={styles.inputIcon} />
+            <TextInput
+              style={styles.textInput}
+              value={user?.location_id?.city || ''}
+              editable={false}
+            />
+          </View>
         </View>
       </View>
 
@@ -804,7 +858,9 @@ function UserInfoForm({ onNext }: { onNext: () => void }) {
 }
 
 // Health Info Form Component (giữ nguyên)
-function HealthInfoForm({ onBack, onSubmit }: { onBack: () => void; onSubmit: () => void }) {
+function HealthInfoForm({ onBack, onNext }: { onBack: () => void; onNext: () => void }) {
+  const { userHealth } = useHealth();
+
   return (
     <View style={styles.formContainer}>
       <TouchableOpacity style={styles.backButtonForm} onPress={onBack}>
@@ -813,65 +869,152 @@ function HealthInfoForm({ onBack, onSubmit }: { onBack: () => void; onSubmit: ()
       </TouchableOpacity>
 
       <Text style={styles.formTitle}>Thông tin sức khỏe</Text>
-      
+
+      {/* Họ tên */}
+      <View style={styles.inputGroup}>
+        <Text style={styles.inputLabel}>Tên người điền</Text>
+        <View style={styles.inputContainer}>
+          <Ionicons name="person-outline" size={20} color="#E91E63" style={styles.inputIcon} />
+          <TextInput style={styles.textInput} value={userHealth?.user_id?.fullname || ''} editable={false} />
+        </View>
+      </View>
+
+      {/* Cân nặng & Chiều cao */}
       <View style={styles.inputRow}>
         <View style={styles.inputHalf}>
-          <Text style={styles.inputLabel}>Cân nặng (kg) *</Text>
+          <Text style={styles.inputLabel}>Cân nặng (kg)</Text>
           <View style={styles.inputContainer}>
             <Ionicons name="fitness-outline" size={20} color="#E91E63" style={styles.inputIcon} />
             <TextInput
               style={styles.textInput}
-              placeholder="65"
-              keyboardType="numeric"
-              placeholderTextColor="#999"
+              value={userHealth?.weight_decimal?.toString() || ''}
+              editable={false}
             />
           </View>
         </View>
-        
+
         <View style={styles.inputHalf}>
-          <Text style={styles.inputLabel}>Chiều cao (cm) *</Text>
+          <Text style={styles.inputLabel}>Chiều cao (cm)</Text>
           <View style={styles.inputContainer}>
             <Ionicons name="resize-outline" size={20} color="#E91E63" style={styles.inputIcon} />
             <TextInput
               style={styles.textInput}
-              placeholder="170"
-              keyboardType="numeric"
-              placeholderTextColor="#999"
+              value={userHealth?.height?.toString() || ''}
+              editable={false}
             />
           </View>
         </View>
       </View>
 
-      <View style={styles.inputGroup}>
-        <Text style={styles.inputLabel}>Huyết áp *</Text>
-        <View style={styles.inputContainer}>
-          <Ionicons name="heart-outline" size={20} color="#E91E63" style={styles.inputIcon} />
-          <TextInput
-            style={styles.textInput}
-            placeholder="120/80"
-            placeholderTextColor="#999"
-          />
+      {/* Huyết áp */}
+      <View style={styles.inputRow}>
+        {/* Huyết áp */}
+        <View style={styles.inputHalf}>
+          <Text style={styles.inputLabel}>Huyết áp</Text>
+          <View style={styles.inputContainer}>
+        <Ionicons name="heart-outline" size={20} color="#E91E63" style={styles.inputIcon} />
+        <TextInput
+          style={styles.textInput}
+          value={userHealth?.blood_pressure?.toString() || ''}
+          editable={false}
+        />
+          </View>
+        </View>
+        {/* Nhóm máu */}
+        <View style={styles.inputHalf}>
+          <Text style={styles.inputLabel}>Nhóm máu</Text>
+          <View style={styles.inputContainer}>
+        <Ionicons name="water-outline" size={20} color="#E91E63" style={styles.inputIcon} />
+        <TextInput
+          style={styles.textInput}
+          value={userHealth?.blood_id?.blood_id || ''}
+          editable={false}
+        />
+          </View>
         </View>
       </View>
-
+      <View style={styles.inputRow}>
+        {/* Lần hiến máu gần nhất và Tình trạng sức khỏe trên cùng 1 dòng */}
+        <View style={styles.inputHalf}>
+          <Text style={styles.inputLabel}>Lần hiến máu gần nhất</Text>
+          <View style={styles.inputContainer}>
+        <Ionicons name="calendar-outline" size={20} color="#E91E63" style={styles.inputIcon} />
+        <TextInput
+          style={styles.textInput}
+          value={userHealth?.latest_donate?.slice(0, 10) || ''}
+          editable={false}
+        />
+          </View>
+        </View>
+        <View style={styles.inputHalf}>
+          <Text style={styles.inputLabel}>Tình trạng hiện tại</Text>
+          <View style={styles.inputContainer}>
+        <Ionicons name="pulse-outline" size={20} color="#E91E63" style={styles.inputIcon} />
+        <TextInput
+          style={styles.textInput}
+          value={userHealth?.status_health || ''}
+          editable={false}
+        />
+          </View>
+        </View>
+      </View>
+      {/* Tiền sử bệnh */}
       <View style={styles.inputGroup}>
         <Text style={styles.inputLabel}>Tiền sử bệnh lý</Text>
         <View style={[styles.inputContainer, styles.textAreaContainer]}>
           <Ionicons name="medical-outline" size={20} color="#E91E63" style={styles.inputIcon} />
           <TextInput
             style={[styles.textInput, styles.textArea]}
-            placeholder="Mô tả tiền sử bệnh lý (nếu có)"
             multiline
             numberOfLines={4}
             textAlignVertical="top"
-            placeholderTextColor="#999"
+            value={userHealth?.medical_history || ''}
+            editable={false}
           />
         </View>
       </View>
 
+      {/* Lần hiến máu gần nhất */}
+
+
+      {/* Ảnh giấy khám sức khỏe */}
+      {userHealth?.img_health && (
+        <View style={styles.inputGroup}>
+          <Text style={styles.inputLabel}>Ảnh giấy khám sức khỏe</Text>
+          <Image
+            source={{ uri: userHealth.img_health }}
+            style={{ width: '100%', height: 200, borderRadius: 8, marginTop: 8 }}
+            contentFit="contain"
+          />
+        </View>
+      )}
+
+      <TouchableOpacity style={styles.nextButton} onPress={onNext}>
+        <Text style={styles.nextButtonText}>Tiếp theo</Text>
+        <Ionicons name="chevron-forward" size={20} color="#fff" />
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+
+function ConfirmForm({ onBack, onSubmit }: { onBack: () => void; onSubmit: () => void }) {
+  return (
+    <View style={styles.formContainer}>
+      <TouchableOpacity style={styles.backButtonForm} onPress={onBack}>
+        <Ionicons name="chevron-back" size={20} color="#E91E63" />
+        <Text style={styles.backButtonText}>Quay lại</Text>
+      </TouchableOpacity>
+
+      <Text style={styles.formTitle}>Xác nhận đơn đăng ký</Text>
+
+      <Text style={styles.confirmText}>
+        Vui lòng kiểm tra lại toàn bộ thông tin bạn đã nhập. Nếu đã chính xác, nhấn nút bên dưới để hoàn tất đăng ký.
+      </Text>
+
       <TouchableOpacity style={styles.submitButton} onPress={onSubmit}>
         <Ionicons name="checkmark-circle-outline" size={20} color="#fff" />
-        <Text style={styles.submitButtonText}>Hoàn thành đăng ký</Text>
+        <Text style={styles.submitButtonText}>Xác nhận và gửi đơn</Text>
       </TouchableOpacity>
     </View>
   );
