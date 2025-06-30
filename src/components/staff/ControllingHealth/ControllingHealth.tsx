@@ -356,8 +356,9 @@ export default function ControllingHealth() {
                 icon={<ReloadOutlined />} 
                 onClick={() => fetchData(pagination.current, pagination.pageSize)}
               >
+
                 Tải lại
-              </Button>
+                </Button>
             </div>
           </div>
 
