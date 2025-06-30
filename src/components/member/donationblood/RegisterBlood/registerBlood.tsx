@@ -19,6 +19,10 @@ export default function RegisterBlood() {
     "health"
   );
 
+const [refresh, setRefresh] = useState(false);
+
+  const handleRefresh = () => setRefresh(prev => !prev);
+
 
   return (
     <div className="flex flex-col bg-gradient-to-b from-red-100 to-red-300 min-h-screen">
@@ -77,7 +81,7 @@ export default function RegisterBlood() {
                   />
                   <span className="text-white">Điền Thông Tin Sức Khỏe</span>
                 </button>
-                <FormRegisterBlood />
+                <FormRegisterBlood onSuccess={handleRefresh} />
               </motion.div>
             )}
           </AnimatePresence>
@@ -90,7 +94,7 @@ export default function RegisterBlood() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <RegisterBloodTable/>
+          <RegisterBloodTable refresh={refresh} />
         </motion.div>
       </div>
 

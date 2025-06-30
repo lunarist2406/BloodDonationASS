@@ -237,6 +237,7 @@ export default function FormHealth() {
               { label: "Tim mạch", value: "Tim mạch" },
               { label: "Hô hấp", value: "Hô hấp" },
               { label: "Khác", value: "Khác" },
+              { label: "Không có tiền sử bệnh", value: "Không có tiền sử bệnh" },
             ]}
           />
         </Form.Item>

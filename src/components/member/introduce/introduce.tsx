@@ -16,7 +16,7 @@ export default function GuestIntroduce() {
   const navigate = useNavigate();
 
   const handleRegister = () => {
-    navigate("/register-blood");
+    navigate("register-blood");
   };
 
   // Hiệu ứng xuất hiện từ dưới lên

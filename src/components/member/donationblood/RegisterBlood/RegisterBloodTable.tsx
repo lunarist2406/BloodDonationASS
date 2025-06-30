@@ -12,7 +12,8 @@ import useDonateBloodService from "../../../../hooks/RegistrationForm/useDonateB
 import useBloodService from "../../../../hooks/Blood/useBloodService";
 import { api } from "../../../config/axios/axiosInstance";
 
-export default function RegisterBloodTable() {
+
+export default function RegisterBloodTable({ refresh }: { refresh?: boolean }) {
   const { getDonateHistoryByUser } = useDonateBloodService();
   const { getBloodById } = useBloodService();
 
@@ -24,7 +25,7 @@ export default function RegisterBloodTable() {
 
   useEffect(() => {
     fetchData(pagination.current, pagination.pageSize);
-  }, []);
+  }, [refresh]);
 
   const fetchData = async (page: number, pageSize: number) => {
     setLoading(true);
@@ -134,7 +135,11 @@ export default function RegisterBloodTable() {
               cancelText: "Không",
               onOk: async () => {
                 try {
-                  await api.patch(`/api/v1/donate-bloods/cancel-donate-schedule/${record.key}`);
+                  await api.patch(`/api/v1/donate-bloods/cancel-donate-schedule/${record.key}`,{},{
+                    headers: {
+                      Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    },
+                  });
                   message.success("Huỷ đăng ký thành công!");
                   fetchData(pagination.current, pagination.pageSize);
                 } catch (err) {
@@ -169,6 +174,7 @@ export default function RegisterBloodTable() {
           <IconClock size={20} /> Thông Tin Đã Đăng Ký
         </h2>
         <Button
+          className="cursor-pointer"
           icon={<IconReload />}
           onClick={() => fetchData(pagination.current, pagination.pageSize)}
           loading={loading}
