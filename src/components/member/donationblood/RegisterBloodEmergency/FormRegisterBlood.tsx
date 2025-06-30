@@ -18,7 +18,11 @@ import useBloodService from "../../../../hooks/Blood/useBloodService";
 
 const { Option } = Select;
 
-export default function FormRegisterReceiveEmergency() {
+interface FormRegisterReceiveEmergencyProps {
+  onSuccess?: () => void;
+}
+
+export default function FormRegisterReceiveEmergency({ onSuccess }: FormRegisterReceiveEmergencyProps) {
   const { userData } = useUser();
   const { getAllCentral } = useCentralService();
   const { createReceiver } = useReceiverService();
@@ -98,6 +102,7 @@ const payload = {
       centralBlood_id: "",
       type: ""
       });
+      onSuccess?.();
     } catch (err) {
       console.error("Lỗi đăng ký:", err);
       message.error("Đăng ký thất bại.");
@@ -348,8 +353,9 @@ const payload = {
         <div className="flex justify-center">
           <button
             type="submit"
-            className="flex items-center gap-2 bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 transition-all mt-4 text-sm"
+            className="flex items-center gap-2 bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 transition-all mt-4 text-sm cursor-pointer"
             disabled={loading}
+            style={{ color: "white" }}
           >
             <IconDroplet className="w-4 h-4" />
             Gửi Đăng Ký

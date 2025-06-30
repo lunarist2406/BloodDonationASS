@@ -233,7 +233,7 @@ export default function FormViewReceiver() {
         {/* Nút reload */}
         <button
           onClick={() => fetchData(pagination.current, pagination.pageSize)}
-          className=" hover:bg-red-400 text-white font-medium px-4 py-1.5 rounded-lg shadow flex items-center gap-2"
+          className=" hover:bg-red-400 text-white font-medium px-4 py-1.5 rounded-lg shadow flex items-center gap-2 cursor-pointer"
         >
           <IconReload /> Tải lại
         </button>

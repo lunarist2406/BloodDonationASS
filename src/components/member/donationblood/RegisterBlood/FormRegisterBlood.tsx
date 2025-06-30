@@ -16,7 +16,11 @@ import useDonateBloodService from "../../../../hooks/RegistrationForm/useDonateB
 
 const { Option } = Select;
 
-export default function FormRegisterBlood() {
+interface FormRegisterBloodProps {
+  onSuccess?: () => void;
+}
+
+export default function FormRegisterBlood({onSuccess}: FormRegisterBloodProps) {
   const { userData } = useUser();
   const { getAllCentral } = useCentralService();
   const { createDonateBlood } = useDonateBloodService();
@@ -57,6 +61,8 @@ export default function FormRegisterBlood() {
       const res = await createDonateBlood(payload);
       console.log("Kết quả trả về:", res);
       message.success("Đăng ký hiến máu thành công!");
+
+       onSuccess?.();
     } catch (err) {
       console.error("Lỗi đăng ký hiến máu:", err);
       message.error("Lỗi đăng ký hiến máu: " + (err.message || ""));
@@ -255,8 +261,9 @@ export default function FormRegisterBlood() {
 
         <button
           type="submit"
-          className="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 transition-all mt-4 text-sm"
+          className="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 transition-all mt-4 text-sm cursor-pointer"
           disabled={loading}
+          style={{color: "white"}}
         >
           Gửi đăng ký
         </button>

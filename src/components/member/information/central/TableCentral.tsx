@@ -137,7 +137,7 @@ export default function TableCentral({
           <IconBuildingBank size={22} /> Danh Sách Trung Tâm
         </h2>
         <Button icon={<ReloadOutlined />} onClick={fetchCentral}>
-          Reload
+          Tải lại
         </Button>
       </div>
 

@@ -200,7 +200,7 @@ export default function TableCentral({ onSelectCentral }) {
         </h2>
         <div className="flex gap-2">
           <Button icon={<ReloadOutlined />} onClick={fetchCentral}>
-            Reload
+            Tải lại
           </Button>
           <Button
             icon={<PlusOutlined />}

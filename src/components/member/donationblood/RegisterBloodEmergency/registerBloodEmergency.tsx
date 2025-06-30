@@ -27,6 +27,9 @@ export default function RegisterBloodEmergency() {
   const [currentStep, setCurrentStep] = useState<"health" | "register">(
     "health"
   );
+
+  const [refresh, setRefresh] = useState(false);
+const handleRefresh = () => setRefresh(prev => !prev);
   console.log("📋 Current waitingList:", waitingList);
   console.log("📋 Current formData:", formData);
   const MotionTh = ({ label, icon: Icon, delay }: MyProps) => (
@@ -102,14 +105,13 @@ export default function RegisterBloodEmergency() {
                   />
                   <span className="text-white"> Điền Thông Tin Sức Khỏe </span>
                 </button>
-                <FormRegisterBloodEmergency
-                />
+                <FormRegisterBloodEmergency onSuccess={handleRefresh} />
               </motion.div>
             )}
           </AnimatePresence>
         </div>
         <div className="col-span-13">
-            <ReceiverTable/>
+            <ReceiverTable refresh={refresh} />
         </div>
       </div>
     </div>

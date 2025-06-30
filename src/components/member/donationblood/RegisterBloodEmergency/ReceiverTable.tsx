@@ -30,7 +30,7 @@ import useBloodService from "../../../../hooks/Blood/useBloodService";
 import dayjs from "dayjs";
 import useCentralService from "../../../../hooks/CentralBlood/useCentralService";
 
-export default function ReceiverTable() {
+export default function ReceiverTable({ refresh }: { refresh?: boolean }) {
   const [dataList, setDataList] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState({
@@ -51,7 +51,7 @@ export default function ReceiverTable() {
 const [centers, setCenters] = useState([]);
   useEffect(() => {
     fetchData(pagination.current, pagination.pageSize);
-  }, []);
+  }, [refresh]);
 
   async function fetchData(page: number, pageSize: number) {
     setLoading(true);
@@ -288,6 +288,8 @@ const [centers, setCenters] = useState([]);
             layout="vertical"
             onFinish={handleEditSubmit}
             initialValues={{
+              centralBlood_id: editData.centralBlood_id?.centralBlood_id,
+              type: editData.type || "DEFAULT",
               date_receiver: editData.date_receiver ? dayjs(editData.date_receiver) : null,
               blood_id: editData.blood_id?.blood_id,
               priority: editData.priority,
