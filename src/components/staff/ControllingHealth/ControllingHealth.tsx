@@ -339,9 +339,9 @@ export default function ControllingHealth() {
                 style={{ maxWidth: 300 }}
                 allowClear
               />
-              <Button icon={<ReloadOutlined />} onClick={fetchData}>
+                <Button icon={<ReloadOutlined />} onClick={() => fetchData()}>
                 Tải lại
-              </Button>
+                </Button>
             </div>
           </div>
 
