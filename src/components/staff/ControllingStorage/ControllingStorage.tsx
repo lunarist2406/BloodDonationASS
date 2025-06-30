@@ -55,7 +55,7 @@ export default function ControllingStorage() {
         pagination.pageSize
       );
     } catch (error) {
-      message.error("Failed to load storages");
+      message.error("Không thể tải dữ liệu kho máu");
       console.error(error);
     } finally {
       setLoading(false);
@@ -93,7 +93,7 @@ export default function ControllingStorage() {
       setBloods(bloodRes.data.result);
       setCentrals(centralRes.data.result);
     } catch {
-      message.error("Failed to load bloods or centrals");
+      message.error("Không thể tải dữ liệu nhóm máu hoặc trung tâm");
     }
   };
 
@@ -107,30 +107,38 @@ export default function ControllingStorage() {
     try {
       if (editingStorage) {
         await updateStorage(editingStorage.storage_id, values);
-        message.success("Updated successfully");
+        message.success("Cập nhật thành công");
       } else {
         await createStorage(values);
-        message.success("Created successfully");
+        message.success("Tạo mới thành công");
       }
       setEditingStorage(null);
       // Reload all data after change
       fetchAllStorages();
     } catch (err) {
-      message.error("Submit failed");
+      message.error("Thao tác thất bại");
       console.error(err);
     }
   };
 
   // Delete item
-  const handleDelete = async (id) => {
-    try {
-      await deleteStorage(id);
-      message.success("Deleted successfully");
-      fetchAllStorages();
-    } catch {
-      message.error("Delete failed");
-    }
-  };
+const handleDelete = async (id) => {
+  Modal.confirm({
+    title: "Bạn có chắc chắn muốn xóa?",
+    okText: "Xóa",
+    okType: "danger",
+    cancelText: "Hủy",
+    onOk: async () => {
+      try {
+        await deleteStorage(id);
+        message.success("Xóa thành công");
+        fetchAllStorages();
+      } catch {
+        message.error("Xóa thất bại");
+      }
+    },
+  });
+};
 
   return (
     <div className="p-8 w-full overflow-hidden flex flex-col gap-6">
@@ -153,11 +161,11 @@ export default function ControllingStorage() {
               <div className="flex items-center gap-2">
                 {editingStorage ? (
                   <>
-                    <IconDatabaseEdit size={18} /> Edit Storage
+                    <IconDatabaseEdit size={18} /> Chỉnh Sửa Kho Máu
                   </>
                 ) : (
                   <>
-                    <IconDatabasePlus size={18} /> Add Storage
+                    <IconDatabasePlus size={18} /> Thêm Kho Máu
                   </>
                 )}
               </div>
@@ -178,13 +186,13 @@ export default function ControllingStorage() {
             title={
               <div className="flex items-center gap-2">
                 <IconDatabaseEdit size={18} />
-                Storages Blood
+                Danh Sách Kho Máu
               </div>
             }
             extra={
               <div className="flex gap-2">
                 <Input.Search
-                  placeholder="Search by Donor"
+                  placeholder="Tìm kiếm theo người hiến"
                   allowClear
                   className="w-64"
                   value={searchText}
@@ -213,7 +221,7 @@ export default function ControllingStorage() {
                   icon={<IconRefresh size={16} />}
                   onClick={() => fetchAllStorages()}
                 >
-                  Reload
+                  Tải Lại
                 </Button>
               </div>
             }
@@ -252,42 +260,43 @@ export default function ControllingStorage() {
         open={!!viewingStorage}
         onCancel={() => setViewingStorage(null)}
         footer={null}
-        title="Storage Details"
+        title="Chi Tiết Kho Máu"
+        cancelText="Hủy"
       >
         {viewingStorage && (
           <div className="space-y-2">
             <p>
-              <b>Storage ID:</b> {viewingStorage.storage_id}
+              <b>Mã Kho:</b> {viewingStorage.storage_id}
             </p>
             <p>
-              <b>Donate ID:</b> {viewingStorage.donate_id?.donate_id}
+              <b>Mã Hiến Máu:</b> {viewingStorage.donate_id?.donate_id}
             </p>
             <p>
-              <b>Donor Name:</b>{" "}
+              <b>Tên Người Hiến:</b>{" "}
               {viewingStorage?.donate_id?.infor_health?.user_id?.fullname ||
-                "Unknown"}
+                "Chưa rõ"}
             </p>
             <p>
-              <b>Date:</b> {dayjs(viewingStorage.date).format("YYYY-MM-DD")}
+              <b>Ngày:</b> {dayjs(viewingStorage.date).format("DD/MM/YYYY")}
             </p>
             <p>
-              <b>ML:</b> {viewingStorage.ml}
+              <b>Dung Tích (ml):</b> {viewingStorage.ml}
             </p>
             <p>
-              <b>Unit:</b> {viewingStorage.unit}
+              <b>Đơn Vị:</b> {viewingStorage.unit}
             </p>
             <p>
-              <b>Expired Date:</b>{" "}
-              {dayjs(viewingStorage.expired_date).format("YYYY-MM-DD")}
+              <b>Ngày Hết Hạn:</b>{" "}
+              {dayjs(viewingStorage.expired_date).format("DD/MM/YYYY")}
             </p>
             <p>
-              <b>Status:</b> {viewingStorage.current_status}
+              <b>Trạng Thái:</b> {viewingStorage.current_status}
             </p>
             <p>
-              <b>Center:</b> {viewingStorage.centralBlood_id?.centralBlood_name}
+              <b>Trung Tâm:</b> {viewingStorage.centralBlood_id?.centralBlood_name}
             </p>
             <p>
-              <b>Center Address:</b>{" "}
+              <b>Địa Chỉ Trung Tâm:</b>{" "}
               {viewingStorage.centralBlood_id?.centralBlood_address}
             </p>
           </div>

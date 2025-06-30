@@ -52,7 +52,7 @@ export default function ControllingHealth() {
 
   const [pagination, setPagination] = useState({
     current: 1,
-    pageSize: 10,
+    pageSize: 5,
     total: 0,
   });
 
@@ -62,14 +62,16 @@ export default function ControllingHealth() {
   // NEW: state sort info (antd passes sorter obj, but here we do local sorting)
   const [sorter, setSorter] = useState({ field: null, order: null });
 
-  const fetchData = async (current = 1, pageSize = 10) => {
+  const fetchData = async (page = pagination.current, size = pagination.pageSize) => {
     setLoading(true);
     try {
-      const res = await getAllHealthInfo(current, pageSize);
+      console.log("Fetching page:", page, "size:", size);
+      const res = await getAllHealthInfo(page, size);
+      console.log("API response:", res.data.result);
       setData(res.data.result);
       setPagination({
-        current,
-        pageSize,
+        current: page,
+        pageSize: size,
         total: res.data.meta.total,
       });
     } catch (err) {
@@ -86,11 +88,14 @@ export default function ControllingHealth() {
   const handleDelete = async (id) => {
     Modal.confirm({
       title: "Bạn có chắc muốn xóa?",
+      okText: "Xóa",
+      cancelText: "Hủy",
       onOk: async () => {
         try {
           await deleteHealthInfo(id);
           message.success("Xóa thành công!");
-          fetchData();
+          // Sau khi xóa, reload lại trang hiện tại
+          fetchData(pagination.current, pagination.pageSize);
         } catch (err) {
           message.error("Xóa thất bại!");
         }
@@ -149,7 +154,7 @@ export default function ControllingHealth() {
       message.success("Cập nhật thành công!");
       setEditModal({ open: false, record: null });
       setFileList([]);
-      fetchData();
+      fetchData(pagination.current, pagination.pageSize);
     } catch (err) {
       console.error("❌ Cập nhật thất bại:", err);
       message.error("Cập nhật thất bại!");
@@ -160,13 +165,21 @@ export default function ControllingHealth() {
     setFileList(newFileList);
   };
 
-  // Handle table change for sorting & pagination (pagination on server side, sorting local here)
-  const handleTableChange = (pagination, filters, sorter) => {
+  // Handle table change for sorting & pagination
+  const handleTableChange = (paginationConfig, filters, sorterConfig) => {
+    console.log("Table change:", paginationConfig, sorterConfig);
+    
+    // Update sorter state
     setSorter({
-      field: sorter.field,
-      order: sorter.order,
+      field: sorterConfig.field,
+      order: sorterConfig.order,
     });
-    fetchData(pagination.current, pagination.pageSize);
+
+    // Handle pagination change
+    if (paginationConfig.current !== pagination.current || 
+        paginationConfig.pageSize !== pagination.pageSize) {
+      fetchData(paginationConfig.current, paginationConfig.pageSize);
+    }
   };
 
   // Filter + sort data locally before rendering Table
@@ -339,7 +352,10 @@ export default function ControllingHealth() {
                 style={{ maxWidth: 300 }}
                 allowClear
               />
-              <Button icon={<ReloadOutlined />} onClick={fetchData}>
+              <Button 
+                icon={<ReloadOutlined />} 
+                onClick={() => fetchData(pagination.current, pagination.pageSize)}
+              >
                 Tải lại
               </Button>
             </div>
@@ -351,8 +367,13 @@ export default function ControllingHealth() {
           rowKey={(record) => record.infor_health}
           loading={loading}
           pagination={{
-            ...pagination,
-            onChange: handleTableChange,
+            current: pagination.current,
+            pageSize: pagination.pageSize,
+            total: pagination.total,
+            showSizeChanger: true,
+            // showQuickJumper: true,
+            showTotal: (total, range) =>
+              `${range[0]}-${range[1]} của ${total} mục`,
           }}
           bordered
           size="middle"
@@ -408,14 +429,15 @@ export default function ControllingHealth() {
         }}
         onOk={handleUpdate}
         okText="Cập nhật"
+        cancelText="Hủy"
       >
         <Form layout="vertical" form={form}>
           <Form.Item
             name="user_id"
             label="User ID"
-            rules={[{ required: true }]}
+            rules={[{ required: true}]}
           >
-            <Input />
+            <Input disabled/>
           </Form.Item>
           <Form.Item
             name="blood_id"
@@ -486,7 +508,7 @@ export default function ControllingHealth() {
               {fileList.length >= 5 ? null : (
                 <div>
                   <UploadOutlined />
-                  <div style={{ marginTop: 8 }}>Upload</div>
+                  <div style={{ marginTop: 8 }}>Tải lên</div>
                 </div>
               )}
             </Upload>

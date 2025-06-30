@@ -260,6 +260,8 @@ export default function ControllingDonate() {
           />
           <Popconfirm
             title="Xóa đơn đăng ký này?"
+            okText="Xóa"
+            cancelText="Hủy"
             onConfirm={() => handleDelete(record.key)}
           >
             <Button icon={<DeleteOutlined />} danger />

@@ -1,5 +1,5 @@
 import React from "react";
-import { Table, Space, Button } from "antd";
+import { Table, Space, Button, Tag } from "antd";
 import { IconEye, IconEdit, IconTrash } from "@tabler/icons-react";
 import dayjs from "dayjs";
 
@@ -25,7 +25,7 @@ export default function TableStorage({
       fixed: "left",
     },
     {
-      title: "Donor Name",
+      title: "Người hiến",
       dataIndex: ["donate_id", "infor_health", "user_id", "fullname"],
       key: "donorName",
       sorter: (a, b) => {
@@ -39,7 +39,7 @@ export default function TableStorage({
         record.donate_id?.infor_health?.user_id?.fullname || "Unknown",
     },
     {
-      title: "Blood Type",
+      title: "Nhóm máu",
       key: "bloodType",
       render: (_, record) => {
         if (
@@ -62,7 +62,7 @@ export default function TableStorage({
       },
     },
     {
-      title: "Date",
+      title: "Ngày hiến",
       dataIndex: "date",
       key: "date",
       sorter: (a, b) => {
@@ -73,41 +73,63 @@ export default function TableStorage({
       render: (date) => (date ? dayjs(date).format("YYYY-MM-DD") : "N/A"),
     },
     {
-      title: "ML",
+      title: "Dung tích (ml)",
       dataIndex: "ml",
       key: "ml",
       sorter: (a, b) => (a.ml ?? 0) - (b.ml ?? 0),
       render: (ml) => (ml !== undefined && ml !== null ? ml : "N/A"),
     },
     {
-      title: "Unit",
+      title: "Đơn vị",
       dataIndex: "unit",
       key: "unit",
       sorter: (a, b) => (a.unit ?? 0) - (b.unit ?? 0),
       render: (unit) => (unit !== undefined && unit !== null ? unit : "N/A"),
     },
     {
-      title: "Status",
-      dataIndex: "current_status",
-      key: "status",
-      filters: [
-        { text: "STORAGE", value: "STORAGE" },
-        { text: "EXPIRED", value: "EXPIRED" },
-        { text: "USED", value: "USED" },
-      ],
-      onFilter: (value, record) => record.current_status === value,
-      render: (status) => status || "N/A",
-    },
+  title: "Trạng thái",
+  dataIndex: "current_status",
+  key: "status",
+  filters: [
+    { text: "STORAGE", value: "STORAGE" },
+    { text: "EXPIRED", value: "EXPIRED" },
+    { text: "USED", value: "USED" },
+    { text: "EXPORTED", value: "EXPORTED" },
+  ],
+  onFilter: (value, record) => record.current_status === value,
+  render: (status) => {
+    let color = "default";
+    let text = "Unknown";
+
+    switch (status) {
+      case "STORAGE":
+        color = "blue";
+        text = "STORAGE";
+        break;
+      case "EXPIRED":
+        color = "red";
+        text = "EXPIRED";
+        break;
+      case "USED":
+        color = "green";
+        text = "USED";
+        break;
+      case "EXPORTED":
+        color = "orange";
+        text = "EXPORTED";
+        break;
+    }
+
+    return <Tag color={color}>{text}</Tag>;
+  }
+  },
     {
-      title: "Action",
+      title: "Hành động",
       key: "action",
       render: (_, record) => (
         <Space>
           <Button icon={<IconEye size={16} />} onClick={() => onView(record)} />
-          <Button
-            icon={<IconEdit size={16} />}
-            onClick={() => onEdit(record)}
-          />
+          <Button icon={<IconEdit size={16} />} onClick={() => onEdit(record)} />
           <Button
             icon={<IconTrash size={16} />}
             danger
@@ -127,22 +149,21 @@ export default function TableStorage({
       rowKey="storage_id"
       loading={loading}
       pagination={{
-        current: pagination.current, // current page
-        pageSize: pagination.pageSize || 5, // ép pageSize, default 5 nếu không có
+        current: pagination.current,
+        pageSize: pagination.pageSize || 5,
         total: pagination.total || 5,
-        pageSizeOptions: ["5", "10"], // cho chọn 5 hoặc 10
-        showSizeChanger: true, // hiện nút chọn size
+        pageSizeOptions: ["5", "10"],
+        showSizeChanger: true,
         onChange: (page, pageSize) => {
-          // gọi khi page hoặc size thay đổi
           if (pageSize !== pagination.pageSize) {
-            onPageSizeChange(pageSize); // đổi size thì gọi hàm này
+            onPageSizeChange(pageSize);
           } else {
-            onPageChange(page, pageSize); // đổi page thì gọi hàm này
+            onPageChange(page, pageSize);
           }
         },
         showQuickJumper: false,
         showTotal: (total, range) =>
-          `${range[0]}-${range[1]} of ${total} items`,
+          `${range[0]} - ${range[1]} trong tổng ${total} bản ghi`,
       }}
       scroll={{ x: "max-content" }}
       size="small"
