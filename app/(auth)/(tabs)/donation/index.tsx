@@ -5,22 +5,21 @@ import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import React, { useEffect, useState } from 'react';
 import {
-  Alert,
-    Animated,
-    Dimensions,
-    Modal,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View
+  Animated,
+  Dimensions,
+  Modal,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
 } from 'react-native';
 
+import useCentral from '@/hooks/central/useCentral';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
-import useCentral from '@/hooks/central/useCentral';
 import Toast from 'react-native-toast-message';
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -41,7 +40,7 @@ export default function DonationScreen() {
           <TouchableOpacity style={styles.backButton}>
             <Ionicons name="chevron-back" size={24} color="#333" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Quản lý hiến máu</Text>
+          <Text style={styles.headerTitle}>Hiến máu</Text>
           <TouchableOpacity style={styles.menuButton}>
             <Ionicons name="ellipsis-vertical" size={24} color="#333" />
           </TouchableOpacity>
@@ -174,96 +173,54 @@ export default function DonationScreen() {
 
 // All Users Table Component (Form cố định)
 function AllUsersTable({ searchText, sortBy, sortOrder }: any) {
-  const allUsers = [
-    {
-      id: 1,
-      name: 'Nguyễn Văn A',
-      bloodType: 'A+',
-      phone: '0123456789',
-      age: 28,
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=50&h=50&fit=crop&crop=face',
-      status: 'donated', // donated, registered, inactive
-      lastActivity: '2024-01-15',
-      donationCount: 3,
-      registrationDate: '2024-01-10',
-      location: 'BV Chợ Rẫy',
-    },
-    {
-      id: 2,
-      name: 'Trần Thị B',
-      bloodType: 'O+',
-      phone: '0987654321',
-      age: 25,
-      avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=50&h=50&fit=crop&crop=face',
-      status: 'donated',
-      lastActivity: '2024-01-14',
-      donationCount: 1,
-      registrationDate: '2024-01-12',
-      location: 'Viện Huyết học',
-    },
-    {
-      id: 3,
-      name: 'Phạm Văn D',
-      bloodType: 'AB+',
-      phone: '0147258369',
-      age: 30,
-      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=50&h=50&fit=crop&crop=face',
-      status: 'registered',
-      lastActivity: '2024-01-16',
-      donationCount: 0,
-      registrationDate: '2024-01-16',
-      location: 'BV Chợ Rẫy',
-      scheduledDate: '2024-01-20',
-    },
-    {
-      id: 4,
-      name: 'Hoàng Thị E',
-      bloodType: 'A-',
-      phone: '0258147369',
-      age: 27,
-      avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=50&h=50&fit=crop&crop=face',
-      status: 'registered',
-      lastActivity: '2024-01-15',
-      donationCount: 0,
-      registrationDate: '2024-01-15',
-      location: 'Viện Huyết học',
-      scheduledDate: '2024-01-19',
-    },
-    {
-      id: 5,
-      name: 'Lê Văn C',
-      bloodType: 'B+',
-      phone: '0369852147',
-      age: 32,
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=50&h=50&fit=crop&crop=face',
-      status: 'donated',
-      lastActivity: '2024-01-13',
-      donationCount: 2,
-      registrationDate: '2024-01-08',
-      location: 'BV Đại học Y Dược',
-    },
-  ];
+  const { allDonateBloods } = useDonateBlood();
 
-  const filteredUsers = allUsers.filter(user =>
-    user.name.toLowerCase().includes(searchText.toLowerCase()) ||
-    user.bloodType.toLowerCase().includes(searchText.toLowerCase())
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  const users = (allDonateBloods || []).map((d) => {
+    const userInfo = d.infor_health?.user_id;
+    return {
+      id: d.donate_id,
+      name: userInfo?.fullname || '—',
+      bloodType: d.blood_id.blood_id,
+      phone: userInfo?.email || '—',
+      gender: userInfo?.gender,
+      avatar: `https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 70) + 1}`,
+      status:
+        d.status_donate === 'COMPLETED'
+          ? 'donated'
+          : d.status_regist === 'PENDING'
+          ? 'registered'
+          : 'inactive',
+      lastActivity: d.date_donate,
+      registrationDate: d.date_register,
+      location: d.centralBlood_id.centralBlood_name,
+      scheduledDate: d.status_regist === 'PENDING' ? d.date_donate : undefined,
+    };
+  });
+
+  const filtered = users.filter(
+    (u) =>
+      u.name.toLowerCase().includes(searchText.toLowerCase()) ||
+      u.bloodType.toLowerCase().includes(searchText.toLowerCase())
   );
 
-  const sortedUsers = [...filteredUsers].sort((a, b) => {
-    let comparison = 0;
-    switch (sortBy) {
-      case 'name':
-        comparison = a.name.localeCompare(b.name);
-        break;
-      case 'bloodType':
-        comparison = a.bloodType.localeCompare(b.bloodType);
-        break;
-      case 'date':
-        comparison = new Date(a.lastActivity).getTime() - new Date(b.lastActivity).getTime();
-        break;
+  const sorted = [...filtered].sort((a, b) => {
+    let comp = 0;
+    if (sortBy === 'name') comp = a.name.localeCompare(b.name);
+    else if (sortBy === 'bloodType') comp = a.bloodType.localeCompare(b.bloodType);
+    else {
+      comp = new Date(a.lastActivity).getTime() - new Date(b.lastActivity).getTime();
     }
-    return sortOrder === 'asc' ? comparison : -comparison;
+    return sortOrder === 'desc' ? -comp : comp;
   });
+
+  const totalPages = Math.ceil(sorted.length / itemsPerPage);
+  const paginatedData = sorted.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   const getStatusInfo = (status: string) => {
     switch (status) {
@@ -271,8 +228,6 @@ function AllUsersTable({ searchText, sortBy, sortOrder }: any) {
         return { color: '#4CAF50', text: 'Đã hiến máu', icon: 'checkmark-circle' };
       case 'registered':
         return { color: '#FF9800', text: 'Đã đăng ký', icon: 'time' };
-      case 'inactive':
-        return { color: '#666', text: 'Không hoạt động', icon: 'pause-circle' };
       default:
         return { color: '#666', text: status, icon: 'help-circle' };
     }
@@ -280,32 +235,41 @@ function AllUsersTable({ searchText, sortBy, sortOrder }: any) {
 
   return (
     <View style={styles.tableContainer}>
+      {/* Header */}
       <View style={styles.tableHeader}>
-        <Text style={styles.tableTitle}>Tất cả người dùng</Text>
-        <Text style={styles.tableSubtitle}>{sortedUsers.length} người</Text>
+        <Text style={styles.tableTitle}>Danh Sách Người Hiến Máu</Text>
+        <Text style={styles.tableSubtitle}>{filtered.length} người</Text>
       </View>
 
-      {/* Statistics Cards */}
+      {/* Stats */}
       <View style={styles.statsContainer}>
         <View style={styles.statCard}>
-          <Text style={styles.statNumber}>{allUsers.filter(u => u.status === 'donated').length}</Text>
+          <Text style={styles.statNumber}>
+            {users.filter((u) => u.status === 'donated').length}
+          </Text>
           <Text style={styles.statLabel}>Đã hiến máu</Text>
         </View>
         <View style={styles.statCard}>
-          <Text style={styles.statNumber}>{allUsers.filter(u => u.status === 'registered').length}</Text>
+          <Text style={styles.statNumber}>
+            {users.filter((u) => u.status === 'registered').length}
+          </Text>
           <Text style={styles.statLabel}>Đã đăng ký</Text>
         </View>
         <View style={styles.statCard}>
-          <Text style={styles.statNumber}>{allUsers.reduce((sum, u) => sum + u.donationCount, 0)}</Text>
-          <Text style={styles.statLabel}>Tổng lần hiến</Text>
+          <Text style={styles.statNumber}>{users.length}</Text>
+          <Text style={styles.statLabel}>Tổng bản ghi</Text>
         </View>
       </View>
 
-      {sortedUsers.map((user) => {
+      {/* Table Body */}
+      {paginatedData.map((user, index) => {
+        const globalIndex = (currentPage - 1) * itemsPerPage + index + 1;
         const statusInfo = getStatusInfo(user.status);
+
         return (
           <TouchableOpacity key={user.id} style={styles.userCard}>
             <View style={styles.userInfo}>
+              <Text style={styles.sttNumber}>#{globalIndex}</Text>
               <Image source={{ uri: user.avatar }} style={styles.userAvatar} />
               <View style={styles.userDetails}>
                 <Text style={styles.userName}>{user.name}</Text>
@@ -313,10 +277,7 @@ function AllUsersTable({ searchText, sortBy, sortOrder }: any) {
                   <View style={styles.bloodTypeBadge}>
                     <Text style={styles.bloodTypeText}>{user.bloodType}</Text>
                   </View>
-                  <Text style={styles.userAge}>{user.age} tuổi</Text>
-                  <View style={styles.donationCountBadge}>
-                    <Text style={styles.donationCountText}>{user.donationCount} lần</Text>
-                  </View>
+                  <Text style={styles.userAge}>{user.gender}</Text>
                 </View>
                 <View style={styles.userActivity}>
                   <Ionicons name="location-outline" size={14} color="#666" />
@@ -324,7 +285,7 @@ function AllUsersTable({ searchText, sortBy, sortOrder }: any) {
                 </View>
               </View>
             </View>
-            
+
             <View style={styles.userStatus}>
               <View style={[styles.statusBadge, { backgroundColor: statusInfo.color }]}>
                 <Ionicons name={statusInfo.icon} size={12} color="#fff" />
@@ -333,21 +294,48 @@ function AllUsersTable({ searchText, sortBy, sortOrder }: any) {
               <Text style={styles.lastActivityText}>
                 {new Date(user.lastActivity).toLocaleDateString('vi-VN')}
               </Text>
-              {user.status === 'registered' && user.scheduledDate && (
+              {user.scheduledDate && (
                 <Text style={styles.scheduledText}>
                   Hẹn: {new Date(user.scheduledDate).toLocaleDateString('vi-VN')}
                 </Text>
               )}
-              <TouchableOpacity style={styles.contactButton}>
-                <Ionicons name="call-outline" size={16} color="#E91E63" />
-              </TouchableOpacity>
             </View>
           </TouchableOpacity>
         );
       })}
+
+      {/* Pagination - giữa bảng */}
+      <View style={[styles.paginationContainer, { alignSelf: 'center', marginTop: 16 }]}>
+        <TouchableOpacity
+          onPress={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+          disabled={currentPage === 1}
+          style={[
+            styles.pageButton,
+            currentPage === 1 && { backgroundColor: '#bdbdbd' }
+          ]}
+        >
+          <Text style={styles.pageButtonText}>{'<'} Trước</Text>
+        </TouchableOpacity>
+
+        <Text style={styles.pageInfo}>
+          Trang {currentPage} / {totalPages}
+        </Text>
+
+        <TouchableOpacity
+          onPress={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+          disabled={currentPage === totalPages}
+          style={[
+            styles.pageButton,
+            currentPage === totalPages && { backgroundColor: '#bdbdbd' }
+          ]}
+        >
+          <Text style={styles.pageButtonText}>Tiếp {'>'}</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
+
 
 // Donated Users Table Component (Cập nhật)
 function DonatedUsersTable({ searchText, sortBy, sortOrder }: any) {
@@ -1215,6 +1203,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 5,
+    marginBottom: 24, // Thêm margin dưới để tránh dính vào pagination
   },
   tableHeader: {
     marginBottom: 20,
@@ -1655,4 +1644,37 @@ const styles = StyleSheet.create({
     color: '#333',
     marginLeft: 12,
   },
+  // Pagination nằm giữa table
+sttNumber: {
+  fontSize: 16,
+  fontWeight: 'bold',
+  marginRight: 10,
+  color: '#555',
+},
+
+paginationContainer: {
+  flexDirection: 'row',
+  justifyContent: 'center',
+  alignItems: 'center',
+  gap: 12,
+},
+
+pageButton: {
+  backgroundColor: '#1976D2',
+  paddingHorizontal: 12,
+  paddingVertical: 6,
+  borderRadius: 6,
+},
+
+pageButtonText: {
+  color: '#fff',
+  fontWeight: '600',
+},
+
+pageInfo: {
+  marginHorizontal: 12,
+  fontWeight: '500',
+  color: '#333',
+},
+
 });

@@ -1,25 +1,63 @@
+import api from '@/config/axiosInstance';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useAuth } from '../auth/useAuthContext';
-import api from '@/config/axiosInstance';
 
 const API_URL = 'api/v1/donate-bloods';
+
+interface CentralBlood {
+  centralBlood_id: number;
+  centralBlood_name: string;
+  centralBlood_address: string;
+  position?: {
+    type: string;
+    coordinates: [number, number];
+  };
+}
+
+interface BloodInfo {
+  blood_id: string;
+}
+
+interface InforHealth {
+  user_id: {
+    email: string;
+    fullname: string;
+    gender: string;
+    user_id: string;
+  };
+  blood_id: string;
+  height: number;
+  weight_decimal: number;
+  blood_pressure: number;
+  medical_history: string;
+  latest_donate: string;
+  status_health: string;
+  img_health: string;
+}
+
+interface DonateBlood {
+  donate_id: string;
+  date_donate: string;
+  date_register: string;
+  centralBlood_id: CentralBlood;
+  blood_id: BloodInfo;
+  status_regist: string;
+  status_donate: string;
+  infor_health?: InforHealth | null;
+  ml: number;
+  unit: number;
+  updated_at: string;
+}
 
 interface DonateBloodPayload {
   date_donate: string;
   centralBlood_id: number;
 }
 
-interface DonateBlood {
-  _id: string;
-  date_donate: string;
-  centralBlood_id: number;
-  // add more fields if needed
-}
-
 interface DonateBloodContextType {
   allDonateBloods: DonateBlood[] | null;
   donateHistory: DonateBlood[] | null;
-  getAllDonateBloods: (current: number, pageSize: number, qs?: string) => Promise<void>;
+  getAllDonateBloods: (current?: number, pageSize?: number, qs?: string) => Promise<void>;
   getDonateHistoryByUser: () => Promise<void>;
   getDonateBloodById: (id: string) => Promise<DonateBlood>;
   createDonateBlood: (payload: DonateBloodPayload) => Promise<any>;
@@ -44,27 +82,31 @@ export const DonateBloodProvider = ({ children }: { children: React.ReactNode })
     },
   };
 
-  const getAllDonateBloods = async (current = 1, pageSize = 10, qs?: string) => {
-    try {
-      setLoading(true);
-      const url = `${API_URL}?current=${current}&pageSize=${pageSize}${qs ? `&qs=${qs}` : ''}`;
-      const res = await api.get(url, authHeaders);
-      setAllDonateBloods(res.data.data || res.data); // tuỳ vào backend structure
-    } catch (err) {
-      console.error('Lỗi lấy danh sách hiến máu:', err);
-      setError(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+const getAllDonateBloods = async (current = 1, pageSize = 10, qs?: string) => {
+  try {
+    setLoading(true);
+    const url = `${API_URL}?current=${current}&pageSize=${pageSize}${qs ? `&qs=${qs}` : ''}`;
+    const res = await api.get(url, authHeaders);
+
+    const results = res.data?.data?.results || [];
+    setAllDonateBloods(results);
+  } catch (err) {
+    console.error('❌ Lỗi lấy danh sách hiến máu:', err);
+    setError(err);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const getDonateHistoryByUser = async () => {
     try {
       setLoading(true);
       const res = await api.get(`${API_URL}/history/user`, authHeaders);
-      setDonateHistory(res.data.data || res.data);
+      const history = res.data?.data || [];
+      setDonateHistory(history);
     } catch (err) {
-      console.error('Lỗi lấy lịch sử hiến máu:', err);
+      console.error('❌ Lỗi lấy lịch sử hiến máu:', err);
       setError(err);
     } finally {
       setLoading(false);
@@ -91,10 +133,10 @@ export const DonateBloodProvider = ({ children }: { children: React.ReactNode })
     return res.data;
   };
 
-  // Auto fetch lịch sử hiến máu của user
   useEffect(() => {
     if (token) {
-      getDonateHistoryByUser();
+        getAllDonateBloods()
+        getDonateHistoryByUser();
     }
   }, [token]);
 
