@@ -24,7 +24,7 @@ import Toast from 'react-native-toast-message';
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 export default function ReceiverScreen() {
-  const [activeTab, setActiveTab] = useState<'all' | 'donated' | 'registered'>('all');
+  const [activeTab, setActiveTab] = useState<'all' | 'Receiver' | 'registered'>('all');
   const [searchText, setSearchText] = useState('');
   const [sortBy, setSortBy] = useState<'date' | 'name' | 'bloodType'>('date');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
@@ -92,17 +92,17 @@ export default function ReceiverScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.tab, activeTab === 'donated' && styles.activeTab]}
-            onPress={() => setActiveTab('donated')}
+            style={[styles.tab, activeTab === 'Receiver' && styles.activeTab]}
+            onPress={() => setActiveTab('Receiver')}
           >
             <Ionicons 
               name="checkmark-circle-outline" 
               size={20} 
-              color={activeTab === 'donated' ? '#E91E63' : '#666'} 
+              color={activeTab === 'Receiver' ? '#E91E63' : '#666'} 
             />
             <Text style={[
               styles.tabText, 
-              activeTab === 'donated' && styles.activeTabText
+              activeTab === 'Receiver' && styles.activeTabText
             ]}>
               Chuẩn Bị
             </Text>
@@ -131,8 +131,8 @@ export default function ReceiverScreen() {
           {activeTab === 'all' && (
             <AllUsersTable searchText={searchText} sortBy={sortBy} sortOrder={sortOrder} />
           )}
-          {activeTab === 'donated' && (
-            <DonatedUsersTable searchText={searchText} sortBy={sortBy} sortOrder={sortOrder} />
+          {activeTab === 'Receiver' && (
+            <ReceiverUsersTable searchText={searchText} sortBy={sortBy} sortOrder={sortOrder} />
           )}
           {activeTab === 'registered' && (
             <RegisteredUsersTable searchText={searchText} sortBy={sortBy} sortOrder={sortOrder} />
@@ -223,7 +223,7 @@ function AllUsersTable({ searchText, sortBy, sortOrder }: any) {
       avatar: `https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 70) + 1}`,
       status:
         d.status_donate === 'COMPLETED'
-          ? 'donated'
+          ? 'Receiver'
           : d.status_regist === 'PENDING'
           ? 'registered'
           : 'inactive',
@@ -261,7 +261,7 @@ function AllUsersTable({ searchText, sortBy, sortOrder }: any) {
 
   const getStatusInfo = (status: string) => {
     switch (status) {
-      case 'donated':
+      case 'Receiver':
         return { color: '#4CAF50', text: 'Đã hiến máu', icon: 'checkmark-circle' };
       case 'registered':
         return { color: '#FF9800', text: 'Đã đăng ký', icon: 'time' };
@@ -298,7 +298,7 @@ function AllUsersTable({ searchText, sortBy, sortOrder }: any) {
       <View style={styles.statsContainer}>
         <View style={styles.statCard}>
           <Text style={styles.statNumber}>
-            {users.filter((u) => u.status === 'donated').length}
+            {users.filter((u) => u.status === 'Receiver').length}
           </Text>
           <Text style={styles.statLabel}>Đã hiến máu</Text>
         </View>
@@ -394,19 +394,18 @@ function AllUsersTable({ searchText, sortBy, sortOrder }: any) {
 
 
 
-// Donated Users Table Component (Cập nhật)
-function DonatedUsersTable({ searchText }: { searchText: string }) {
+// Receiver Users Table Component (Cập nhật)
+ function ReceiverUsersTable({ searchText }: { searchText: string }) {
   const { receiverHistory, getReceiverHistoryById } = useReceiver();
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedReceiver, setSelectedReceiver] = useState<any>(null);
 
-  // Tự động load dữ liệu khi component mount
   useEffect(() => {
-  const interval = setInterval(() => {
-    getReceiverHistoryById();
-  }, 1000); // 30s
+    const interval = setInterval(() => {
+      getReceiverHistoryById();
+    }, 30000); // 30s
 
-  return () => clearInterval(interval);    // eslint-disable-next-line react-hooks/exhaustive-deps
+    return () => clearInterval(interval);
   }, []);
 
   const handleReload = async () => {
@@ -417,7 +416,7 @@ function DonatedUsersTable({ searchText }: { searchText: string }) {
         text1: 'Danh sách đã được làm mới',
         position: 'top',
       });
-    } catch (err) {
+    } catch {
       Toast.show({
         type: 'error',
         text1: 'Lỗi khi tải lại danh sách',
@@ -425,16 +424,12 @@ function DonatedUsersTable({ searchText }: { searchText: string }) {
     }
   };
 
-  const filteredReceivers =
-    receiverHistory?.filter(
-      (Receiver: any) =>
-        Receiver.status_donate === 'PENDING' &&
-        Receiver.status_regist === 'APPROVED' &&
-        (
-          Receiver?.centralBlood_id?.centralBlood_name?.toLowerCase().includes(searchText.toLowerCase()) ||
-          Receiver?.infor_health?.status_health?.toLowerCase().includes(searchText.toLowerCase())
-        )
-    ) || [];
+  const filteredReceivers = receiverHistory?.filter(
+    (receiver: any) =>
+      receiver.status_donate === 'PENDING' &&
+      receiver.status_regist === 'APPROVED' &&
+      receiver.centralBlood_id?.centralBlood_name?.toLowerCase().includes(searchText.toLowerCase())
+  ) || [];
 
   return (
     <>
@@ -450,8 +445,6 @@ function DonatedUsersTable({ searchText }: { searchText: string }) {
               paddingVertical: 6,
               paddingHorizontal: 12,
               borderRadius: 6,
-              alignItems: 'center',
-              justifyContent: 'center',
             }}
           >
             <Ionicons name="refresh" size={20} color="#fff" />
@@ -472,23 +465,12 @@ function DonatedUsersTable({ searchText }: { searchText: string }) {
               elevation: 4,
             }}
           >
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Image
-                source={{ uri: item.infor_health?.img_health }}
-                style={{ width: 60, height: 60, borderRadius: 30, marginRight: 12 }}
-              />
-              <View>
-                <Text style={{ fontWeight: 'bold', fontSize: 16 }}>
-                  {item.centralBlood_id?.centralBlood_name}
-                </Text>
-                <Text style={{ color: '#666' }}>
-                  Ngày hiến: {new Date(item.date_donate).toLocaleDateString('vi-VN')}
-                </Text>
-                <Text style={{ color: '#999' }}>
-                  Cân nặng: {item.infor_health?.weight_decimal} kg
-                </Text>
-              </View>
-            </View>
+            <Text style={{ fontWeight: 'bold', fontSize: 16, marginBottom: 6 }}>
+              {item.centralBlood_id?.centralBlood_name}
+            </Text>
+            <Text style={{ color: '#666' }}>
+              Ngày nhận máu: {new Date(item.date_receiver).toLocaleDateString('vi-VN')}
+            </Text>
 
             <TouchableOpacity
               style={{
@@ -513,12 +495,7 @@ function DonatedUsersTable({ searchText }: { searchText: string }) {
       </ScrollView>
 
       {/* Modal chi tiết đơn */}
-      <Modal
-        visible={modalVisible}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setModalVisible(false)}
-      >
+      <Modal visible={modalVisible} transparent animationType="slide" onRequestClose={() => setModalVisible(false)}>
         <View style={{
           flex: 1,
           backgroundColor: 'rgba(0,0,0,0.4)',
@@ -533,19 +510,15 @@ function DonatedUsersTable({ searchText }: { searchText: string }) {
             maxWidth: 400,
             elevation: 8,
           }}>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-              <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#E91E63' }}>Chi tiết đơn hiến máu</Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 }}>
+              <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#E91E63' }}>Chi tiết đơn nhận máu</Text>
               <TouchableOpacity onPress={() => setModalVisible(false)}>
                 <Ionicons name="close" size={24} color="#333" />
               </TouchableOpacity>
             </View>
+
             {selectedReceiver && (
               <>
-                <Image
-                  source={{ uri: selectedReceiver.infor_health?.img_health }}
-                  style={{ width: '100%', height: 120, borderRadius: 8, marginBottom: 12 }}
-                  contentFit="cover"
-                />
                 <Text style={{ fontWeight: 'bold', fontSize: 16, marginBottom: 4 }}>
                   {selectedReceiver.centralBlood_id?.centralBlood_name}
                 </Text>
@@ -553,28 +526,38 @@ function DonatedUsersTable({ searchText }: { searchText: string }) {
                   Địa chỉ: {selectedReceiver.centralBlood_id?.centralBlood_address}
                 </Text>
                 <Text style={{ color: '#666', marginBottom: 4 }}>
-                  Ngày hiến: {new Date(selectedReceiver.date_donate).toLocaleDateString('vi-VN')}
+                  Ngày nhận máu: {new Date(selectedReceiver.date_receiver).toLocaleDateString('vi-VN')}
                 </Text>
                 <Text style={{ color: '#666', marginBottom: 4 }}>
-                  Họ tên: {selectedReceiver.infor_health?.user_id?.fullname}
+                  Họ tên người nhận: {selectedReceiver.user_id?.fullname}
                 </Text>
                 <Text style={{ color: '#666', marginBottom: 4 }}>
-                  Cân nặng: {selectedReceiver.infor_health?.weight_decimal} kg
+                  SĐT: {selectedReceiver.user_id?.phone}
                 </Text>
                 <Text style={{ color: '#666', marginBottom: 4 }}>
-                  Huyết áp: {selectedReceiver.infor_health?.blood_pressure} mmHg
+                  Email: {selectedReceiver.user_id?.email}
                 </Text>
                 <Text style={{ color: '#666', marginBottom: 4 }}>
-                  Nhóm máu: {selectedReceiver.infor_health?.blood_id?.blood_id}
+                  Giới tính: {selectedReceiver.user_id?.gender}
                 </Text>
                 <Text style={{ color: '#666', marginBottom: 4 }}>
-                  Tình trạng: {selectedReceiver.infor_health?.status_health}
+                  Ngày sinh: {new Date(selectedReceiver.user_id?.dob).toLocaleDateString('vi-VN')}
                 </Text>
                 <Text style={{ color: '#666', marginBottom: 4 }}>
-                  Tiền sử bệnh: {selectedReceiver.infor_health?.medical_history || 'Không'}
+                  Nhóm máu: {selectedReceiver.blood_id?.blood_type_id} Rh{selectedReceiver.blood_id?.rh_id === 1 ? '+' : '-'}
+                </Text>
+                <Text style={{ color: '#666', marginBottom: 4 }}>
+                  Loại đơn: {selectedReceiver.type === 'EMERGENCY' ? 'Khẩn cấp' : 'Thông thường'}
+                </Text>
+                <Text style={{ color: '#666', marginBottom: 4 }}>
+                  Đơn vị máu cần: {selectedReceiver.unit} đơn vị ({selectedReceiver.ml} ml)
+                </Text>
+                <Text style={{ color: '#666', marginBottom: 4 }}>
+                  Trạng thái nhận máu: {selectedReceiver.status_receiver}
                 </Text>
               </>
             )}
+
             <TouchableOpacity
               style={{
                 marginTop: 16,
