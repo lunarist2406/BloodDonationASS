@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import {
   View,
@@ -18,6 +16,7 @@ import type { BloodDonationData } from "@/hooks/searchByDistance/useSearchByDist
 import useCentral from "@/hooks/central/useCentral";
 import useSearchByDistanceService from "@/hooks/searchByDistance/useSearchByDistanceService";
 import { Picker } from "@react-native-picker/picker";
+import CenterPicker from "./centerPicker";
 
 interface FilterInformationUIProps {
   selectedTypes: string[];
@@ -49,9 +48,11 @@ export default function FilterInformationUI({
     useSearchByDistanceService();
   const [useCurrentLocation, setUseCurrentLocation] = useState(false);
   const [loadingLocation, setLoadingLocation] = useState(false);
+  const [showPicker, setShowPicker] = useState(false);
 
   const handleUseLocationChange = async (checked: boolean) => {
     if (!checked) {
+      onCenterChange(null);
       setUseCurrentLocation(false);
       onUseCurrentLocationChange?.(null);
       setData(originalData);
@@ -83,7 +84,11 @@ export default function FilterInformationUI({
         radiusInKm: distanceKm || 10,
       };
       const response = await searchByCurrentPosition(objectSearch);
-      setData(response.data);
+      if (response && response.data) {
+        setData(response.data);
+      } else {
+        ToastAndroid.show("Lỗi dữ liệu trả về.", ToastAndroid.SHORT);
+      }
     } catch (err) {
       ToastAndroid.show(
         "Không thể lấy vị trí. Vui lòng thử lại.",
@@ -97,9 +102,8 @@ export default function FilterInformationUI({
   };
 
   const handleAllowClear = () => {
+    setShowPicker(false);
     onCenterChange(null);
-    setUseCurrentLocation(false);
-    onUseCurrentLocationChange?.(null);
     setData(originalData);
   };
 
@@ -181,38 +185,21 @@ export default function FilterInformationUI({
           </View>
         </View>
 
-        <View style={styles.divider} />
-
-        <View style={styles.pickerContainer}>
-          <Text style={styles.pickerLabel}>Hoặc chọn trung tâm</Text>
-          <View style={styles.pickerWrapper}>
-            <Picker
-              selectedValue={selectedCenter ?? null}
-              onValueChange={(value) => {
-                handleCenterChange(value === null ? null : value);
-              }}
-              style={styles.picker}
-              enabled={!useCurrentLocation}
-            >
-              <Picker.Item label="Chọn trung tâm hiến máu" value={null} />
-              {central.map((c) => (
-                <Picker.Item
-                  key={c.centralBlood_id}
-                  label={c.centralBlood_name}
-                  value={c.centralBlood_id.toString()}
-                />
-              ))}
-            </Picker>
-          </View>
-          {selectedCenter && (
-            <TouchableOpacity
-              onPress={handleAllowClear}
-              style={styles.clearButton}
-            >
-              <Text style={styles.clearButtonText}>Bỏ chọn trung tâm</Text>
-            </TouchableOpacity>
-          )}
+        <View style={styles.orContainer}>
+        <View style={styles.orLine} />
+        <View style={styles.orBadge}>
+          <Text style={styles.orText}>HOẶC</Text>
         </View>
+        <View style={styles.orLine} />
+      </View>
+
+        <CenterPicker
+          central={central}
+          selectedCenter={selectedCenter}
+          useCurrentLocation={useCurrentLocation}
+          onCenterChange={handleCenterChange}
+          onClearSelection={handleAllowClear}
+        />
       </View>
 
       {/* Role Selection Card */}
@@ -433,6 +420,31 @@ const styles = StyleSheet.create({
   },
   picker: {
     height: 50,
+  },
+  orContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 20,
+  },
+  orLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: "#E5E7EB",
+  },
+  orBadge: {
+    backgroundColor: "#FFFFFF",
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    marginHorizontal: 12,
+  },
+  orText: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#6B7280",
+    letterSpacing: 0.5,
   },
   clearButton: {
     marginTop: 12,
