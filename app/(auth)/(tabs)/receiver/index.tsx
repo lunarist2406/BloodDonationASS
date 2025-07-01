@@ -16,6 +16,7 @@ import {
   View
 } from 'react-native';
 
+import { useBloodContext } from '@/hooks/Blood/useBlood';
 import useCentral from '@/hooks/central/useCentral';
 import { useReceiver } from '@/hooks/Receiver/useReceiver';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -184,7 +185,6 @@ export default function ReceiverScreen() {
 // All Users Table Component (Form cố định)
 function AllUsersTable({ searchText, sortBy, sortOrder }: any) {
   const { allReceivers, getAllReceiverBloods } = useReceiver();
-  console.log("Receiver:", allReceivers);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 3;
   const [loading, setLoading] = useState(false);
@@ -399,11 +399,12 @@ function AllUsersTable({ searchText, sortBy, sortOrder }: any) {
   const { receiverHistory, getReceiverHistoryById } = useReceiver();
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedReceiver, setSelectedReceiver] = useState<any>(null);
+  const { bloodList} = useBloodContext();
 
   useEffect(() => {
     const interval = setInterval(() => {
       getReceiverHistoryById();
-    }, 30000); // 30s
+    }, 1000); // 30s
 
     return () => clearInterval(interval);
   }, []);
@@ -544,7 +545,21 @@ function AllUsersTable({ searchText, sortBy, sortOrder }: any) {
                   Ngày sinh: {new Date(selectedReceiver.user_id?.dob).toLocaleDateString('vi-VN')}
                 </Text>
                 <Text style={{ color: '#666', marginBottom: 4 }}>
-                  Nhóm máu: {selectedReceiver.blood_id?.blood_type_id} Rh{selectedReceiver.blood_id?.rh_id === 1 ? '+' : '-'}
+                  Nhóm máu: {
+                  (() => {
+                    // Lấy blood_id của đơn
+                    const bloodId = selectedReceiver.blood_id?.blood_id;
+                    // Lấy bloodList từ hook
+                    // (hook đã được khai báo ở trên: const { bloodList } = useBloodContext();)
+                    const blood = Array.isArray(bloodList)
+                    ? bloodList.find((b) => b.blood_id === bloodId)
+                    : null;
+                    // Hiển thị theo format gốc, ví dụ: A(-)
+                    return blood
+                    ? `${blood.blood_type_id?.blood_name || ''}(${blood.rh_id?.blood_Rh || ''})`
+                    : 'Không xác định';
+                  })()
+                  }
                 </Text>
                 <Text style={{ color: '#666', marginBottom: 4 }}>
                   Loại đơn: {selectedReceiver.type === 'EMERGENCY' ? 'Khẩn cấp' : 'Thông thường'}
@@ -577,17 +592,20 @@ function AllUsersTable({ searchText, sortBy, sortOrder }: any) {
   );
 }
 // Registered Users Table Component (Cập nhật)
-function RegisteredUsersTable({ searchText, sortBy, sortOrder }: any) {
+ function RegisteredUsersTable({ searchText }: { searchText: string }) {
   const { receiverHistory, getReceiverHistoryById } = useReceiver();
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedReceiver, setSelectedReceiver] = useState<any>(null);
-  useEffect(() => {
-  const interval = setInterval(() => {
-    getReceiverHistoryById();
-  }, 1000); // 30s
+  const { bloodList} = useBloodContext();
 
-  return () => clearInterval(interval);    // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    const interval = setInterval(() => {
+      getReceiverHistoryById();
+    }, 30000); // 30s
+
+    return () => clearInterval(interval);
   }, []);
+
   const handleReload = async () => {
     try {
       await getReceiverHistoryById();
@@ -604,23 +622,24 @@ function RegisteredUsersTable({ searchText, sortBy, sortOrder }: any) {
     }
   };
 
-  // Lọc các đơn có status_donate === 'PENDING' và status_regist === 'PENDING'
-  const filteredReceivers =
-    receiverHistory?.filter(
-      (Receiver: any) =>
-        Receiver.status_donate === 'PENDING' &&
-        Receiver.status_regist === 'PENDING' &&
-        (
-          Receiver?.centralBlood_id?.centralBlood_name?.toLowerCase().includes(searchText.toLowerCase()) ||
-          Receiver?.infor_health?.user_id?.fullname?.toLowerCase().includes(searchText.toLowerCase()) ||
-          Receiver?.infor_health?.blood_id?.blood_id?.toLowerCase().includes(searchText.toLowerCase())
-        )
-    ) || [];
+  // Lọc các đơn đăng ký với status_donate & status_regist = PENDING
+  const filteredReceivers = receiverHistory?.filter((receiver: any) => {
+    const search = searchText.toLowerCase();
+    return (
+      receiver.status_donate === 'PENDING' &&
+      receiver.status_regist === 'PENDING' &&
+      (
+        receiver.centralBlood_id?.centralBlood_name?.toLowerCase().includes(search) ||
+        receiver.user_id?.fullname?.toLowerCase().includes(search) ||
+        `${receiver.blood_id?.blood_type_id}${receiver.blood_id?.rh_id === 1 ? '+' : '-'}`.includes(search)
+      )
+    );
+  }) || [];
 
   return (
     <>
       <ScrollView contentContainerStyle={{ padding: 16 }}>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 }}>
           <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
             Danh sách đơn đăng ký ({filteredReceivers.length})
           </Text>
@@ -631,8 +650,6 @@ function RegisteredUsersTable({ searchText, sortBy, sortOrder }: any) {
               paddingVertical: 6,
               paddingHorizontal: 12,
               borderRadius: 6,
-              alignItems: 'center',
-              justifyContent: 'center',
             }}
           >
             <Ionicons name="refresh" size={20} color="#fff" />
@@ -653,27 +670,30 @@ function RegisteredUsersTable({ searchText, sortBy, sortOrder }: any) {
               elevation: 4,
             }}
           >
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Image
-                source={{ uri: item.infor_health?.img_health }}
-                style={{ width: 60, height: 60, borderRadius: 30, marginRight: 12 }}
-              />
-              <View>
-                <Text style={{ fontWeight: 'bold', fontSize: 16 }}>
-                  {item.infor_health?.user_id?.fullname}
-                </Text>
-                <Text style={{ color: '#666' }}>
-                  Ngày đăng ký: {new Date(item.date_register).toLocaleDateString('vi-VN')}
-                </Text>
+            <View style={{ marginBottom: 10 }}>
+              <Text style={{ fontWeight: 'bold', fontSize: 16 }}>
+                {item.user_id?.fullname}
+              </Text>
+              <Text style={{ color: '#666' }}>
+                Ngày đăng ký: {new Date(item.date_register).toLocaleDateString('vi-VN')}
+              </Text>
                 <Text style={{ color: '#999' }}>
-                  Nhóm máu: {item.infor_health?.blood_id?.blood_id}
+                Nhóm máu: {
+                  (() => {
+                  const bloodId = item.blood_id?.blood_id;
+                  const blood = Array.isArray(bloodList)
+                    ? bloodList.find((b) => b.blood_id === bloodId)
+                    : null;
+                  return blood
+                    ? `${blood.blood_type_id?.blood_name || ''}(${blood.rh_id?.blood_Rh || ''})`
+                    : 'Không xác định';
+                  })()
+                }
                 </Text>
-              </View>
             </View>
 
             <TouchableOpacity
               style={{
-                marginTop: 10,
                 backgroundColor: '#FFD700',
                 padding: 10,
                 borderRadius: 8,
@@ -714,19 +734,17 @@ function RegisteredUsersTable({ searchText, sortBy, sortOrder }: any) {
             maxWidth: 400,
             elevation: 8,
           }}>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-              <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#E91E63' }}>Chi tiết đơn đăng ký</Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 }}>
+              <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#E91E63' }}>
+                Chi tiết đơn đăng ký
+              </Text>
               <TouchableOpacity onPress={() => setModalVisible(false)}>
                 <Ionicons name="close" size={24} color="#333" />
               </TouchableOpacity>
             </View>
+
             {selectedReceiver && (
               <>
-                <Image
-                  source={{ uri: selectedReceiver.infor_health?.img_health }}
-                  style={{ width: '100%', height: 120, borderRadius: 8, marginBottom: 12 }}
-                  contentFit="cover"
-                />
                 <Text style={{ fontWeight: 'bold', fontSize: 16, marginBottom: 4 }}>
                   {selectedReceiver.centralBlood_id?.centralBlood_name}
                 </Text>
@@ -737,25 +755,36 @@ function RegisteredUsersTable({ searchText, sortBy, sortOrder }: any) {
                   Ngày đăng ký: {new Date(selectedReceiver.date_register).toLocaleDateString('vi-VN')}
                 </Text>
                 <Text style={{ color: '#666', marginBottom: 4 }}>
-                  Họ tên: {selectedReceiver.infor_health?.user_id?.fullname}
+                  Họ tên: {selectedReceiver.user_id?.fullname}
                 </Text>
                 <Text style={{ color: '#666', marginBottom: 4 }}>
-                  Cân nặng: {selectedReceiver.infor_health?.weight_decimal} kg
+                  Email: {selectedReceiver.user_id?.email}
                 </Text>
                 <Text style={{ color: '#666', marginBottom: 4 }}>
-                  Huyết áp: {selectedReceiver.infor_health?.blood_pressure} mmHg
+                  SĐT: {selectedReceiver.user_id?.phone}
                 </Text>
                 <Text style={{ color: '#666', marginBottom: 4 }}>
-                  Nhóm máu: {selectedReceiver.infor_health?.blood_id?.blood_id}
+                  Giới tính: {selectedReceiver.user_id?.gender}
                 </Text>
                 <Text style={{ color: '#666', marginBottom: 4 }}>
-                  Tình trạng: {selectedReceiver.infor_health?.status_health}
+                  Ngày sinh: {new Date(selectedReceiver.user_id?.dob).toLocaleDateString('vi-VN')}
                 </Text>
                 <Text style={{ color: '#666', marginBottom: 4 }}>
-                  Tiền sử bệnh: {selectedReceiver.infor_health?.medical_history || 'Không'}
+                  Nhóm máu: {
+                  (() => {
+                    const bloodId = selectedReceiver.blood_id?.blood_id;
+                    const blood = Array.isArray(bloodList)
+                    ? bloodList.find((b) => b.blood_id === bloodId)
+                    : null;
+                    return blood
+                    ? `${blood.blood_type_id?.blood_name || ''}(${blood.rh_id?.blood_Rh || ''})`
+                    : 'Không xác định';
+                  })()
+                  }
                 </Text>
               </>
             )}
+
             <TouchableOpacity
               style={{
                 marginTop: 16,
@@ -1060,6 +1089,7 @@ function UserInfoForm({ onNext, onBack }: { onNext: () => void; onBack: () => vo
 // Health Info Form Component (giữ nguyên)
 function HealthInfoForm({ onBack, onNext }: { onBack: () => void; onNext: () => void }) {
   const { userHealth } = useHealth();
+  const { bloodList} = useBloodContext();
 
   return (
     <View style={styles.formContainer}>
@@ -1124,12 +1154,21 @@ function HealthInfoForm({ onBack, onNext }: { onBack: () => void; onNext: () => 
         <View style={styles.inputHalf}>
           <Text style={styles.inputLabel}>Nhóm máu</Text>
           <View style={styles.inputContainer}>
-        <Ionicons name="water-outline" size={20} color="#E91E63" style={styles.inputIcon} />
-        <TextInput
-          style={styles.textInput}
-          value={userHealth?.blood_id?.blood_id || ''}
-          editable={false}
-        />
+            <Ionicons name="water-outline" size={20} color="#E91E63" style={styles.inputIcon} />
+            <TextInput
+              style={styles.textInput}
+              value={
+          (() => {
+            const bloodId = userHealth?.blood_id?.blood_id;
+            if (!bloodId || !Array.isArray(bloodList)) return '';
+            const blood = bloodList.find((b) => b.blood_id === bloodId);
+            return blood
+              ? `${blood.blood_type_id?.blood_name || ''}(${blood.rh_id?.blood_Rh || ''})`
+              : '';
+          })()
+              }
+              editable={false}
+            />
           </View>
         </View>
       </View>
@@ -1199,19 +1238,24 @@ function HealthInfoForm({ onBack, onNext }: { onBack: () => void; onNext: () => 
 
 
 
-export function ConfirmForm({ onBack, onSubmit }: { onBack: () => void; onSubmit: () => void }) {
+function ConfirmForm({ onBack, onSubmit }: { onBack: () => void; onSubmit: () => void }) {
   const { createReceiver } = useReceiver();
   const { central } = useCentral();
+  const { bloodList, loading } = useBloodContext();
 
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [selectedCenter, setSelectedCenter] = useState<string | null>(null); // ép chuỗi ID
+  const [selectedCenter, setSelectedCenter] = useState<string | null>(null);
+  const [bloodId, setBloodId] = useState<string | null>(null);
+  const [ml, setMl] = useState<string>('');
+  const [unit, setUnit] = useState<string>('');
+  const [priorityType, setPriorityType] = useState<'DEFAULT' | 'EMERGENCY'>('DEFAULT');
 
   const handleSubmit = async () => {
-    if (!selectedCenter) {
+    if (!selectedCenter || !bloodId || !ml || !unit) {
       Toast.show({
         type: 'error',
-        text1: 'Vui lòng chọn trung tâm hiến máu!',
+        text1: 'Vui lòng điền đầy đủ tất cả các trường!',
         position: 'top',
       });
       return;
@@ -1219,18 +1263,20 @@ export function ConfirmForm({ onBack, onSubmit }: { onBack: () => void; onSubmit
 
     try {
       const payload = {
-        date_donate: selectedDate.toISOString(),
-        centralBlood_id: Number(selectedCenter),
+        blood_id: String(bloodId),
+        date_receiver: selectedDate.toISOString(),
+        ml: Number(ml),
+        unit: Number(unit),
+        type: String(priorityType),
+        centralBlood_id: String(selectedCenter),
       };
 
       await createReceiver(payload);
 
       Toast.show({
         type: 'success',
-        text1: 'Đăng ký thành công 🎉',
-        text2: 'Cảm ơn bạn đã tham gia hiến máu 💖',
+        text1: 'Tạo yêu cầu thành công 🎉',
         position: 'top',
-        visibilityTime: 3000,
       });
 
       onSubmit();
@@ -1241,64 +1287,163 @@ export function ConfirmForm({ onBack, onSubmit }: { onBack: () => void; onSubmit
         text2: 'Vui lòng thử lại sau.',
         position: 'top',
       });
-      console.log("Lỗi khi gửi đơn:", error);
+      console.log("Lỗi khi gửi đơn:", error.response?.data || error.message);
     }
   };
+
   return (
     <View style={styles.formContainer}>
+      {/* Back button */}
       <TouchableOpacity style={styles.backButtonForm} onPress={onBack}>
         <Ionicons name="chevron-back" size={20} color="#E91E63" />
         <Text style={styles.backButtonText}>Quay lại</Text>
       </TouchableOpacity>
 
-      <Text style={styles.formTitle}>Xác nhận đơn đăng ký</Text>
+      <Text style={styles.formTitle}>Tạo yêu cầu nhận máu</Text>
 
-      {/* Chọn ngày hiến máu */}
+      {/* Ngày nhận máu */}
       <View style={styles.inputGroup}>
-        <Text style={styles.inputLabel}>Ngày hiến máu</Text>
+        <Text style={styles.inputLabel}>Ngày nhận máu</Text>
         <TouchableOpacity
           onPress={() => setShowDatePicker(true)}
           style={[styles.inputContainer, { paddingVertical: 12 }]}
         >
           <Ionicons name="calendar" size={20} color="#E91E63" style={styles.inputIcon} />
-          <Text style={styles.textInput}>{selectedDate.toLocaleDateString()}</Text>
+          <Text style={styles.textInput}>{selectedDate.toLocaleDateString('vi-VN')}</Text>
         </TouchableOpacity>
         {showDatePicker && (
           <DateTimePicker
-        value={selectedDate}
-        mode="date"
-        display="default"
-        onChange={(event, date) => {
-          setShowDatePicker(false);
-          if (date) setSelectedDate(date);
-        }}
+            value={selectedDate}
+            mode="date"
+            display="default"
+            minimumDate={new Date()}
+            onChange={(event, date) => {
+              setShowDatePicker(false);
+              if (date) {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                if (date < today) {
+                  Toast.show({
+                    type: 'error',
+                    text1: 'Không thể chọn ngày trong quá khứ!',
+                    position: 'top',
+                  });
+                } else {
+                  setSelectedDate(date);
+                }
+              }
+            }}
           />
         )}
       </View>
 
-      {/* Chọn trung tâm hiến máu */}
-      <View style={[styles.inputGroup, { minHeight: 100 }]}>
-        <Text style={styles.inputLabel}>Trung tâm hiến máu</Text>
-        <View style={[styles.inputContainer, { paddingVertical: 0, minHeight: 60 }]}>
-          <Ionicons name="business-outline" size={20} color="#E91E63" style={styles.inputIcon} />
+      {/* Nhóm máu */}
+      <View style={styles.inputGroup}>
+        <Text style={styles.inputLabel}>Nhóm máu</Text>
+        <View style={[styles.inputContainer, { minHeight: 60 }]}>
+          <Ionicons name="water-outline" size={20} color="#E91E63" style={styles.inputIcon} />
           <Picker
-        selectedValue={selectedCenter}
-        onValueChange={(itemValue) => setSelectedCenter(itemValue)}
-        style={{ flex: 1, height: 50 }}
-        dropdownIconColor="#E91E63"
+            selectedValue={bloodId}
+            onValueChange={(val) => setBloodId(val)}
+            style={{ flex: 1 }}
+            dropdownIconColor="#E91E63"
           >
-        <Picker.Item label="-- Chọn trung tâm --" value={null} />
-        {central?.map((item) => (
-          <Picker.Item
-            key={item.centralBlood_id}
-            label={`${item.centralBlood_name} - ${item.centralBlood_address}`}
-            value={String(item.centralBlood_id)}
-          />
-        ))}
+            <Picker.Item label="-- Chọn nhóm máu --" value={null} />
+            {!loading &&
+              Array.isArray(bloodList) &&
+              bloodList.map((item) => (
+                <Picker.Item
+                  key={item.blood_id}
+                  label={`${item.blood_type_id.blood_name}(${item.rh_id.blood_Rh})`}
+                  value={item.blood_id}
+                />
+              ))}
           </Picker>
         </View>
       </View>
 
+      {/* Số lượng máu (ml) */}
+      <View style={styles.inputGroup}>
+        <Text style={styles.inputLabel}>Số lượng máu (ml)</Text>
+        <View style={styles.inputContainer}>
+          <Ionicons name="flask-outline" size={20} color="#E91E63" style={styles.inputIcon} />
+          <TextInput
+            style={styles.textInput}
+            keyboardType="numeric"
+            placeholder="Nhập số ml"
+            value={ml}
+            onChangeText={(text) => {
+              let numeric = text.replace(/[^0-9]/g, '');
+              if (numeric && parseInt(numeric, 10) < 50) {
+                numeric = '50';
+                Toast.show({
+                  type: 'error',
+                  text1: 'Số lượng tối thiểu là 50ml',
+                  position: 'top',
+                });
+              }
+              setMl(numeric);
+            }}
+          />
+        </View>
+      </View>
+
+      {/* Đơn vị máu */}
+      <View style={styles.inputGroup}>
+        <Text style={styles.inputLabel}>Số đơn vị máu</Text>
+        <View style={styles.inputContainer}>
+          <Ionicons name="albums-outline" size={20} color="#E91E63" style={styles.inputIcon} />
+          <TextInput
+            style={styles.textInput}
+            keyboardType="numeric"
+            placeholder="Nhập số đơn vị"
+            value={unit}
+            onChangeText={setUnit}
+          />
+        </View>
+      </View>
+
+      {/* Mức độ ưu tiên */}
+      <View style={styles.inputGroup}>
+        <Text style={styles.inputLabel}>Mức độ ưu tiên</Text>
+        <View style={[styles.inputContainer, { minHeight: 60 }]}>
+          <Ionicons name="alert-circle-outline" size={20} color="#E91E63" style={styles.inputIcon} />
+          <Picker
+            selectedValue={priorityType}
+            onValueChange={(val) => setPriorityType(val)}
+            style={{ flex: 1 }}
+            dropdownIconColor="#E91E63"
+          >
+            <Picker.Item label="Thông thường" value="DEFAULT" />
+            <Picker.Item label="Khẩn cấp" value="EMERGENCY" />
+          </Picker>
+        </View>
+      </View>
+
+      {/* Trung tâm hiến máu */}
+      <View style={styles.inputGroup}>
+        <Text style={styles.inputLabel}>Trung tâm hiến máu</Text>
+        <View style={[styles.inputContainer, { minHeight: 60 }]}>
+          <Ionicons name="business-outline" size={20} color="#E91E63" style={styles.inputIcon} />
+          <Picker
+            selectedValue={selectedCenter}
+            onValueChange={(val) => setSelectedCenter(val)}
+            style={{ flex: 1 }}
+            dropdownIconColor="#E91E63"
+          >
+            <Picker.Item label="-- Chọn trung tâm --" value={null} />
+            {central?.map((item) => (
+              <Picker.Item
+                key={item.centralBlood_id}
+                label={`${item.centralBlood_name} - ${item.centralBlood_address}`}
+                value={item.centralBlood_id}
+              />
+            ))}
+          </Picker>
+        </View>
+      </View>
+
+      {/* Nút gửi đơn */}
       <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
         <Ionicons name="checkmark-circle-outline" size={20} color="#fff" />
         <Text style={styles.submitButtonText}>Xác nhận và gửi đơn</Text>
