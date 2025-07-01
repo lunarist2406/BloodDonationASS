@@ -29,7 +29,7 @@ export default function BloodManagement() {
       title: (
         <div className="flex items-center text-red-600 font-semibold">
           <IconHeart size={18} className="mr-2" />
-          Blood Name
+          Nhóm máu
         </div>
       ),
       dataIndex: "blood_name",
@@ -54,7 +54,7 @@ export default function BloodManagement() {
       title: (
         <div className="flex items-center text-red-600 font-semibold">
           <IconTestPipe size={18} className="mr-2" />
-          Blood Rh
+          Loại Rh
         </div>
       ),
       dataIndex: "blood_Rh",
@@ -68,7 +68,7 @@ export default function BloodManagement() {
       title: (
         <div className="flex items-center text-red-600 font-semibold">
           <IconDatabase size={18} className="mr-2" />
-          Blood ID
+          Mã máu
         </div>
       ),
       dataIndex: "blood_id",
@@ -79,7 +79,7 @@ export default function BloodManagement() {
       title: (
         <div className="flex items-center text-red-600 font-semibold">
           <IconHeart size={18} className="mr-2" />
-          Blood Type
+          Nhóm máu
         </div>
       ),
       dataIndex: ["blood_type_id", "blood_name"],
@@ -89,7 +89,7 @@ export default function BloodManagement() {
       title: (
         <div className="flex items-center text-red-600 font-semibold">
           <IconBolt size={18} className="mr-2" />
-          Rh Type
+          Loại Rh
         </div>
       ),
       dataIndex: ["rh_id", "blood_Rh"],
@@ -103,7 +103,7 @@ export default function BloodManagement() {
         {/* Left side: Blood Types + Rh */}
         <div className="flex-1">
           <h2 className="text-xl font-semibold text-red-600 mb-4">
-            Blood Types
+            Nhóm máu
           </h2>
           <div className="bg-gradient-to-r from-red-100 via-red-50 to-red-100 rounded-lg p-4 mb-10 shadow-md">
             <Table
@@ -117,7 +117,7 @@ export default function BloodManagement() {
             />
           </div>
 
-          <h2 className="text-xl font-semibold text-red-600 mb-4">Rh Types</h2>
+          <h2 className="text-xl font-semibold text-red-600 mb-4">Loại Rh</h2>
           <div className="bg-gradient-to-r from-red-100 via-red-50 to-red-100 rounded-lg p-4 shadow-md">
             <Table
               columns={rhColumns}
@@ -133,7 +133,7 @@ export default function BloodManagement() {
 
         {/* Right side: Bloods */}
         <div className="flex-2">
-          <h2 className="text-xl font-semibold text-red-600 mb-4">Bloods</h2>
+          <h2 className="text-xl font-semibold text-red-600 mb-4">Máu</h2>
           <div className="bg-gradient-to-r from-red-100 via-red-50 to-red-100 rounded-lg p-4 shadow-md">
             <Table
               columns={bloodColumns}

@@ -57,7 +57,7 @@ export default function FormCreate({
   }, [editingStorage, form]);
 
   const onFinish = (values) => {
-    // Convert dates to ISO strings
+    // Chuyển đổi ngày tháng sang chuỗi ISO
     const payload = {
       ...values,
       date: values.date?.toISOString(),
@@ -74,10 +74,10 @@ export default function FormCreate({
             name="donate_id"
             label={
               <span className="flex items-center gap-2">
-                <IconListCheck size={16} /> Donate ID
+                <IconListCheck size={16} /> Mã hiến máu
               </span>
             }
-            rules={[{ required: true, message: "Please input Donate ID" }]}
+            rules={[{ required: true, message: "Vui lòng nhập mã hiến tặng" }]}
           >
             <Input />
           </Form.Item>
@@ -86,12 +86,12 @@ export default function FormCreate({
             name="blood_id"
             label={
               <span className="flex items-center gap-2">
-                <IconDroplet size={16} /> Blood Type
+                <IconDroplet size={16} /> Nhóm máu
               </span>
             }
-            rules={[{ required: true, message: "Please select Blood Type" }]}
+            rules={[{ required: true, message: "Vui lòng chọn nhóm máu" }]}
           >
-            <Select placeholder="Select blood">
+            <Select placeholder="Chọn nhóm máu">
               {bloods.map((b) => (
                 <Option key={b.blood_id} value={b.blood_id}>
                   {b.blood_type_id.blood_name} {b.rh_id.blood_Rh}
@@ -104,54 +104,54 @@ export default function FormCreate({
             name="date"
             label={
               <span className="flex items-center gap-2">
-                <IconCalendar size={16} /> Date
+                <IconCalendar size={16} /> Ngày
               </span>
             }
-            rules={[{ required: true, message: "Please select Date" }]}
+            rules={[{ required: true, message: "Vui lòng chọn ngày" }]}
           >
-            <DatePicker style={{ width: "100%" }} />
+            <DatePicker style={{ width: "100%" }} placeholder="Chọn ngày" />
           </Form.Item>
 
           <Form.Item
             name="expired_date"
             label={
               <span className="flex items-center gap-2">
-                <IconHourglass size={16} /> Expired Date
+                <IconHourglass size={16} /> Ngày hết hạn
               </span>
             }
           >
-            <DatePicker style={{ width: "100%" }} />
+            <DatePicker style={{ width: "100%" }} placeholder="Chọn ngày hết hạn" />
           </Form.Item>
 
           <Form.Item
             name="ml"
             label={
               <span className="flex items-center gap-2">
-                <IconGauge size={16} /> ML
+                <IconGauge size={16} /> Dung tích (ml)
               </span>
             }
-            rules={[{ type: "number", min: 50, message: "Min 50" }]}
+            rules={[{ type: "number", min: 50, message: "Tối thiểu 50ml" }]}
           >
-            <InputNumber min={50} style={{ width: "100%" }} />
+            <InputNumber min={50} style={{ width: "100%" }} placeholder="Nhập dung tích" />
           </Form.Item>
 
           <Form.Item
             name="unit"
             label={
               <span className="flex items-center gap-2">
-                <IconNumbers size={16} /> Unit
+                <IconNumbers size={16} /> Đơn vị
               </span>
             }
-            rules={[{ type: "number", min: 1, message: "Min 1" }]}
+            rules={[{ type: "number", min: 1, message: "Tối thiểu 1 đơn vị" }]}
           >
-            <InputNumber min={1} style={{ width: "100%" }} />
+            <InputNumber min={1} style={{ width: "100%" }} placeholder="Nhập số đơn vị" />
           </Form.Item>
 
           <Form.Item
             name="current_status"
             label={
               <span className="flex items-center gap-2">
-                <IconListCheck size={16} /> Status
+                <IconListCheck size={16} /> Trạng thái
               </span>
             }
             initialValue="STORAGE"
@@ -160,6 +160,7 @@ export default function FormCreate({
               <Option value="STORAGE">STORAGE</Option>
               <Option value="EXPIRED">EXPIRED</Option>
               <Option value="USED">USED</Option>
+              <Option value="EXPORTED">EXPORTED</Option>
             </Select>
           </Form.Item>
 
@@ -167,11 +168,11 @@ export default function FormCreate({
             name="centralBlood_id"
             label={
               <span className="flex items-center gap-2">
-                <IconBuildingBank size={16} /> Central Blood Center
+                <IconBuildingBank size={16} /> Trung tâm máu
               </span>
             }
           >
-            <Select placeholder="Select center">
+            <Select placeholder="Chọn trung tâm máu">
               {centrals.map((c) => (
                 <Option key={c.centralBlood_id} value={c.centralBlood_id}>
                   {c.centralBlood_name}
@@ -195,7 +196,7 @@ export default function FormCreate({
                 )
               }
             >
-              {editingStorage ? "Update" : "Create"}
+              {editingStorage ? "Cập nhật" : "Tạo mới"}
             </Button>
             {editingStorage && (
               <Button
@@ -203,7 +204,7 @@ export default function FormCreate({
                 icon={<IconCircleX size={16} />}
                 type="default"
               >
-                Cancel
+                Hủy bỏ
               </Button>
             )}
           </div>
