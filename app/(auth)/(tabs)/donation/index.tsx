@@ -104,7 +104,7 @@ export default function DonationScreen() {
               styles.tabText, 
               activeTab === 'donated' && styles.activeTabText
             ]}>
-              Đã hiến
+              Chuẩn Bị
             </Text>
           </TouchableOpacity>
           
@@ -140,12 +140,22 @@ export default function DonationScreen() {
         </ScrollView>
 
         {/* Floating Register Button */}
-        <TouchableOpacity 
-          style={styles.floatingButton}
+        <TouchableOpacity
+          style={[
+            styles.floatingButton,
+            {
+              left: undefined,
+              right: 20,
+              flexDirection: 'row',
+              justifyContent: 'center',
+              paddingHorizontal: 12,
+              paddingVertical: 10,
+              borderRadius: 20,
+            }
+          ]}
           onPress={() => setShowRegisterModal(true)}
         >
-          <Ionicons name="add" size={24} color="#fff" />
-          <Text style={styles.floatingButtonText}>Đăng ký</Text>
+          <Ionicons name="add" size={18} color="#fff" style={{ alignSelf: 'center' }} />
         </TouchableOpacity>
 
         {/* Register Modal */}
@@ -173,10 +183,36 @@ export default function DonationScreen() {
 
 // All Users Table Component (Form cố định)
 function AllUsersTable({ searchText, sortBy, sortOrder }: any) {
-  const { allDonateBloods } = useDonateBlood();
+  const { allDonateBloods, getAllDonateBloods } = useDonateBlood();
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = 3;
+  const [loading, setLoading] = useState(false);
+
+  // Reload data when component mounts or when data changes
+
+  // Auto reload when allDonateBloods changes (if needed)
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [allDonateBloods]);
+
+  const handleReload = async () => {
+    setLoading(true);
+    try {
+      await getAllDonateBloods();
+      Toast.show({
+        type: 'success',
+        text1: 'Đã làm mới danh sách',
+        position: 'top',
+      });
+    } catch (err) {
+      Toast.show({
+        type: 'error',
+        text1: 'Lỗi khi tải lại danh sách',
+      });
+    }
+    setLoading(false);
+  };
 
   const users = (allDonateBloods || []).map((d) => {
     const userInfo = d.infor_health?.user_id;
@@ -236,9 +272,14 @@ function AllUsersTable({ searchText, sortBy, sortOrder }: any) {
   return (
     <View style={styles.tableContainer}>
       {/* Header */}
-      <View style={styles.tableHeader}>
-        <Text style={styles.tableTitle}>Danh Sách Người Hiến Máu</Text>
-        <Text style={styles.tableSubtitle}>{filtered.length} người</Text>
+      <View style={[styles.tableHeader, { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }]}>
+        <View>
+          <Text style={styles.tableTitle}>Danh Sách Người Hiến Máu</Text>
+          <Text style={styles.tableSubtitle}>{filtered.length} người</Text>
+        </View>
+        <TouchableOpacity onPress={handleReload} style={{ backgroundColor: '#E91E63', padding: 8, borderRadius: 8 }}>
+          <Ionicons name="refresh" size={20} color="#fff" />
+        </TouchableOpacity>
       </View>
 
       {/* Stats */}
@@ -338,234 +379,400 @@ function AllUsersTable({ searchText, sortBy, sortOrder }: any) {
 
 
 // Donated Users Table Component (Cập nhật)
-function DonatedUsersTable({ searchText, sortBy, sortOrder }: any) {
-  const donatedUsers = [
-    {
-      id: 1,
-      name: 'Nguyễn Văn A',
-      bloodType: 'A+',
-      donatedDate: '2024-01-15',
-      location: 'BV Chợ Rẫy',
-      amount: '450ml',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=50&h=50&fit=crop&crop=face',
-      phone: '0123456789',
-      age: 28,
-      registrationDate: '2024-01-10', // Ngày đăng ký ban đầu
-      donationHistory: [
-        { date: '2024-01-15', amount: '450ml', location: 'BV Chợ Rẫy' },
-        { date: '2023-10-20', amount: '450ml', location: 'BV Chợ Rẫy' },
-        { date: '2023-07-15', amount: '450ml', location: 'Viện Huyết học' },
-      ]
-    },
-    {
-      id: 2,
-      name: 'Trần Thị B',
-      bloodType: 'O+',
-      donatedDate: '2024-01-14',
-      location: 'Viện Huyết học',
-      amount: '450ml',
-      avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=50&h=50&fit=crop&crop=face',
-      phone: '0987654321',
-      age: 25,
-      registrationDate: '2024-01-12',
-      donationHistory: [
-        { date: '2024-01-14', amount: '450ml', location: 'Viện Huyết học' },
-      ]
-    },
-    {
-      id: 3,
-      name: 'Lê Văn C',
-      bloodType: 'B+',
-      donatedDate: '2024-01-13',
-      location: 'BV Đại học Y Dược',
-      amount: '450ml',
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=50&h=50&fit=crop&crop=face',
-      phone: '0369852147',
-      age: 32,
-      registrationDate: '2024-01-08',
-      donationHistory: [
-        { date: '2024-01-13', amount: '450ml', location: 'BV Đại học Y Dược' },
-        { date: '2023-11-10', amount: '450ml', location: 'BV Chợ Rẫy' },
-      ]
-    },
-  ];
+function DonatedUsersTable({ searchText }: { searchText: string }) {
+  const { donateHistory, getDonateHistoryByUser } = useDonateBlood();
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedDonation, setSelectedDonation] = useState<any>(null);
 
-  const filteredUsers = donatedUsers.filter(user =>
-    user.name.toLowerCase().includes(searchText.toLowerCase()) ||
-    user.bloodType.toLowerCase().includes(searchText.toLowerCase())
-  );
+  // Tự động load dữ liệu khi component mount
+  useEffect(() => {
+  const interval = setInterval(() => {
+    getDonateHistoryByUser();
+  }, 1000); // 30s
+
+  return () => clearInterval(interval);    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleReload = async () => {
+    try {
+      await getDonateHistoryByUser();
+      Toast.show({
+        type: 'success',
+        text1: 'Danh sách đã được làm mới',
+        position: 'top',
+      });
+    } catch (err) {
+      Toast.show({
+        type: 'error',
+        text1: 'Lỗi khi tải lại danh sách',
+      });
+    }
+  };
+
+  const filteredDonations =
+    donateHistory?.filter(
+      (donation: any) =>
+        donation.status_donate === 'PENDING' &&
+        donation.status_regist === 'APPROVED' &&
+        (
+          donation?.centralBlood_id?.centralBlood_name?.toLowerCase().includes(searchText.toLowerCase()) ||
+          donation?.infor_health?.status_health?.toLowerCase().includes(searchText.toLowerCase())
+        )
+    ) || [];
 
   return (
-    <View style={styles.tableContainer}>
-      <View style={styles.tableHeader}>
-        <Text style={styles.tableTitle}>Danh sách người đã hiến máu</Text>
-        <Text style={styles.tableSubtitle}>{filteredUsers.length} người</Text>
-      </View>
+    <>
+      <ScrollView contentContainerStyle={{ padding: 16 }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+          <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
+            Danh sách đơn hiến máu ({filteredDonations.length})
+          </Text>
+          <TouchableOpacity
+            onPress={handleReload}
+            style={{
+              backgroundColor: '#E91E63',
+              paddingVertical: 6,
+              paddingHorizontal: 12,
+              borderRadius: 6,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Ionicons name="refresh" size={20} color="#fff" />
+          </TouchableOpacity>
+        </View>
 
-      {filteredUsers.map((user) => (
-        <TouchableOpacity key={user.id} style={styles.userCard}>
-          <View style={styles.userInfo}>
-            <Image source={{ uri: user.avatar }} style={styles.userAvatar} />
-            <View style={styles.userDetails}>
-              <Text style={styles.userName}>{user.name}</Text>
-              <View style={styles.userMeta}>
-                <View style={styles.bloodTypeBadge}>
-                  <Text style={styles.bloodTypeText}>{user.bloodType}</Text>
-                </View>
-                <Text style={styles.userAge}>{user.age} tuổi</Text>
-                <View style={styles.donationCountBadge}>
-                  <Text style={styles.donationCountText}>{user.donationHistory.length} lần</Text>
-                </View>
-              </View>
-              <View style={styles.donationInfo}>
-                <Ionicons name="location-outline" size={14} color="#666" />
-                <Text style={styles.locationText}>{user.location}</Text>
-              </View>
-              <View style={styles.registrationInfo}>
-                <Ionicons name="calendar-outline" size={14} color="#666" />
-                <Text style={styles.registrationText}>
-                  Đăng ký: {new Date(user.registrationDate).toLocaleDateString('vi-VN')}
+        {filteredDonations.map((item: any, index: number) => (
+          <View
+            key={index}
+            style={{
+              backgroundColor: '#fff',
+              borderRadius: 12,
+              marginBottom: 16,
+              padding: 16,
+              shadowColor: '#000',
+              shadowOpacity: 0.1,
+              shadowRadius: 6,
+              elevation: 4,
+            }}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Image
+                source={{ uri: item.infor_health?.img_health }}
+                style={{ width: 60, height: 60, borderRadius: 30, marginRight: 12 }}
+              />
+              <View>
+                <Text style={{ fontWeight: 'bold', fontSize: 16 }}>
+                  {item.centralBlood_id?.centralBlood_name}
+                </Text>
+                <Text style={{ color: '#666' }}>
+                  Ngày hiến: {new Date(item.date_donate).toLocaleDateString('vi-VN')}
+                </Text>
+                <Text style={{ color: '#999' }}>
+                  Cân nặng: {item.infor_health?.weight_decimal} kg
                 </Text>
               </View>
             </View>
+
+            <TouchableOpacity
+              style={{
+                marginTop: 10,
+                backgroundColor: '#FFD700',
+                padding: 10,
+                borderRadius: 8,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+              onPress={() => {
+                setSelectedDonation(item);
+                setModalVisible(true);
+              }}
+            >
+              <Ionicons name="document-text-outline" size={16} color="black" style={{ marginRight: 6 }} />
+              <Text style={{ fontWeight: 'bold', color: 'black' }}>Xem chi tiết đơn</Text>
+            </TouchableOpacity>
           </View>
-          
-          <View style={styles.donationDetails}>
-            <Text style={styles.donationAmount}>{user.amount}</Text>
-            <Text style={styles.donationDate}>
-              {new Date(user.donatedDate).toLocaleDateString('vi-VN')}
-            </Text>
-            <View style={styles.actionButtons}>
-              <TouchableOpacity style={styles.historyButton}>
-                <Ionicons name="time-outline" size={14} color="#E91E63" />
-                <Text style={styles.historyButtonText}>Lịch sử</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.contactButton}>
-                <Ionicons name="call-outline" size={16} color="#E91E63" />
+        ))}
+      </ScrollView>
+
+      {/* Modal chi tiết đơn */}
+      <Modal
+        visible={modalVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={{
+          flex: 1,
+          backgroundColor: 'rgba(0,0,0,0.4)',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+          <View style={{
+            backgroundColor: '#fff',
+            borderRadius: 16,
+            padding: 24,
+            width: '85%',
+            maxWidth: 400,
+            elevation: 8,
+          }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+              <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#E91E63' }}>Chi tiết đơn hiến máu</Text>
+              <TouchableOpacity onPress={() => setModalVisible(false)}>
+                <Ionicons name="close" size={24} color="#333" />
               </TouchableOpacity>
             </View>
+            {selectedDonation && (
+              <>
+                <Image
+                  source={{ uri: selectedDonation.infor_health?.img_health }}
+                  style={{ width: '100%', height: 120, borderRadius: 8, marginBottom: 12 }}
+                  contentFit="cover"
+                />
+                <Text style={{ fontWeight: 'bold', fontSize: 16, marginBottom: 4 }}>
+                  {selectedDonation.centralBlood_id?.centralBlood_name}
+                </Text>
+                <Text style={{ color: '#666', marginBottom: 4 }}>
+                  Địa chỉ: {selectedDonation.centralBlood_id?.centralBlood_address}
+                </Text>
+                <Text style={{ color: '#666', marginBottom: 4 }}>
+                  Ngày hiến: {new Date(selectedDonation.date_donate).toLocaleDateString('vi-VN')}
+                </Text>
+                <Text style={{ color: '#666', marginBottom: 4 }}>
+                  Họ tên: {selectedDonation.infor_health?.user_id?.fullname}
+                </Text>
+                <Text style={{ color: '#666', marginBottom: 4 }}>
+                  Cân nặng: {selectedDonation.infor_health?.weight_decimal} kg
+                </Text>
+                <Text style={{ color: '#666', marginBottom: 4 }}>
+                  Huyết áp: {selectedDonation.infor_health?.blood_pressure} mmHg
+                </Text>
+                <Text style={{ color: '#666', marginBottom: 4 }}>
+                  Nhóm máu: {selectedDonation.infor_health?.blood_id?.blood_id}
+                </Text>
+                <Text style={{ color: '#666', marginBottom: 4 }}>
+                  Tình trạng: {selectedDonation.infor_health?.status_health}
+                </Text>
+                <Text style={{ color: '#666', marginBottom: 4 }}>
+                  Tiền sử bệnh: {selectedDonation.infor_health?.medical_history || 'Không'}
+                </Text>
+              </>
+            )}
+            <TouchableOpacity
+              style={{
+                marginTop: 16,
+                backgroundColor: '#E91E63',
+                borderRadius: 8,
+                paddingVertical: 10,
+                alignItems: 'center',
+              }}
+              onPress={() => setModalVisible(false)}
+            >
+              <Text style={{ color: '#fff', fontWeight: 'bold' }}>Đóng</Text>
+            </TouchableOpacity>
           </View>
-        </TouchableOpacity>
-      ))}
-    </View>
+        </View>
+      </Modal>
+    </>
   );
 }
-
 // Registered Users Table Component (Cập nhật)
 function RegisteredUsersTable({ searchText, sortBy, sortOrder }: any) {
-  const registeredUsers = [
-    {
-      id: 1,
-      name: 'Phạm Văn D',
-      bloodType: 'AB+',
-      registeredDate: '2024-01-16',
-      scheduledDate: '2024-01-20',
-      location: 'BV Chợ Rẫy',
-      status: 'confirmed',
-      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=50&h=50&fit=crop&crop=face',
-      phone: '0147258369',
-      age: 30,
-    },
-    {
-      id: 2,
-      name: 'Hoàng Thị E',
-      bloodType: 'A-',
-      registeredDate: '2024-01-15',
-      scheduledDate: '2024-01-19',
-      location: 'Viện Huyết học',
-      status: 'pending',
-      avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=50&h=50&fit=crop&crop=face',
-      phone: '0258147369',
-      age: 27,
-    },
-  ];
+  const { donateHistory, getDonateHistoryByUser } = useDonateBlood();
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedDonation, setSelectedDonation] = useState<any>(null);
+  useEffect(() => {
+  const interval = setInterval(() => {
+    getDonateHistoryByUser();
+  }, 1000); // 30s
 
-  const filteredUsers = registeredUsers.filter(user =>
-    user.name.toLowerCase().includes(searchText.toLowerCase()) ||
-    user.bloodType.toLowerCase().includes(searchText.toLowerCase())
-  );
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'confirmed': return '#4CAF50';
-      case 'pending': return '#FF9800';
-      case 'cancelled': return '#F44336';
-      default: return '#666';
+  return () => clearInterval(interval);    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const handleReload = async () => {
+    try {
+      await getDonateHistoryByUser();
+      Toast.show({
+        type: 'success',
+        text1: 'Danh sách đã được làm mới',
+        position: 'top',
+      });
+    } catch (err) {
+      Toast.show({
+        type: 'error',
+        text1: 'Lỗi khi tải lại danh sách',
+      });
     }
   };
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'confirmed': return 'Đã xác nhận';
-      case 'pending': return 'Chờ xác nhận';
-      case 'cancelled': return 'Đã hủy';
-      default: return status;
-    }
-  };
-
-  const handleMoveToCompleted = (userId: number) => {
-    // Logic chuyển từ đăng ký sang hoàn thành hiến máu
-    console.log('Chuyển user', userId, 'sang bảng đã hiến máu');
-  };
+  // Lọc các đơn có status_donate === 'PENDING' và status_regist === 'PENDING'
+  const filteredDonations =
+    donateHistory?.filter(
+      (donation: any) =>
+        donation.status_donate === 'PENDING' &&
+        donation.status_regist === 'PENDING' &&
+        (
+          donation?.centralBlood_id?.centralBlood_name?.toLowerCase().includes(searchText.toLowerCase()) ||
+          donation?.infor_health?.user_id?.fullname?.toLowerCase().includes(searchText.toLowerCase()) ||
+          donation?.infor_health?.blood_id?.blood_id?.toLowerCase().includes(searchText.toLowerCase())
+        )
+    ) || [];
 
   return (
-    <View style={styles.tableContainer}>
-      <View style={styles.tableHeader}>
-        <Text style={styles.tableTitle}>Danh sách người đã đăng ký</Text>
-        <Text style={styles.tableSubtitle}>{filteredUsers.length} người</Text>
-      </View>
+    <>
+      <ScrollView contentContainerStyle={{ padding: 16 }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+          <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
+            Danh sách đơn đăng ký ({filteredDonations.length})
+          </Text>
+          <TouchableOpacity
+            onPress={handleReload}
+            style={{
+              backgroundColor: '#E91E63',
+              paddingVertical: 6,
+              paddingHorizontal: 12,
+              borderRadius: 6,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Ionicons name="refresh" size={20} color="#fff" />
+          </TouchableOpacity>
+        </View>
 
-      {filteredUsers.map((user) => (
-        <TouchableOpacity key={user.id} style={styles.userCard}>
-          <View style={styles.userInfo}>
-            <Image source={{ uri: user.avatar }} style={styles.userAvatar} />
-            <View style={styles.userDetails}>
-              <Text style={styles.userName}>{user.name}</Text>
-              <View style={styles.userMeta}>
-                <View style={styles.bloodTypeBadge}>
-                  <Text style={styles.bloodTypeText}>{user.bloodType}</Text>
-                </View>
-                <Text style={styles.userAge}>{user.age} tuổi</Text>
-              </View>
-              <View style={styles.donationInfo}>
-                <Ionicons name="calendar-outline" size={14} color="#666" />
-                <Text style={styles.locationText}>
-                  Hẹn: {new Date(user.scheduledDate).toLocaleDateString('vi-VN')}
+        {filteredDonations.map((item: any, index: number) => (
+          <View
+            key={index}
+            style={{
+              backgroundColor: '#fff',
+              borderRadius: 12,
+              marginBottom: 16,
+              padding: 16,
+              shadowColor: '#000',
+              shadowOpacity: 0.1,
+              shadowRadius: 6,
+              elevation: 4,
+            }}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Image
+                source={{ uri: item.infor_health?.img_health }}
+                style={{ width: 60, height: 60, borderRadius: 30, marginRight: 12 }}
+              />
+              <View>
+                <Text style={{ fontWeight: 'bold', fontSize: 16 }}>
+                  {item.infor_health?.user_id?.fullname}
+                </Text>
+                <Text style={{ color: '#666' }}>
+                  Ngày đăng ký: {new Date(item.date_register).toLocaleDateString('vi-VN')}
+                </Text>
+                <Text style={{ color: '#999' }}>
+                  Nhóm máu: {item.infor_health?.blood_id?.blood_id}
                 </Text>
               </View>
-              <View style={styles.donationInfo}>
-                <Ionicons name="location-outline" size={14} color="#666" />
-                <Text style={styles.locationText}>{user.location}</Text>
-              </View>
             </View>
+
+            <TouchableOpacity
+              style={{
+                marginTop: 10,
+                backgroundColor: '#FFD700',
+                padding: 10,
+                borderRadius: 8,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+              onPress={() => {
+                setSelectedDonation(item);
+                setModalVisible(true);
+              }}
+            >
+              <Ionicons name="document-text-outline" size={16} color="black" style={{ marginRight: 6 }} />
+              <Text style={{ fontWeight: 'bold', color: 'black' }}>Xem chi tiết đơn</Text>
+            </TouchableOpacity>
           </View>
-          
-          <View style={styles.registrationDetails}>
-            <View style={[
-              styles.statusBadge,
-              { backgroundColor: getStatusColor(user.status) }
-            ]}>
-              <Text style={styles.statusText}>{getStatusText(user.status)}</Text>
-            </View>
-            <Text style={styles.registrationDate}>
-              Đăng ký: {new Date(user.registeredDate).toLocaleDateString('vi-VN')}
-            </Text>
-            <View style={styles.actionButtons}>
-              <TouchableOpacity 
-                style={styles.completeButton}
-                onPress={() => handleMoveToCompleted(user.id)}
-              >
-                <Ionicons name="checkmark-outline" size={14} color="#fff" />
-                <Text style={styles.completeButtonText}>Hoàn thành</Text>
+        ))}
+      </ScrollView>
+
+      {/* Modal chi tiết đơn */}
+      <Modal
+        visible={modalVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={{
+          flex: 1,
+          backgroundColor: 'rgba(0,0,0,0.4)',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+          <View style={{
+            backgroundColor: '#fff',
+            borderRadius: 16,
+            padding: 24,
+            width: '85%',
+            maxWidth: 400,
+            elevation: 8,
+          }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+              <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#E91E63' }}>Chi tiết đơn đăng ký</Text>
+              <TouchableOpacity onPress={() => setModalVisible(false)}>
+                <Ionicons name="close" size={24} color="#333" />
               </TouchableOpacity>
-              <TouchableOpacity style={styles.contactButton}>
-                <Ionicons name="call-outline" size={16} color="#E91E63" />
-              </TouchableOpacity>
             </View>
+            {selectedDonation && (
+              <>
+                <Image
+                  source={{ uri: selectedDonation.infor_health?.img_health }}
+                  style={{ width: '100%', height: 120, borderRadius: 8, marginBottom: 12 }}
+                  contentFit="cover"
+                />
+                <Text style={{ fontWeight: 'bold', fontSize: 16, marginBottom: 4 }}>
+                  {selectedDonation.centralBlood_id?.centralBlood_name}
+                </Text>
+                <Text style={{ color: '#666', marginBottom: 4 }}>
+                  Địa chỉ: {selectedDonation.centralBlood_id?.centralBlood_address}
+                </Text>
+                <Text style={{ color: '#666', marginBottom: 4 }}>
+                  Ngày đăng ký: {new Date(selectedDonation.date_register).toLocaleDateString('vi-VN')}
+                </Text>
+                <Text style={{ color: '#666', marginBottom: 4 }}>
+                  Họ tên: {selectedDonation.infor_health?.user_id?.fullname}
+                </Text>
+                <Text style={{ color: '#666', marginBottom: 4 }}>
+                  Cân nặng: {selectedDonation.infor_health?.weight_decimal} kg
+                </Text>
+                <Text style={{ color: '#666', marginBottom: 4 }}>
+                  Huyết áp: {selectedDonation.infor_health?.blood_pressure} mmHg
+                </Text>
+                <Text style={{ color: '#666', marginBottom: 4 }}>
+                  Nhóm máu: {selectedDonation.infor_health?.blood_id?.blood_id}
+                </Text>
+                <Text style={{ color: '#666', marginBottom: 4 }}>
+                  Tình trạng: {selectedDonation.infor_health?.status_health}
+                </Text>
+                <Text style={{ color: '#666', marginBottom: 4 }}>
+                  Tiền sử bệnh: {selectedDonation.infor_health?.medical_history || 'Không'}
+                </Text>
+              </>
+            )}
+            <TouchableOpacity
+              style={{
+                marginTop: 16,
+                backgroundColor: '#E91E63',
+                borderRadius: 8,
+                paddingVertical: 10,
+                alignItems: 'center',
+              }}
+              onPress={() => setModalVisible(false)}
+            >
+              <Text style={{ color: '#fff', fontWeight: 'bold' }}>Đóng</Text>
+            </TouchableOpacity>
           </View>
-        </TouchableOpacity>
-      ))}
-    </View>
+        </View>
+      </Modal>
+    </>
   );
 }
 
