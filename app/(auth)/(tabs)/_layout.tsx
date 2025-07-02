@@ -7,13 +7,12 @@ import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function TabLayout() {
-
   const redColor = '#8B0000'; // đỏ đậm
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: redColor, // Nếu bạn muốn tab active cũng đỏ luôn
+        tabBarActiveTintColor: redColor,
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
@@ -33,13 +32,6 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarIcon: () => <Ionicons name="paper-plane" size={28} color={redColor} />,
-        }}
-      />
-      <Tabs.Screen
         name="donation"
         options={{
           title: 'Hiến máu',
@@ -51,6 +43,14 @@ export default function TabLayout() {
         options={{
           title: 'Nhận máu',
           tabBarIcon: () => <Ionicons name="bandage" size={28} color={redColor} />,
+        }}
+      />
+      {/* Đưa AI lên trước tìm kiếm */}
+      <Tabs.Screen
+        name="chatbot"
+        options={{
+          title: 'AI',
+          tabBarIcon: () => <Ionicons name="chatbubbles" size={28} color={redColor} />,
         }}
       />
       <Tabs.Screen
