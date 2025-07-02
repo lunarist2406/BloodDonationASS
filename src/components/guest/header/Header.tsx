@@ -380,6 +380,7 @@ const staffLinks = [
     label: "Quản Lý Đơn Vị Kho Máu của Trung Tâm",
     icon: IconDatabase,
   },
+  { to: "controlling-blood-export", label: "Quản Lý Xuất Máu", icon: IconSettings2 },
   { to: "staff-profile", label: "Tài Khoản", icon: IconUserBolt },
   {
     to: "business-systems",
