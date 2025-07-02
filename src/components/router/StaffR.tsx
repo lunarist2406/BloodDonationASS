@@ -5,6 +5,7 @@ import StaffProfile from "../staff/profile/Profile";
 import ControllingStorage from "../staff/ControllingStorage/ControllingStorage";
 import ControllingHealth from "../staff/ControllingHealth/ControllingHealth";
 import ControllingReceiver from "../staff/ControllingReceiver/ControllingReceiver";
+import ControllingExportBlood from "../staff/bloodExport/ControllingBloodExport";
 
 // Lazy load components
 const HomePage = lazy(() => import("../../page/HomePage"));
@@ -27,6 +28,9 @@ export default function StaffR() {
           <Route path="staff-profile" element={<StaffProfile />} />
 
           <Route path="business-systems" element={<BusinessSystems />} />
+
+          <Route path="controlling-blood-export" element={<ControllingExportBlood />} />
+
         </Route>
       </Routes>
     </Suspense>
