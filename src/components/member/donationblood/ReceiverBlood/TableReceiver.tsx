@@ -164,7 +164,7 @@ export default function TableReceiverBlood() {
         Đơn Gần Nhất đang chờ duyệt
       </Title>
 
-      {data.map((item, index) => (
+      {data.map((item) => (
         <div
           key={item.id}
           className="mb-8 border border-gray-200 rounded-lg p-4"

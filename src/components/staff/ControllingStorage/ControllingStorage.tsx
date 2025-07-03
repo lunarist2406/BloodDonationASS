@@ -122,23 +122,23 @@ export default function ControllingStorage() {
   };
 
   // Delete item
-const handleDelete = async (id:string) => {
-  Modal.confirm({
-    title: "Bạn có chắc chắn muốn xóa?",
-    okText: "Xóa",
-    okType: "danger",
-    cancelText: "Hủy",
-    onOk: async () => {
-      try {
-        await deleteStorage(id);
-        message.success("Xóa thành công");
-        fetchAllStorages();
-      } catch {
-        message.error("Xóa thất bại");
-      }
-    },
-  });
-};
+  const handleDelete = async (id:string | number) => {
+    Modal.confirm({
+      title: "Bạn có chắc chắn muốn xóa?",
+      okText: "Xóa",
+      okType: "danger",
+      cancelText: "Hủy",
+      onOk: async () => {
+        try {
+          await deleteStorage(String(id));
+          message.success("Xóa thành công");
+          fetchAllStorages();
+        } catch {
+          message.error("Xóa thất bại");
+        }
+      },
+    });
+  };
 
   return (
     <div className="p-8 w-full overflow-hidden flex flex-col gap-6">
@@ -182,76 +182,76 @@ const handleDelete = async (id:string) => {
         </div>
 
         <div className="w-full lg:w-2/3 overflow-x-auto">
-          <Card
+            <Card
             title={
               <div className="flex items-center gap-2">
-                <IconDatabaseEdit size={18} />
-                Danh Sách Kho Máu
+              <IconDatabaseEdit size={18} />
+              Danh Sách Kho Máu
               </div>
             }
             extra={
               <div className="flex gap-2">
-                <Input.Search
-                  placeholder="Tìm kiếm theo người hiến"
-                  allowClear
-                  className="w-64"
-                  value={searchText}
-                  onChange={(e:any) => {
-                    const value = e.target.value;
-                    setSearchText(value);
-                    applyFilterAndPagination(
-                      allStorages,
-                      value,
-                      1,
-                      pagination.pageSize
-                    );
-                  }}
-                  onSearch={(value:any) => {
-                    setSearchText(value);
-                    applyFilterAndPagination(
-                      allStorages,
-                      value,
-                      1,
-                      pagination.pageSize
-                    );
-                  }}
-                />
+              <Input.Search
+                placeholder="Tìm kiếm theo người hiến"
+                allowClear
+                className="w-64"
+                value={searchText}
+                onChange={(e:any) => {
+                const value = e.target.value;
+                setSearchText(value);
+                applyFilterAndPagination(
+                  allStorages,
+                  value,
+                  1,
+                  pagination.pageSize
+                );
+                }}
+                onSearch={(value:any) => {
+                setSearchText(value);
+                applyFilterAndPagination(
+                  allStorages,
+                  value,
+                  1,
+                  pagination.pageSize
+                );
+                }}
+              />
 
-                <Button
-                  icon={<IconRefresh size={16} />}
-                  onClick={() => fetchAllStorages()}
-                >
-                  Tải Lại
-                </Button>
+              <Button
+                icon={<IconRefresh size={16} />}
+                onClick={() => fetchAllStorages()}
+              >
+                Tải Lại
+              </Button>
               </div>
             }
-          >
+            >
             <TableStorage
               storages={storages}
               loading={loading}
               pagination={pagination}
               bloods={bloods}
               onPageChange={(page:any, pageSize:any) =>
-                applyFilterAndPagination(
-                  allStorages,
-                  searchText,
-                  page,
-                  pageSize
-                )
+              applyFilterAndPagination(
+                allStorages,
+                searchText,
+                page,
+                pageSize
+              )
               }
               onPageSizeChange={(size:any) => {
-                setPagination((prev) => ({
-                  ...prev,
-                  pageSize: size,
-                  current: 1,
-                }));
-                applyFilterAndPagination(allStorages, searchText, 1, size);
+              setPagination((prev) => ({
+                ...prev,
+                pageSize: size,
+                current: 1,
+              }));
+              applyFilterAndPagination(allStorages, searchText, 1, size);
               }}
               onView={setViewingStorage}
               onEdit={setEditingStorage}
               onDelete={handleDelete}
             />
-          </Card>
+            </Card>
         </div>
       </div>
 

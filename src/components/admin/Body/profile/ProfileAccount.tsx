@@ -35,7 +35,7 @@ export default function ProfileAccount() {
         role_name: userData.data.role_id?.[0]?.role_name || "MEMBER",
       });
 
-      setDonationCount(5);
+      setDonationCount(donationCount);
     }
   }, [userData, form]);
 

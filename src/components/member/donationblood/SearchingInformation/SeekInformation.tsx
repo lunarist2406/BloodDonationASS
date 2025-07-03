@@ -14,7 +14,7 @@ export const SeekInformation = () => {
   const [originalData, setOriginalData] = useState<BloodDonationData[]>([]);
   const { user } = useAuth();
   const [distanceKm, setDistanceKm] = useState(10);
-  const [selectedCenter, updateCenter] = useState<string | null>(null);
+  const [selectedCenter, updateCenter] = useState<string>("");
 
   const { filteredData, selectedTypes, updateTypes } = useBloodDonationFilter(
     data,

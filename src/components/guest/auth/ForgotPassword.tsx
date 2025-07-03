@@ -99,7 +99,6 @@ export default function ForgotPassword() {
   // State management
   const [currentStep, setCurrentStep] = useState(0);
   const [email, setEmail] = useState("");
-  const [verificationCode, setVerificationCode] = useState<number>();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -197,7 +196,6 @@ export default function ForgotPassword() {
       );
 
       if (response.data?.statusCode === 201) {
-        setVerificationCode(Number(values.code));
         setSuccess("Mã xác thực hợp lệ");
         setCurrentStep(2);
       } else {

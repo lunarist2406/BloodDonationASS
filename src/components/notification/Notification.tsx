@@ -8,7 +8,6 @@ import { api } from '../config/axios/axiosInstance';
 const SOCKET_URL = "http://localhost:3000/noti"; // Đổi thành URL backend của bạn
 
 export const NotificationDropdown: React.FC<NotificationDropdownProps & { userId: string }> = ({
-  notifications: propNotifications,
   onMarkAsRead,
   onMarkAllAsRead,
 }) => {

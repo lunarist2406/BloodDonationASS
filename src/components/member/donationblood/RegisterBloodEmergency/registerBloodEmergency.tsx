@@ -10,32 +10,11 @@ import FormHealth from "../FormHealth";
 import ReceiverTable from "./ReceiverTable";
 
 export default function RegisterBloodEmergency() {
-
-  interface MyProps {
-    label: string;
-    icon: React.ElementType;
-    delay?: number;
-  }
   const [currentStep, setCurrentStep] = useState<"health" | "register">(
     "health"
   );
-
   const [refresh, setRefresh] = useState(false);
 const handleRefresh = () => setRefresh(prev => !prev);
-
-  const MotionTh = ({ label, icon: Icon, delay }: MyProps) => (
-    <motion.th
-      className="border px-3 py-2"
-      initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay }}
-    >
-      <div className="flex items-center justify-center gap-1 text-sm font-semibold text-red-800">
-        <Icon size={16} />
-        {label}
-      </div>
-    </motion.th>
-  );
 
   return (
     <div className="flex flex-col bg-gradient-to-b from-red-100 to-red-300 min-h-screen">

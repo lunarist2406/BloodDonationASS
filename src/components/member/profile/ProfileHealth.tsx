@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, Descriptions, Spin } from "antd";
 import {
   IconHeartbeat,

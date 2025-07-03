@@ -1,5 +1,5 @@
 // FormCreate.tsx
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import {
   Form,
   Input,
@@ -7,8 +7,6 @@ import {
   DatePicker,
   InputNumber,
   Select,
-  message,
-  Col,
 } from "antd";
 import {
   IconListCheck,
@@ -18,7 +16,6 @@ import {
   IconGauge,
   IconNumbers,
   IconBuildingBank,
-  IconTrash,
   IconCircleX,
   IconFilePlus,
   IconEdit,
@@ -27,13 +24,41 @@ import dayjs from "dayjs";
 
 const { Option } = Select;
 
+interface BloodType {
+  blood_id: string | number;
+  blood_type_id: { blood_name: string };
+  rh_id: { blood_Rh: string };
+}
+
+interface CentralType {
+  centralBlood_id: string | number;
+  centralBlood_name: string;
+}
+
+interface StorageType {
+  date?: string;
+  expired_date?: string;
+  donate_id?: { donate_id: string | number };
+  centralBlood_id?: { centralBlood_id: string | number };
+  blood_id?: { blood_id: string | number } | string | number;
+  [key: string]: any;
+}
+
+interface FormCreateProps {
+  editingStorage?: StorageType | null;
+  onSubmit: (payload: any) => void;
+  bloods: BloodType[];
+  centrals: CentralType[];
+  onCancelEdit?: () => void;
+}
+
 export default function FormCreate({
   editingStorage,
   onSubmit,
   bloods,
   centrals,
   onCancelEdit,
-}) {
+}: FormCreateProps) {
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -56,7 +81,7 @@ export default function FormCreate({
     }
   }, [editingStorage, form]);
 
-  const onFinish = (values) => {
+  const onFinish = (values:any) => {
     // Chuyển đổi ngày tháng sang chuỗi ISO
     const payload = {
       ...values,

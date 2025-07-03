@@ -377,7 +377,7 @@ const handleStatusUpdate = async (
           showSizeChanger
           pageSizeOptions={["5", "10", "20", "50"]}
           onChange={(page, pageSize) => fetchData(page, pageSize)}
-          onShowSizeChange={(current, size) => fetchData(1, size)}
+          onShowSizeChange={( size) => fetchData(1, size)}
           showTotal={(total, range) =>
             `${range[0]}-${range[1]} / ${total} bản ghi`
           }
