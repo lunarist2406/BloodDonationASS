@@ -10,7 +10,6 @@ import {
   IconChevronLeft,
 } from "@tabler/icons-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useRegisterBlood } from "../../../../hooks/RegistrationForm/useRegisterBlood";
 import { useState } from "react";
 import FormRegisterBloodEmergency from "./FormRegisterBlood";
 import FormHealth from "../FormHealth";
@@ -22,16 +21,12 @@ export default function RegisterBloodEmergency() {
     icon: React.ElementType;
     delay?: number;
   }
-  const { waitingList, setWaitingList, formData, setFormData } =
-    useRegisterBlood();
   const [currentStep, setCurrentStep] = useState<"health" | "register">(
     "health"
   );
 
   const [refresh, setRefresh] = useState(false);
 const handleRefresh = () => setRefresh(prev => !prev);
-  console.log("📋 Current waitingList:", waitingList);
-  console.log("📋 Current formData:", formData);
   const MotionTh = ({ label, icon: Icon, delay }: MyProps) => (
     <motion.th
       className="border px-3 py-2"
