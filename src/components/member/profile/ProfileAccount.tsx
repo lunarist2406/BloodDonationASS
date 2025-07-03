@@ -52,11 +52,16 @@ export default function ProfileAccount() {
     console.log("🚀 Payload gửi lên:", payload);
 
     try {
-      await updateUser(userData?.data.user_id, payload);
+      const userId = userData?.data.user_id;
+      if (!userId) {
+        message.error("❌ Không tìm thấy thông tin người dùng!");
+        return;
+      }
+      await updateUser(userId, payload);
       message.success("✅ Cập nhật thành công!");
 
       // ⏬ Fetch lại user mới nhất
-      const updatedUser = await getUserById(userData?.data.user_id);
+      const updatedUser = await getUserById(userId);
       setUserData(updatedUser);
     } catch (error: any) {
       console.error("❌ Lỗi cập nhật:", error);

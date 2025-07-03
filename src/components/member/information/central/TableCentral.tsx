@@ -14,8 +14,6 @@ import {
   IconMapPin,
   IconBuildingBank,
   IconClock,
-  IconCalendarTime,
-  IconPower,
   IconMapPinFilled,
 } from "@tabler/icons-react";
 

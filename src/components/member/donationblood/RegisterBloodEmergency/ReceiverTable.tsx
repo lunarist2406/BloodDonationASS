@@ -1,13 +1,9 @@
 import {
   IconUser,
-  IconCalendar,
   IconPhone,
   IconMapPin,
   IconDroplet,
   IconClock,
-  IconUserCircle,
-  IconChevronRight,
-  IconChevronLeft,
   IconReload,
   IconUserCheck
 } from "@tabler/icons-react";
@@ -299,7 +295,7 @@ const [centers, setCenters] = useState([]);
           >
           <Form.Item name="centralBlood_id" label="Trung Tâm Hiến Máu">
             <Select placeholder="Chọn trung tâm">
-              {centers.map((center) => (
+              {centers.map((center:any) => (
                 <Select.Option key={center.centralBlood_id} value={center.centralBlood_id}>
                   {center.centralBlood_name} - {center.centralBlood_address}
                 </Select.Option>
@@ -316,7 +312,7 @@ const [centers, setCenters] = useState([]);
 
           <Form.Item name="blood_id" label="Nhóm máu">
             <Select placeholder="Chọn nhóm máu">
-              {bloods.map((blood) => (
+              {bloods.map((blood:any) => (
                 <Select.Option key={blood.blood_id} value={blood.blood_id}>
                   {blood.blood_type_id.blood_name} ({blood.rh_id.blood_Rh})
                 </Select.Option>

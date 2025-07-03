@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import {
   IconDroplet,
   IconCalendar,
   IconNumbers,
   IconListDetails,
-  IconBuildingHospital,
   IconGenderMale,
   IconGenderFemale,
 } from "@tabler/icons-react";
@@ -17,7 +16,11 @@ import useUser from "../../../../hooks/User/useUser";
 import useBloodService from "../../../../hooks/Blood/useBloodService";
 
 const { Option } = Select;
-
+interface Center {
+  centralBlood_id: string;
+  centralBlood_name: string;
+  centralBlood_address: string;
+}
 interface FormRegisterReceiveEmergencyProps {
   onSuccess?: () => void;
 }
@@ -38,7 +41,7 @@ export default function FormRegisterReceiveEmergency({ onSuccess }: FormRegister
     });
 
 
-  const [centers, setCenters] = useState([]);
+const [centers, setCenters] = useState<Center[]>([]);
   const [bloods, setBloods] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -59,12 +62,12 @@ export default function FormRegisterReceiveEmergency({ onSuccess }: FormRegister
     fetchData();
   }, []);
 
-  const handleChange = (e) => {
+  const handleChange = (e:any) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-const handleSelectChange = (value, field) => {
+const handleSelectChange = (value:any, field:any) => {
   setFormData((prev) => ({
     ...prev,
     [field]: field === "centralBlood_id" ? String(value) : value,
@@ -72,7 +75,7 @@ const handleSelectChange = (value, field) => {
 };
 
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e:any) => {
     e.preventDefault();
     const { blood_id, date_receiver, ml, unit, centralBlood_id } = formData;
 
@@ -277,7 +280,7 @@ const payload = {
               placeholder="Chọn nhóm máu"
               allowClear
             >
-              {bloods.map((blood) => (
+              {bloods.map((blood:any) => (
                 <Option key={blood.blood_id} value={blood.blood_id}>
                   {blood.blood_type_id.blood_name} ({blood.rh_id.blood_Rh})
                 </Option>
@@ -327,24 +330,16 @@ const payload = {
         <div className={inputWrapper}>
           <label className="block font-semibold mb-1">Chọn Trung Tâm Hiến Máu</label>
           <Select
-            value={
-              centers.find((c) => String(c.centralBlood_id) === String(formData.centralBlood_id))
-          ? centers.find((c) => String(c.centralBlood_id) === String(formData.centralBlood_id)).centralBlood_name
-          : undefined
-            }
-            onChange={(value) => {
-              // value là tên trung tâm, tìm id tương ứng
-              const selected = centers.find((c) => c.centralBlood_name === value);
-              handleSelectChange(selected ? selected.centralBlood_id : "", "centralBlood_id");
-            }}
+            value={formData.centralBlood_id || undefined}
+            onChange={(value) => handleSelectChange(value, "centralBlood_id")}
             className="w-full"
             placeholder="Chọn trung tâm"
             loading={loading}
             allowClear
           >
-            {centers.map((center) => (
-              <Option key={center.centralBlood_id} value={center.centralBlood_name}>
-          {center.centralBlood_name} - {center.centralBlood_address}
+            {centers.map((center: any) => (
+              <Option key={center.centralBlood_id} value={center.centralBlood_id}>
+                {center.centralBlood_name} - {center.centralBlood_address}
               </Option>
             ))}
           </Select>

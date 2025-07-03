@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { IconBell } from '@tabler/icons-react';
 import { io, Socket } from 'socket.io-client';
@@ -124,7 +124,7 @@ const handleMarkAllAsRead = async () => {
     setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
     if (onMarkAllAsRead) onMarkAllAsRead();
     console.log('✅ Response:', response);
-  } catch (err) {
+  } catch (err:any) {
     console.error('Lỗi mark-all-read:', err);
     if (err.response) {
       console.error('Response:', err.response);

@@ -1,15 +1,12 @@
 import { Routes, Route } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import LoadingSpinner from "../LoadingSpinner";
-import { ProtectedRoute } from "../../middleware/auth/ProtectedRoute";
 import Profile from "../member/profile/Profile";
 import CentralInformation from "../member/information/central/ControllingCentral";
 
 // Lazy load các page
 const HomePage = lazy(() => import("../../page/HomePage"));
-const BloodDonationCenter = lazy(
-  () => import("../member/information/BloodDonationCenter")
-);
+
 const BloodDocuments = lazy(
   () => import("../member/information/BloodDocuments")
 );

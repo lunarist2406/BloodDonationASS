@@ -1,11 +1,5 @@
 import {
-  IconUser,
-  IconCalendar,
-  IconPhone,
-  IconMapPin,
   IconDroplet,
-  IconClock,
-  IconUserCircle,
   IconChevronRight,
   IconChevronLeft,
 } from "@tabler/icons-react";

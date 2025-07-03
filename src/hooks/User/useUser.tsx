@@ -7,20 +7,12 @@ export interface RoleUser {
   role_name: string;
 }
 
-export interface LocationUser {
-  ipAddress: string;
-  country: string;
-  district: string;
-  road: string;
-  location_id: string | null;
-}
-
 export interface data {
   user_id: string;
   fullname: string;
   role_id: RoleUser[];
   gender: string;
-  location_id: LocationUser;
+  location_id: Location;
   token: string;
   email: string;
   phone: string;

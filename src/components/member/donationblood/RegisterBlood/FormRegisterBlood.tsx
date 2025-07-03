@@ -1,8 +1,5 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
-  IconUser,
-  IconPhone,
-  IconMapPin,
   IconGenderMale,
   IconGenderFemale,
   IconClockHour8,
@@ -43,7 +40,7 @@ export default function FormRegisterBlood({onSuccess}: FormRegisterBloodProps) {
     fetchCenters();
   }, []);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e:any) => {
     e.preventDefault();
     if (!selectedCenter) {
       return message.error("Vui lòng chọn trung tâm hiến máu");
@@ -63,7 +60,7 @@ export default function FormRegisterBlood({onSuccess}: FormRegisterBloodProps) {
       message.success("Đăng ký hiến máu thành công!");
 
        onSuccess?.();
-    } catch (err) {
+    } catch (err:any) {
       console.error("Lỗi đăng ký hiến máu:", err);
       message.error("Lỗi đăng ký hiến máu: " + (err.message || ""));
     } finally {
@@ -224,7 +221,7 @@ export default function FormRegisterBlood({onSuccess}: FormRegisterBloodProps) {
             placeholder="Chọn địa điểm"
             loading={loading}
           >
-            {centers.map((center) => (
+            {centers.map((center:any) => (
               <Option
                 key={center.centralBlood_id}
                 value={center.centralBlood_id}

@@ -1,14 +1,12 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Table, Tag, Pagination, Input } from "antd";
 import {
   IconClock,
   IconUser,
-  IconDroplet,
   IconMapPin,
   IconCalendar,
   IconSearch,
   IconReload,
-  IconTypeface,
   IconStatusChange,
 } from "@tabler/icons-react";
 import useBloodService from "../../../../hooks/Blood/useBloodService";

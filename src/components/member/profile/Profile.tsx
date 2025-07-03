@@ -5,7 +5,6 @@ import ProfileAccount from "./ProfileAccount";
 import ProfileHealth from "./ProfileHealth";
 import HistoryDonation from "./History";
 import useUser from "../../../hooks/User/useUser";
-import useBloodService from "../../../hooks/Blood/useBloodService";
 
 const profileTabs = [
   {

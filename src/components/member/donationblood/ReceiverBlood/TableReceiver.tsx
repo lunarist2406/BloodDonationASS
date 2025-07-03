@@ -5,26 +5,15 @@ import {
   Col,
   Typography,
   Button,
-  Modal,
   Spin,
 } from "antd";
 import {
-  IconUser,
-  IconCalendar,
-  IconPhone,
   IconMail,
-  IconMapPin,
   IconActivityHeartbeat,
   IconBuildingHospital,
   IconStar,
-  IconArrowBigUpLine,
   IconWeight,
-  IconHeartRateMonitor,
-  IconHeartbeat,
   IconHistory,
-  IconPill,
-  IconCalendarTime,
-  IconVirus,
   IconDroplet,
   IconHeart,
 } from "@tabler/icons-react";
@@ -47,7 +36,6 @@ export default function TableReceiverBlood() {
     const res = await getReceiverHistoryById();
     const all = res?.data|| [];
 
-    // 👉 lọc đơn có trạng thái PENDING
     const pendingList = all
       .filter((item: any) => item.status_donate === "PENDING")
       .sort(
@@ -55,13 +43,11 @@ export default function TableReceiverBlood() {
           new Date(b.date_register).getTime() - new Date(a.date_register).getTime()
       );
       console.log("Data pending",pendingList)
-    // ❗ Nếu không có đơn PENDING thì return rỗng luôn
     if (!pendingList.length) {
       setData([]);
       return;
     }
 
-    // 👉 Map lại dữ liệu giống structure cũ
     const mappedData = await Promise.all(
       pendingList.map(async (item: any) => {
         let bloodDisplay = "Chưa có nhóm máu";
