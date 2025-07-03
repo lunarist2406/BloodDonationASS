@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   PieChart,
   Pie,
@@ -32,12 +32,12 @@ const COLORS = [
 export default function ChartStorage() {
   const { getStorages } = useStorage();
   const { getAllBloods } = useBloodService();
-  const [dataPie, setDataPie] = useState([]);
-  const [dataBar, setDataBar] = useState([]);
+  const [dataPie, setDataPie] = useState<any>([]);
+  const [dataBar, setDataBar] = useState<any>([]);
   const [loading, setLoading] = useState(false);
-  const [totalML, setTotalML] = useState(0);
-  const [totalUnits, setTotalUnits] = useState(0);
-  const [showPie, setShowPie] = useState(true);
+  const [totalML, setTotalML] = useState<any>(0);
+  const [totalUnits, setTotalUnits] = useState<any>(0);
+  const [showPie, setShowPie] = useState<any>(true);
 
   const fetchChartData = async () => {
     setLoading(true);
@@ -49,12 +49,12 @@ export default function ChartStorage() {
       const storages = res.data.result;
       const bloods = bloodRes.data.result;
 
-      const map = {};
+      const map: { [label: string]: { label: string; unit: number; ml: number } } = {};
       let mlSum = 0;
       let unitSum = 0;
 
-      storages.forEach((item) => {
-        const blood = bloods.find((b) => b.blood_id === item.blood_id);
+      storages.forEach((item: any) => {
+        const blood = bloods.find((b: any) => b.blood_id === item.blood_id);
         if (!blood) return;
 
         const label = `${blood.blood_type_id?.blood_name || ""} ${
@@ -108,7 +108,7 @@ export default function ChartStorage() {
   };
 
   // Tạo component header chart cho gọn
-  const ChartHeader = ({ title }) => (
+  const ChartHeader = ({ title }:any) => (
     <div className="flex items-center justify-between mb-4 px-4">
       <h3 className="text-lg font-semibold">{title}</h3>
       <Button
@@ -139,8 +139,6 @@ export default function ChartStorage() {
               <Card
                 loading={loading}
                 className="w-full"
-                bodyStyle={{ padding: 0 }}
-                style={{ body: { padding: 0 } }}
               >
                 <ChartHeader title="Tỷ lệ các loại máu (Unit)" />
                 <div className="w-full h-[400px] px-4">
@@ -155,7 +153,7 @@ export default function ChartStorage() {
                         outerRadius={100}
                         label
                       >
-                        {dataPie.map((_, index) => (
+                        {dataPie.map((_:any, index:any) => (
                           <Cell
                             key={`cell-${index}`}
                             fill={COLORS[index % COLORS.length]}

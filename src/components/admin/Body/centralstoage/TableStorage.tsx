@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Table,
   Space,
@@ -16,17 +16,17 @@ import useStorage from "../../../../hooks/storage/useStorage";
 import useBloodService from "../../../../hooks/Blood/useBloodService";
 
 export default function TableStorage() {
-  const [storages, setStorages] = useState([]);
-  const [allStorages, setAllStorages] = useState([]);
-  const [bloods, setBloods] = useState([]);
-  const [pagination, setPagination] = useState({
+  const [storages, setStorages] = useState<any>([]);
+  const [allStorages, setAllStorages] = useState<any>([]);
+  const [bloods, setBloods] = useState<any>([]);
+  const [pagination, setPagination] = useState<any>({
     current: 1,
     pageSize: 5,
     total: 0,
   });
   const [loading, setLoading] = useState(false);
-  const [searchText, setSearchText] = useState("");
-  const [viewing, setViewing] = useState(null);
+  const [searchText, setSearchText] = useState<any>("");
+  const [viewing, setViewing] = useState<any>(null);
 
   const { getStorages, deleteStorage } = useStorage();
   const { getAllBloods } = useBloodService();
@@ -50,8 +50,8 @@ export default function TableStorage() {
     }
   };
 
-  const applyFilter = (data, search, current, size) => {
-    const filtered = data.filter((item) =>
+  const applyFilter = (data:any, search:any, current:any, size:any) => {
+    const filtered = data.filter((item:any) =>
       item.donate_id?.infor_health?.user_id?.fullname
         ?.toLowerCase()
         .includes(search.toLowerCase())
@@ -59,7 +59,7 @@ export default function TableStorage() {
     const start = (current - 1) * size;
     const sliced = filtered.slice(start, start + size);
     setStorages(sliced);
-    setPagination((prev) => ({
+    setPagination((prev:any) => ({
       ...prev,
       current,
       pageSize: size,
@@ -67,7 +67,7 @@ export default function TableStorage() {
     }));
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (id:string) => {
     try {
       await deleteStorage(id);
       message.success("Xoá thành công");
@@ -82,20 +82,20 @@ export default function TableStorage() {
       title: "STT",
       key: "index",
       width: 70,
-      render: (_, __, index) =>
+      render: (_:any, __:any, index:any) =>
         index + 1 + (pagination.current - 1) * pagination.pageSize,
     },
     {
       title: "Donor Name",
       key: "donor",
-      render: (_, record) =>
+      render: (_:any, record:any) =>
         record?.donate_id?.infor_health?.user_id?.fullname || "Unknown",
     },
     {
       title: "Blood Type",
       key: "blood",
-      render: (_, record) => {
-        const b = bloods.find((b) => b.blood_id === record.blood_id);
+      render: (_:any, record:any) => {
+        const b = bloods.find((b:any) => b.blood_id === record.blood_id);
         return b
           ? `${b.blood_type_id?.blood_name || ""} ${b.rh_id?.blood_Rh || ""}`
           : "Unknown";
@@ -104,7 +104,7 @@ export default function TableStorage() {
     {
       title: "Date",
       key: "date",
-      render: (r) => dayjs(r.date).format("YYYY-MM-DD"),
+      render: (r:any) => dayjs(r.date).format("YYYY-MM-DD"),
     },
     {
       title: "ML",
@@ -124,7 +124,7 @@ export default function TableStorage() {
     {
       title: "Action",
       key: "action",
-      render: (_, record) => (
+      render: (_:any, record:any) => (
         <Space>
           <Tooltip title="Xem">
             <Button
@@ -157,7 +157,7 @@ export default function TableStorage() {
             placeholder="Tìm theo tên người hiến"
             allowClear
             value={searchText}
-            onChange={(e) => {
+            onChange={(e:any) => {
               const v = e.target.value;
               setSearchText(v);
               applyFilter(allStorages, v, 1, pagination.pageSize);

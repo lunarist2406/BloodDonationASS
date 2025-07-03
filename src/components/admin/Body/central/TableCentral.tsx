@@ -22,19 +22,19 @@ import { useAuth } from "../../../../hooks/User/useAuth";
 import { getAllWorkingHours } from "../../../../hooks/workinghours/WorkingHourService";
 import { IconMapPinFilled, IconBuildingBank } from "@tabler/icons-react";
 
-export default function TableCentral({ onSelectCentral }) {
+export default function TableCentral({ onSelectCentral } :any) {
   const { getAllCentral, createCentral, updateCentral, deleteCentral } =
     useCentralService();
   const { token } = useAuth();
 
   const [central, setCentral] = useState([]);
-  const [workingHours, setWorkingHours] = useState([]);
-  const [selectedItem, setSelectedItem] = useState(null);
+  const [workingHours, setWorkingHours] = useState<any>([]);
+  const [selectedItem, setSelectedItem] = useState<any>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isFormModalVisible, setIsFormModalVisible] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(false);
+  const [isEditMode, setIsEditMode] = useState<any>(false);
   const [loading, setLoading] = useState(false);
-  const [selectedWorkingIds, setSelectedWorkingIds] = useState([]);
+  const [selectedWorkingIds, setSelectedWorkingIds] = useState<any>([]);
 
   const [form] = Form.useForm();
 
@@ -71,8 +71,8 @@ export default function TableCentral({ onSelectCentral }) {
     setIsFormModalVisible(true);
   };
 
-  const openEditModal = (record) => {
-    const ids = record.working_id?.map((id) => id.working_id || id._id || id);
+  const openEditModal = (record:any) => {
+    const ids = record.working_id?.map((id:any) => id.working_id || id._id || id);
     form.setFieldsValue({
       ...record,
       working_id: ids,
@@ -83,7 +83,7 @@ export default function TableCentral({ onSelectCentral }) {
     setIsFormModalVisible(true);
   };
 
-  const handleDelete = async (record) => {
+  const handleDelete = async (record:any) => {
     Modal.confirm({
       title: "Bạn có chắc muốn xoá trung tâm này?",
       okText: "Xoá",
@@ -104,7 +104,7 @@ export default function TableCentral({ onSelectCentral }) {
   const handleFormSubmit = async () => {
     try {
       const values = await form.validateFields();
-      values.working_id = values.working_id.map((id) =>
+      values.working_id = values.working_id.map((id:any) =>
         typeof id === "string" ? id : id?.working_id || id?._id || String(id)
       );
 
@@ -124,7 +124,7 @@ export default function TableCentral({ onSelectCentral }) {
     }
   };
 
-  const showDetail = (record) => {
+  const showDetail = (record:any) => {
     setSelectedItem(record);
     setIsModalVisible(true);
   };
@@ -134,7 +134,7 @@ export default function TableCentral({ onSelectCentral }) {
       title: "Tên Trung Tâm",
       dataIndex: "centralBlood_name",
       key: "centralBlood_name",
-      render: (_, record) => (
+      render: (_:any, record:any) => (
         <button
           onClick={() => onSelectCentral(record)}
           className="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition duration-150 ease-in-out"
@@ -149,8 +149,8 @@ export default function TableCentral({ onSelectCentral }) {
     {
       title: "Trạng Thái",
       key: "is_open",
-      render: (_, record) => {
-        const anyOpen = record.working_id?.some((item) => item.is_open);
+      render: (_:any, record:any) => {
+        const anyOpen = record.working_id?.some((item:any) => item.is_open);
         return anyOpen ? (
           <Tag color="green">Hoạt Động</Tag>
         ) : (
@@ -161,7 +161,7 @@ export default function TableCentral({ onSelectCentral }) {
     {
       title: "Hành Động",
       key: "action",
-      render: (_, record) => (
+      render: (_:any, record:any) => (
         <div className="flex gap-2">
           <Button
             icon={<EyeOutlined />}
@@ -246,7 +246,7 @@ export default function TableCentral({ onSelectCentral }) {
             <Descriptions.Item label="Giờ Làm Việc">
               {selectedItem.working_id && selectedItem.working_id.length > 0 ? (
                 <ul className="list-disc list-inside">
-                  {selectedItem.working_id.map((item) => (
+                  {selectedItem.working_id.map((item:any) => (
                     <li key={item.working_id}>
                       {item.day_of_week}: {item.open_time?.slice(11, 16)} -{" "}
                       {item.close_time?.slice(11, 16)} (
@@ -295,7 +295,7 @@ export default function TableCentral({ onSelectCentral }) {
               placeholder="Chọn Working IDs"
               onChange={(value) => setSelectedWorkingIds(value)}
             >
-              {workingHours.map((item) => (
+              {workingHours.map((item:any) => (
                 <Select.Option key={item.working_id} value={item.working_id}>
                   {`${item.day_of_week} - ${item.open_time.slice(
                     11,
@@ -311,10 +311,10 @@ export default function TableCentral({ onSelectCentral }) {
               <strong>Giờ làm việc đã chọn:</strong>
               <ul className="list-disc list-inside">
                 {workingHours
-                  .filter((item) =>
+                  .filter((item:any) =>
                     selectedWorkingIds.includes(item.working_id)
                   )
-                  .map((item) => (
+                  .map((item:any) => (
                     <li key={item.working_id}>
                       {item.day_of_week}: {item.open_time.slice(11, 16)} -{" "}
                       {item.close_time.slice(11, 16)} (

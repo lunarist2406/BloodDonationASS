@@ -6,7 +6,6 @@ import {
   Form,
   Input,
   Select,
-  Popconfirm,
   message,
   Typography,
   Space,
@@ -31,21 +30,21 @@ export default function TableControlling() {
 
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
   const [form] = Form.useForm();
 
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
 
   // Thêm state tìm kiếm email
-  const [searchEmail, setSearchEmail] = useState("");
+  const [searchEmail, setSearchEmail] = useState<any>("");
 
   useEffect(() => {
     fetchAllUsers(currentPage, pageSize);
   }, [currentPage, pageSize, fetchAllUsers]);
 
   // View user info
-  const handleDetail = (record) => {
+  const handleDetail = (record:any) => {
     setSelectedUser(record);
     form.setFieldsValue({
       fullname: record.fullname,
@@ -60,7 +59,7 @@ export default function TableControlling() {
   };
 
   // Edit user
-  const handleEdit = (record) => {
+  const handleEdit = (record:any) => {
     setSelectedUser(record);
     form.setFieldsValue({
       fullname: record.fullname,
@@ -88,7 +87,7 @@ export default function TableControlling() {
       message.success("Cập nhật người dùng thành công");
       setEditModalOpen(false);
       fetchAllUsers(currentPage, pageSize);
-    } catch (err) {
+    } catch (err:any) {
       message.error("Cập nhật thất bại: " + err.message);
       console.error(err);
     }
@@ -114,7 +113,7 @@ export default function TableControlling() {
   const columns = [
     {
       title: "STT",
-      render: (_, __, index) => (currentPage - 1) * pageSize + index + 1,
+      render: (_:any, __:any, index:any) => (currentPage - 1) * pageSize + index + 1,
     },
     {
       title: "Họ tên",
@@ -139,7 +138,7 @@ export default function TableControlling() {
     },
     {
       title: "Hành động",
-      render: (_, record) => (
+      render: (_:any, record:any) => (
         <Space>
           <Button
             icon={<IconEye size={18} />}
@@ -200,7 +199,7 @@ export default function TableControlling() {
         placeholder="Tìm kiếm theo email"
         allowClear
         style={{ marginBottom: 16, maxWidth: 300 }}
-        onChange={(e) => setSearchEmail(e.target.value)}
+        onChange={(e:any) => setSearchEmail(e.target.value)}
         value={searchEmail}
       />
 

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { IconUser } from "@tabler/icons-react";
 import ProfileAccount from "./ProfileAccount";

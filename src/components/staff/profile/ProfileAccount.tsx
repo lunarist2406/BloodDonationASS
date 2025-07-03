@@ -63,7 +63,6 @@ export default function ProfileAccount() {
       // ⏬ Fetch lại user mới nhất
       const updatedUser = await getUserById(userId);
       setUserData(updatedUser);
-      setUserData(updatedUser);
     } catch (error: any) {
       console.error("❌ Lỗi cập nhật:", error);
       const errMessage =
