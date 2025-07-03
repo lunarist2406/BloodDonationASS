@@ -4,7 +4,7 @@ interface UserAuthResponse {
   user_id: string;
   fullname: string;
   email: string;
-  role: string;
+  role_name: string;
 }
 
 interface UserAuthStore {

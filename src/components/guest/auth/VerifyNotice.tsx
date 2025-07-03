@@ -1,6 +1,5 @@
-import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Result, Button, Typography } from 'antd';
+import { Result,  Typography } from 'antd';
 import { MailOutlined } from '@ant-design/icons';
 import backgroundImage from '../../../assets/background.png';
 import { motion } from 'framer-motion';

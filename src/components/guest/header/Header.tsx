@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import  { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../../../assets/logo.png";
@@ -14,7 +14,6 @@ import {
   IconUserCog,
   IconShieldCheck,
   IconUserBolt,
-  IconUser,
   IconUserCancel,
 } from "@tabler/icons-react";
 import img1 from "../../../assets/Blood-Donation-1.webp";
@@ -47,7 +46,7 @@ export default function GuestHeader() {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
-  const role = user?.role || "";
+  const role = user?.role_name || "";
   const fullname = user?.fullname?.trim() || "";
   const encodedName = fullname.replace(/\s+/g, "-").toLowerCase();
 

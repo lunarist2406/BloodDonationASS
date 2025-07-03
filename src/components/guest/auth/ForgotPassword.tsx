@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import  { useEffect, useState, useRef, type ChangeEvent, type KeyboardEvent } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import {
@@ -7,7 +7,6 @@ import {
   Input,
   Button,
   Typography,
-  Alert,
   Space,
   Divider,
   message
@@ -42,31 +41,36 @@ interface ResetPasswordResponse {
   message: string;
   data?: any;
 }
-
+type Props = {
+  value: string;
+  onChange: (value: string) => void;
+  disabled?: boolean;
+};
 // Component nhập 6 số xác thực
-function VerificationCodeInput({ value = "", onChange, disabled }) {
+function VerificationCodeInput({ value = "", onChange, disabled = false }: Props) {
   const inputs = Array(6).fill(0);
-  const refs = Array.from({ length: 6 }, () => useRef(null));
+  const refs = Array.from({ length: 6 }, () => useRef<HTMLInputElement>(null));
 
-  const handleChange = (e, idx) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>, idx: number) => {
     const val = e.target.value.replace(/\D/g, "");
     let newValue = value;
+
     if (val) {
       newValue = value.substring(0, idx) + val[0] + value.substring(idx + 1);
       onChange(newValue);
-      if (idx < 5 && val) refs[idx + 1].current.focus();
+      if (idx < 5 && val) refs[idx + 1]?.current?.focus();
     } else {
-      // Khi xóa, set ký tự tại idx thành rỗng
       newValue = value.substring(0, idx) + "" + value.substring(idx + 1);
       onChange(newValue);
     }
   };
 
-  const handleKeyDown = (e, idx) => {
-    if (e.key === "Backspace" && !value[idx] && idx > 0) {
-      refs[idx - 1].current.focus();
-    }
-  };
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, idx: number) => {
+      if (e.key === "Backspace" && !value[idx] && idx > 0) {
+        refs[idx - 1]?.current?.focus();
+      }
+    };
+
 
   return (
     <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
@@ -76,8 +80,8 @@ function VerificationCodeInput({ value = "", onChange, disabled }) {
           ref={refs[idx]}
           maxLength={1}
           value={value[idx] || ""}
-          onChange={e => handleChange(e, idx)}
-          onKeyDown={e => handleKeyDown(e, idx)}
+          onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange(e, idx)}
+          onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => handleKeyDown(e, idx)}
           style={{ width: 40, textAlign: "center", fontSize: 20 }}
           disabled={disabled}
           inputMode="numeric"

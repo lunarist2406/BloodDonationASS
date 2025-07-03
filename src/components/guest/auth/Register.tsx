@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Form, Input, Select, DatePicker, Button, Modal } from "antd";
 import {
@@ -14,7 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { api } from "../../../components/config/axios/axiosInstance";
 import axios from "axios";
 import moment from "moment";
-import { getProvinces, getDistricts, getWards } from "vietnam-provinces";
+import { getProvinces, getDistricts, getWards,District, Ward } from "vietnam-provinces";
 
 
 const { Option } = Select;
@@ -25,8 +25,8 @@ export default function Register() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [provinces] = useState(getProvinces());
-const [districts, setDistricts] = useState([]);
-const [wards, setWards] = useState([]);
+const [districts, setDistricts] = useState<District[]>([]);
+const [wards, setWards] = useState<Ward[]>([]);
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -76,7 +76,7 @@ const [wards, setWards] = useState([]);
     fetchIP();
   }, [form]);
 
-  const handleProvinceChange = (value) => {
+  const handleProvinceChange = (value:any) => {
   const selectedProvince = provinces.find((p) => p.code === value);
   if (selectedProvince) {
     const provinceDistricts = getDistricts(selectedProvince.code);
@@ -89,7 +89,7 @@ const [wards, setWards] = useState([]);
   }
 };
 
-const handleDistrictChange = (value) => {
+const handleDistrictChange = (value:any) => {
   const selectedDistrict = districts.find((d) => d.code === value);
   if (selectedDistrict) {
     const districtWards = getWards(selectedDistrict.code);
@@ -100,7 +100,7 @@ const handleDistrictChange = (value) => {
   }
 };
 
-const handleSubmit = async (values) => {
+const handleSubmit = async (values:any) => {
   setError("");
   setIsLoading(true);
 

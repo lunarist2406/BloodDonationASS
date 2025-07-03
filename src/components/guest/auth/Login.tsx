@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import {
@@ -80,9 +80,10 @@ export default function Login() {
       console.log("Login response data:", response.data);
       console.log("Data object:", response.data.data);
       if (response.data?.data?.access_token) {
+        const data = response.data?.data.user
         console.log("Token found:", response.data.data.access_token);
         setAuthToken(response.data.data.access_token);
-        setUser(response.data?.data.user);
+        setUser(data);
         const fullname = response.data.data.user.fullname?.trim() || "";
         const lastWord = fullname.split(" ").pop() || "";
         navigate(`/${encodeURIComponent(lastWord)}`);

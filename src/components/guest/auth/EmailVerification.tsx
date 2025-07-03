@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import  { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Result, Spin, Button, Typography } from 'antd';
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { api } from '../../config/axios/axiosInstance';
 
-const { Title, Text } = Typography;
+const { Title} = Typography;
 
 type VerificationStatus = 'loading' | 'success' | 'error' | 'invalid' | 'already-verified';
 
