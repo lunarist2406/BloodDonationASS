@@ -1,4 +1,3 @@
-import { useRegisterBlood } from "../../../../hooks/RegistrationForm/useRegisterBlood";
 import TableReceiverBlood from "./TableReceiver";
 import FormViewReceiver from "./FormViewReceiver";
 import { motion } from "framer-motion";
