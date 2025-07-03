@@ -1,6 +1,5 @@
-import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { IconUser, IconUserBolt } from "@tabler/icons-react";
+import { IconUserBolt } from "@tabler/icons-react";
 import ProfileAccount from "./ProfileAccount";
 import useUser from "../../../hooks/User/useUser";
 

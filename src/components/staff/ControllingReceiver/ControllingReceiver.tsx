@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import {
   Table,
   Tag,
@@ -68,7 +68,11 @@ const getBloodLabel = async (bloodId: string) => {
 async function fetchData(page: number, pageSize: number) {
   setLoading(true);
   try {
-    const res = await getAllReceiverBloods(page, pageSize, "");
+    const res = await getAllReceiverBloods({
+      current: page,
+      pageSize,
+      qs: "",
+    });
     const rawList = res.data.results;
 
     const formattedList = await Promise.all(
@@ -122,7 +126,7 @@ async function fetchData(page: number, pageSize: number) {
     try {
       await deleteReceiver(id);
       message.success("Xóa đơn đăng ký thành công");
-      fetchData(pagination.current, pagination.pageSize, search);
+      fetchData(pagination.current, pagination.pageSize);
     } catch (error) {
       message.error("Xóa thất bại");
     }
@@ -157,7 +161,7 @@ const handleStatusUpdate = async (
     console.log("PAYLOAD:", payload);
     await updateReceiver(record.receiver_id, payload);
     message.success("Cập nhật trạng thái thành công");
-    fetchData(pagination.current, pagination.pageSize, search);
+    fetchData(pagination.current, pagination.pageSize);
   } catch (error) {
     message.error("Cập nhật thất bại");
     console.error("Cập nhật trạng thái lỗi:", error);
@@ -335,14 +339,14 @@ const handleStatusUpdate = async (
           <Input
             placeholder="Tìm kiếm theo tên"
             value={search}
-            onChange={(e) => handleSearch(e.target.value)}
+            onChange={(e:any) => handleSearch(e.target.value)}
             prefix={<SearchOutlined />}
           />
 
           <Button
             icon={<ReloadOutlined />}
             onClick={() =>
-              fetchData(pagination.current, pagination.pageSize, search)
+              fetchData(pagination.current, pagination.pageSize)
             }
           >
             Làm mới

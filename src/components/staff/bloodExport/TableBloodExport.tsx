@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Table,
   Space,
@@ -19,6 +19,7 @@ import {
 } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import useBloodExportService from "../../../hooks/BloodExport/useBloodExportService";
+import type { ColumnsType } from "antd/es/table";
 
 export default function TableExportBlood() {
   const [exports, setExports] = useState([]);
@@ -30,10 +31,10 @@ export default function TableExportBlood() {
   });
   const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState("");
-  const [viewing, setViewing] = useState(null);
-  const [editing, setEditing] = useState(null);
-  const [storages, setStorages] = useState([]);
-  const [receivers, setReceivers] = useState([]);
+  const [viewing, setViewing] = useState<any>(null);
+  const [editing, setEditing] = useState<any>(null);
+  const [storages, setStorages] = useState<any>([]);
+  const [receivers, setReceivers] = useState<any>([]);
   const statusOptions = ["PENDING", "APPROVED", "REJECTED", "CANCELLED", "COMPLETED"];
 
 
@@ -54,8 +55,8 @@ export default function TableExportBlood() {
       const res = await getExportBloods(1, 100);
       const rawData = res?.data?.results || [];
 
-      const enrichedData = await Promise.all(
-        rawData.map(async (item) => {
+      const enrichedData:any = await Promise.all(
+        rawData.map(async (item:any) => {
           let userName = "Không rõ";
           let bloodLabel = "Không rõ";
           let storageName = "Không rõ";
@@ -110,8 +111,8 @@ export default function TableExportBlood() {
     }
   };
 
-  const applyFilter = (data, search, current, size) => {
-    const filtered = data.filter((item) =>
+  const applyFilter = (data:any, search:any, current:any, size:any) => {
+    const filtered = data.filter((item:any) =>
       item.receiver_name?.toLowerCase().includes(search.toLowerCase())
     );
     const start = (current - 1) * size;
@@ -124,7 +125,7 @@ export default function TableExportBlood() {
     });
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = (id:string) => {
     Modal.confirm({
       title: "Bạn có chắc muốn xoá bản ghi xuất máu này?",
       okText: "Xoá",
@@ -141,67 +142,67 @@ export default function TableExportBlood() {
       },
     });
   };
+const colorMap = {
+  PENDING: "gold",
+  APPROVED: "green",
+  REJECTED: "red",
+  CANCELLED: "volcano",
+  COMPLETED: "blue",
+} as const;
 
-  const columns = [
-    {
-      title: "STT",
-      render: (_, __, index) =>
-        index + 1 + (pagination.current - 1) * pagination.pageSize,
-    },
-    {
-      title: "Người nhận",
-      dataIndex: "receiver_name",
-    },
-    {
-      title: "Loại máu",
-      dataIndex: "blood_type",
-    },
-    {
-      title: "Kho lưu",
-      dataIndex: "storage_name",
-    },
-    {
-      title: "Ngày xuất",
-      render: (record) =>
-        dayjs(record.export_date).format("YYYY-MM-DD HH:mm"),
-    },
-    {
-  title: "Trạng thái",
-  dataIndex: "status",
-  render: (status) => {
-    const colorMap = {
-      PENDING: "gold",
-      APPROVED: "green",
-      REJECTED: "red",
-      CANCELLED: "volcano",
-      COMPLETED: "blue",
-    };
-
-    return <Tag color={colorMap[status] || "default"}>{status}</Tag>;
+type StatusType = keyof typeof colorMap;
+const columns: ColumnsType<any> = [
+  {
+    title: "STT",
+    render: (_: any, __: any, index: number) =>
+      index + 1 + (pagination.current - 1) * pagination.pageSize,
   },
-},
-
-    {
-      title: "Hành động",
-      render: (_, record) => (
-        <Space>
-          <Tooltip title="Xem chi tiết">
-            <Button icon={<IconEye size={16} />} onClick={() => setViewing(record)} />
-          </Tooltip>
-          <Tooltip title="Chỉnh sửa">
-            <Button icon={<IconEdit size={16} />} onClick={() => { setEditing(record); fetchDropdowns(); }} />
-          </Tooltip>
-          <Tooltip title="Xoá">
-            <Button
-              icon={<IconTrash size={16} />}
-              danger
-              onClick={() => handleDelete(record.export_id)}
-            />
-          </Tooltip>
-        </Space>
-      ),
+  {
+    title: "Người nhận",
+    dataIndex: "receiver_name",
+  },
+  {
+    title: "Loại máu",
+    dataIndex: "blood_type",
+  },
+  {
+    title: "Kho lưu",
+    dataIndex: "storage_name",
+  },
+  {
+    title: "Ngày xuất",
+    render: (record: any) =>
+      dayjs(record.export_date).format("YYYY-MM-DD HH:mm"),
+  },
+  {
+    title: "Trạng thái",
+    dataIndex: "status",
+    render: (status: string) => {
+      const color = colorMap[status as StatusType] || "default";
+      return <Tag color={color}>{status}</Tag>;
     },
-  ];
+  },
+  {
+    title: "Hành động",
+    render: (_: any, record: any) => (
+      <Space>
+        <Tooltip title="Xem chi tiết">
+          <Button icon={<IconEye size={16} />} onClick={() => setViewing(record)} />
+        </Tooltip>
+        <Tooltip title="Chỉnh sửa">
+          <Button icon={<IconEdit size={16} />} onClick={() => { setEditing(record); fetchDropdowns(); }} />
+        </Tooltip>
+        <Tooltip title="Xoá">
+          <Button
+            icon={<IconTrash size={16} />}
+            danger
+            onClick={() => handleDelete(record.export_id)}
+          />
+        </Tooltip>
+      </Space>
+    ),
+  },
+];
 
   useEffect(() => {
     fetchData();
@@ -215,7 +216,7 @@ export default function TableExportBlood() {
           <Input.Search
             placeholder="Tìm theo người nhận"
             value={searchText}
-            onChange={(e) => {
+            onChange={(e:any) => {
               const v = e.target.value;
               setSearchText(v);
               applyFilter(allExports, v, 1, pagination.pageSize);
@@ -241,6 +242,7 @@ export default function TableExportBlood() {
             applyFilter(allExports, searchText, page, size),
         }}
         scroll={{ x: "max-content" }}
+        style={{minHeight:500}}
       />
 
       <Modal
@@ -288,7 +290,7 @@ export default function TableExportBlood() {
               value={editing.storage_id?.storage_id}
               onChange={(value) => setEditing({ ...editing, storage_id: { storage_id: value } })}
             >
-              {storages.map((s) => (
+              {storages.map((s:any) => (
                 <Select.Option key={s.storage_id} value={s.storage_id}>
                   {s.centralBlood_id?.centralBlood_name || "Không rõ"}
                 </Select.Option>
@@ -301,7 +303,7 @@ export default function TableExportBlood() {
               value={editing.receiver_id?.receiver_id}
               onChange={(value) => setEditing({ ...editing, receiver_id: { receiver_id: value } })}
             >
-              {receivers.map((r) => (
+              {receivers.map((r:any) => (
                 <Select.Option key={r.receiver_id} value={r.receiver_id}>
                   {r.user_id?.fullname || "Không rõ"}
                 </Select.Option>

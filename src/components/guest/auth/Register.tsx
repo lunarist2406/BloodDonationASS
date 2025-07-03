@@ -14,19 +14,29 @@ import { useNavigate } from "react-router-dom";
 import { api } from "../../../components/config/axios/axiosInstance";
 import axios from "axios";
 import moment from "moment";
-import { getProvinces, getDistricts, getWards,District, Ward } from "vietnam-provinces";
+import { getProvinces, getDistricts, getWards } from "vietnam-provinces";
 
 
 const { Option } = Select;
+export interface District {
+  code: string;
+  name: string;
+  province_code: string;
+}
 
+export interface Ward {
+  code: string;
+  name: string;
+  district_code: string;
+}
 export default function Register() {
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [provinces] = useState(getProvinces());
-const [districts, setDistricts] = useState<District[]>([]);
-const [wards, setWards] = useState<Ward[]>([]);
+  const [districts, setDistricts] = useState<District[]>([]);
+  const [wards, setWards] = useState<Ward[]>([]);
 
   const [formData, setFormData] = useState({
     fullName: "",

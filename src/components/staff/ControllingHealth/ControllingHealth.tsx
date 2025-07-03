@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import{ useEffect, useState, useMemo } from "react";
 import {
   Table,
   Button,
@@ -42,25 +42,25 @@ export default function ControllingHealth() {
     updateHealthInfoAdmin,
   } = useHealthService();
 
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<any>([]);
   const [loading, setLoading] = useState(false);
-  const [viewModal, setViewModal] = useState({ open: false, record: null });
-  const [editModal, setEditModal] = useState({ open: false, record: null });
+  const [viewModal, setViewModal] = useState<any>({ open: false, record: null });
+  const [editModal, setEditModal] = useState<any>({ open: false, record: null });
   const [form] = Form.useForm();
 
-  const [fileList, setFileList] = useState([]);
+  const [fileList, setFileList] = useState<any>([]);
 
-  const [pagination, setPagination] = useState({
+  const [pagination, setPagination] = useState<any>({
     current: 1,
     pageSize: 5,
     total: 0,
   });
 
   // NEW: state search fullname
-  const [searchName, setSearchName] = useState("");
+  const [searchName, setSearchName] = useState<any>("");
 
   // NEW: state sort info (antd passes sorter obj, but here we do local sorting)
-  const [sorter, setSorter] = useState({ field: null, order: null });
+  const [sorter, setSorter] = useState<any>({ field: null, order: null });
 
   const fetchData = async (page = pagination.current, size = pagination.pageSize) => {
     setLoading(true);
@@ -85,7 +85,7 @@ export default function ControllingHealth() {
     fetchData();
   }, []);
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (id:string) => {
     Modal.confirm({
       title: "Bạn có chắc muốn xóa?",
       okText: "Xóa",
@@ -103,7 +103,7 @@ export default function ControllingHealth() {
     });
   };
 
-  const handleEdit = (record) => {
+  const handleEdit = (record:any) => {
     setEditModal({ open: true, record });
     form.setFieldsValue({
       user_id: record.user_id?.user_id || "",
@@ -137,13 +137,13 @@ export default function ControllingHealth() {
 
       for (const [key, value] of Object.entries(values)) {
         if (key === "latest_donate") {
-          formData.append(key, value.toISOString());
+          formData.append(key, (value as dayjs.Dayjs).toISOString());
         } else if (key !== "img_health" && value !== undefined && value !== null) {
           formData.append(key, value.toString());
         }
       }
 
-      fileList.forEach((file) => {
+      fileList.forEach((file:any) => {
         if (file.originFileObj) {
           formData.append("img_health", file.originFileObj);
         }
@@ -161,12 +161,12 @@ export default function ControllingHealth() {
     }
   };
 
-  const onUploadChange = ({ fileList: newFileList }) => {
+  const onUploadChange = ({ fileList: newFileList }: { fileList: any[] }) => {
     setFileList(newFileList);
   };
 
   // Handle table change for sorting & pagination
-  const handleTableChange = (paginationConfig, filters, sorterConfig) => {
+  const handleTableChange = (paginationConfig:any, sorterConfig:any) => {
     console.log("Table change:", paginationConfig, sorterConfig);
     
     // Update sorter state
@@ -187,15 +187,15 @@ export default function ControllingHealth() {
     let filtered = data;
 
     if (searchName.trim()) {
-      filtered = filtered.filter((item) =>
+      filtered = filtered.filter((item:any) =>
         item.user_id?.fullname
           ?.toLowerCase()
           .includes(searchName.trim().toLowerCase())
       );
     }
-
+    
     if (sorter.field && sorter.order) {
-      filtered = filtered.slice().sort((a, b) => {
+      filtered = filtered.slice().sort((a:any, b:any) => {
         let aVal = a[sorter.field];
         let bVal = b[sorter.field];
 
@@ -220,7 +220,7 @@ export default function ControllingHealth() {
     return filtered;
   }, [data, searchName, sorter]);
 
-  const columns = [
+  const columns:any = [
     {
       title: (
         <div className="flex flex-col items-center gap-1 text-sm font-semibold text-gray-800">
@@ -229,7 +229,7 @@ export default function ControllingHealth() {
       ),
       key: "stt",
       align: "center",
-      render: (_text, _record, index) =>
+      render: (_text:any, _record:any, index:any) =>
         (pagination.current - 1) * pagination.pageSize + index + 1,
     },
     {
@@ -298,7 +298,7 @@ export default function ControllingHealth() {
       dataIndex: "img_health",
       key: "img_health",
       align: "center",
-      render: (_, record) =>
+      render: (_:any, record:any) =>
         record.img_health ? (
           <Image width={50} src={record.img_health} />
         ) : (
@@ -313,7 +313,7 @@ export default function ControllingHealth() {
       ),
       key: "actions",
       align: "center",
-      render: (_, record) => (
+      render: (_:any, record:any) => (
         <Space>
           <Button
             icon={<EyeOutlined />}
@@ -348,7 +348,7 @@ export default function ControllingHealth() {
                 placeholder="Tìm theo tên..."
                 prefix={<SearchOutlined />}
                 value={searchName}
-                onChange={(e) => setSearchName(e.target.value)}
+                onChange={(e:any) => setSearchName(e.target.value)}
                 style={{ maxWidth: 300 }}
                 allowClear
               />
@@ -365,7 +365,7 @@ export default function ControllingHealth() {
         <Table
           columns={columns}
           dataSource={processedData}
-          rowKey={(record) => record.infor_health}
+          rowKey={(record:any) => record.infor_health}
           loading={loading}
           pagination={{
             current: pagination.current,
@@ -501,8 +501,8 @@ export default function ControllingHealth() {
               onChange={onUploadChange}
               listType="picture-card"
               onRemove={(file) => {
-                setFileList((current) =>
-                  current.filter((f) => f.uid !== file.uid)
+                setFileList((current:any) =>
+                  current.filter((f:any) => f.uid !== file.uid)
                 );
               }}
             >

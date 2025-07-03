@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   getAllWorkingHours,
   createWorkingHour,
@@ -123,7 +123,7 @@ export default function WorkingTimeManagement() {
       await deleteWorkingHour(id, token);
       message.success("Xoá thành công");
       fetchData();
-    } catch (err) {
+    } catch (err:any) {
       message.error(`Xoá thất bại ` + err?.message);
     }
   };

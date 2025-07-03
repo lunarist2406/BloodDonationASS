@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import {
   Table,
   Tag,
@@ -31,7 +31,7 @@ export default function ControllingDonate() {
 
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState<any>("");
 
   const [pagination, setPagination] = useState({
     current: 1,
@@ -48,7 +48,7 @@ export default function ControllingDonate() {
 
   const [allData, setAllData] = useState<any[]>([]);
 
-  async function fetchData(page: number, pageSize: number) {
+  async function fetchData(page: number, pageSize: number, ) {
     setLoading(true);
     try {
       const res = await getAllDonateBloods(page, pageSize, "");
@@ -96,7 +96,7 @@ export default function ControllingDonate() {
     try {
       await deleteDonateBlood(id);
       message.success("Xóa đơn đăng ký thành công");
-      fetchData(pagination.current, pagination.pageSize, search);
+      fetchData(pagination.current, pagination.pageSize);
     } catch (error) {
       message.error("Xóa thất bại");
     }
@@ -127,7 +127,7 @@ export default function ControllingDonate() {
       };
       await updateDonateBlood(record.donate_id, payload);
       message.success("Cập nhật trạng thái thành công");
-      fetchData(pagination.current, pagination.pageSize, search);
+      fetchData(pagination.current, pagination.pageSize);
     } catch (error) {
       message.error("Cập nhật thất bại");
       console.error("Cập nhật trạng thái lỗi:", error);
@@ -287,14 +287,14 @@ export default function ControllingDonate() {
           <Input
             placeholder="Tìm kiếm theo tên"
             value={search}
-            onChange={(e) => handleSearch(e.target.value)}
+            onChange={(e:any) => handleSearch(e.target.value)}
             prefix={<SearchOutlined />}
           />
 
           <Button
             icon={<ReloadOutlined />}
             onClick={() =>
-              fetchData(pagination.current, pagination.pageSize, search)
+              fetchData(pagination.current, pagination.pageSize)
             }
           >
             Làm mới

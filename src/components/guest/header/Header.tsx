@@ -46,7 +46,7 @@ export default function GuestHeader() {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
-  const role = user?.role_name || "";
+  const role = user?.role || "";
   const fullname = user?.fullname?.trim() || "";
   const encodedName = fullname.replace(/\s+/g, "-").toLowerCase();
 

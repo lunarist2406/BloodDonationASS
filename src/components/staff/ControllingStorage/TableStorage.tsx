@@ -1,7 +1,22 @@
-import React from "react";
 import { Table, Space, Button, Tag } from "antd";
 import { IconEye, IconEdit, IconTrash } from "@tabler/icons-react";
 import dayjs from "dayjs";
+
+type TableStorageProps = {
+  storages: any[];
+  loading: boolean;
+  pagination: {
+    current: number;
+    pageSize: number;
+    total: number;
+  };
+  onPageChange: (page: number, pageSize: number) => void;
+  onPageSizeChange: (pageSize: number) => void;
+  onView: (record: any) => void;
+  onEdit: (record: any) => void;
+  onDelete: (storageId: string | number) => void;
+  bloods: any[];
+};
 
 export default function TableStorage({
   storages,
@@ -13,35 +28,35 @@ export default function TableStorage({
   onEdit,
   onDelete,
   bloods,
-}) {
-  const columns = [
+}: TableStorageProps) {
+  const columns :any= [
     {
       title: "STT",
       key: "index",
       width: 70,
-      render: (_, __, index) =>
+      render: (_:any, __:any, index:any) =>
         index + 1 + (pagination.current - 1) * pagination.pageSize,
-      sorter: (a, b) => a.index - b.index,
+      sorter: (a:any, b:any) => a.index - b.index,
       fixed: "left",
     },
     {
       title: "Người hiến",
       dataIndex: ["donate_id", "infor_health", "user_id", "fullname"],
       key: "donorName",
-      sorter: (a, b) => {
+      sorter: (a:any, b:any) => {
         const nameA =
           a.donate_id?.infor_health?.user_id?.fullname?.toLowerCase() || "";
         const nameB =
           b.donate_id?.infor_health?.user_id?.fullname?.toLowerCase() || "";
         return nameA.localeCompare(nameB);
       },
-      render: (_, record) =>
+      render: (_:any, record:any) =>
         record.donate_id?.infor_health?.user_id?.fullname || "Unknown",
     },
     {
       title: "Nhóm máu",
       key: "bloodType",
-      render: (_, record) => {
+      render: (_:any, record:any) => {
         if (
           record.blood_id &&
           typeof record.blood_id === "object" &&
@@ -65,26 +80,26 @@ export default function TableStorage({
       title: "Ngày hiến",
       dataIndex: "date",
       key: "date",
-      sorter: (a, b) => {
+      sorter: (a:any, b:any) => {
         const aTime = a.date ? dayjs(a.date).unix() : 0;
         const bTime = b.date ? dayjs(b.date).unix() : 0;
         return aTime - bTime;
       },
-      render: (date) => (date ? dayjs(date).format("YYYY-MM-DD") : "N/A"),
+      render: (date:any) => (date ? dayjs(date).format("YYYY-MM-DD") : "N/A"),
     },
     {
       title: "Dung tích (ml)",
       dataIndex: "ml",
       key: "ml",
-      sorter: (a, b) => (a.ml ?? 0) - (b.ml ?? 0),
-      render: (ml) => (ml !== undefined && ml !== null ? ml : "N/A"),
+      sorter: (a:any, b:any) => (a.ml ?? 0) - (b.ml ?? 0),
+      render: (ml:any) => (ml !== undefined && ml !== null ? ml : "N/A"),
     },
     {
       title: "Đơn vị",
       dataIndex: "unit",
       key: "unit",
-      sorter: (a, b) => (a.unit ?? 0) - (b.unit ?? 0),
-      render: (unit) => (unit !== undefined && unit !== null ? unit : "N/A"),
+      sorter: (a:any, b:any) => (a.unit ?? 0) - (b.unit ?? 0),
+      render: (unit:any) => (unit !== undefined && unit !== null ? unit : "N/A"),
     },
     {
   title: "Trạng thái",
@@ -96,8 +111,8 @@ export default function TableStorage({
     { text: "USED", value: "USED" },
     { text: "EXPORTED", value: "EXPORTED" },
   ],
-  onFilter: (value, record) => record.current_status === value,
-  render: (status) => {
+  onFilter: (value:any, record:any) => record.current_status === value,
+  render: (status:any) => {
     let color = "default";
     let text = "Unknown";
 
@@ -126,7 +141,7 @@ export default function TableStorage({
     {
       title: "Hành động",
       key: "action",
-      render: (_, record) => (
+      render: (_:any, record:any) => (
         <Space>
           <Button icon={<IconEye size={16} />} onClick={() => onView(record)} />
           <Button icon={<IconEdit size={16} />} onClick={() => onEdit(record)} />

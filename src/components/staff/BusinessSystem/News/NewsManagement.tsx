@@ -23,7 +23,7 @@ export default function NewsManagement() {
     useNewsService();
 
   const [form] = Form.useForm();
-  const [newsData, setNewsData] = useState([]);
+  const [newsData, setNewsData] = useState<any>([]);
   const [loading, setLoading] = useState(false);
   const [editingNewsId, setEditingNewsId] = useState<number | null>(null);
   const [search, setSearch] = useState("");
@@ -81,7 +81,7 @@ export default function NewsManagement() {
     try {
       const res = await getNewsById(id);
       // Check if response has data and result
-      setViewNews(res.data?.result || res.data || null);
+      setViewNews(res.data || null);
     } catch (err) {
       notification.error({ message: "Không thể lấy chi tiết tin tức!" });
       setViewNews(null);

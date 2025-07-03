@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Button, Card, Input, message, Modal } from "antd";
 import dayjs from "dayjs";
 
@@ -7,7 +7,7 @@ import useBloodService from "../../../hooks/Blood/useBloodService";
 import useCentralService from "../../../hooks/CentralBlood/useCentralService";
 import { motion } from "framer-motion";
 import FormCreate from "./FormCreate";
-import TableStorage, { type StorageRecord } from "./TableStorage";
+import TableStorage from "./TableStorage";
 import {
   IconDatabaseEdit,
   IconDatabasePlus,
@@ -15,12 +15,12 @@ import {
 } from "@tabler/icons-react";
 
 export default function ControllingStorage() {
-  const [allStorages, setAllStorages] = useState<StorageRecord[]>([]);
-  const [storages, setStorages] = useState<StorageRecord[]>([]);
-  const [editingStorage, setEditingStorage] = useState<StorageRecord | null>(
+  const [allStorages, setAllStorages] = useState<any>([]);
+  const [storages, setStorages] = useState<any>([]);
+  const [editingStorage, setEditingStorage] = useState<any | null>(
     null
   );
-  const [viewingStorage, setViewingStorage] = useState<StorageRecord | null>(
+  const [viewingStorage, setViewingStorage] = useState<any | null>(
     null
   );
 
@@ -64,12 +64,12 @@ export default function ControllingStorage() {
 
   // Filter by fullname and paginate
   const applyFilterAndPagination = (
-    data: StorageRecord[],
+    data: any,
     search: string,
     currentPage: number,
     pageSize: number
   ) => {
-    const filtered = data.filter((item) => {
+    const filtered = data.filter((item:any) => {
       const fullname = item?.donate_id?.infor_health?.user_id?.fullname || "";
       return fullname.toLowerCase().includes(search.toLowerCase());
     });
@@ -103,7 +103,7 @@ export default function ControllingStorage() {
   }, []);
 
   // Submit create/update
-  const handleSubmit = async (values) => {
+  const handleSubmit = async (values:any) => {
     try {
       if (editingStorage) {
         await updateStorage(editingStorage.storage_id, values);
@@ -122,7 +122,7 @@ export default function ControllingStorage() {
   };
 
   // Delete item
-const handleDelete = async (id) => {
+const handleDelete = async (id:string) => {
   Modal.confirm({
     title: "Bạn có chắc chắn muốn xóa?",
     okText: "Xóa",
@@ -196,7 +196,7 @@ const handleDelete = async (id) => {
                   allowClear
                   className="w-64"
                   value={searchText}
-                  onChange={(e) => {
+                  onChange={(e:any) => {
                     const value = e.target.value;
                     setSearchText(value);
                     applyFilterAndPagination(
@@ -206,7 +206,7 @@ const handleDelete = async (id) => {
                       pagination.pageSize
                     );
                   }}
-                  onSearch={(value) => {
+                  onSearch={(value:any) => {
                     setSearchText(value);
                     applyFilterAndPagination(
                       allStorages,
@@ -231,7 +231,7 @@ const handleDelete = async (id) => {
               loading={loading}
               pagination={pagination}
               bloods={bloods}
-              onPageChange={(page, pageSize) =>
+              onPageChange={(page:any, pageSize:any) =>
                 applyFilterAndPagination(
                   allStorages,
                   searchText,
@@ -239,7 +239,7 @@ const handleDelete = async (id) => {
                   pageSize
                 )
               }
-              onPageSizeChange={(size) => {
+              onPageSizeChange={(size:any) => {
                 setPagination((prev) => ({
                   ...prev,
                   pageSize: size,
