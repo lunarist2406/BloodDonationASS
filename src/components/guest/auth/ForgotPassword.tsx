@@ -9,7 +9,8 @@ import {
   Typography,
   Space,
   Divider,
-  message
+  message,
+  type InputRef
 } from "antd";
 import {
   MailOutlined,
@@ -49,7 +50,7 @@ type Props = {
 // Component nhập 6 số xác thực
 function VerificationCodeInput({ value = "", onChange, disabled = false }: Props) {
   const inputs = Array(6).fill(0);
-  const refs = Array.from({ length: 6 }, () => useRef<HTMLInputElement>(null));
+const refs = Array.from({ length: 6 }, () => useRef<InputRef>(null));
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>, idx: number) => {
     const val = e.target.value.replace(/\D/g, "");
