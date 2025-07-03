@@ -3,6 +3,7 @@ import { useAuth } from "./useAuth";
 
 const API_URL = "http://localhost:3000/api/v1/users";
 
+
 export default function useUserService() {
   const { token } = useAuth(); // Lấy token từ auth context
 
@@ -19,7 +20,7 @@ export default function useUserService() {
         current,
         pageSize,
       },
-      headers: authHeaders,
+      ...authHeaders,
     });
     return res.data;
   };
@@ -37,19 +38,19 @@ export default function useUserService() {
   };
 
   // Create new user
-  const createUser = async (newUserData) => {
+  const createUser = async (newUserData:any) => {
     const res = await api.post(API_URL, newUserData, authHeaders);
     return res.data;
   };
 
   // Update user by ID
-  const updateUser = async (id, updatedData) => {
+  const updateUser = async (id:string , updatedData: any  ) => {
     const res = await api.patch(`${API_URL}/${id}`, updatedData, authHeaders);
     return res.data;
   };
 
   // Delete user by ID
-  const deleteUser = async (id) => {
+  const deleteUser = async (id:string ) => {
     const res = await api.delete(`${API_URL}/${id}`, authHeaders);
     return res.data;
   };

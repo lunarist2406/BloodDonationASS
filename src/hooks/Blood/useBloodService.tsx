@@ -28,7 +28,7 @@ export default function useBloodService() {
   };
 
   // Lấy blood theo ID
-  const getBloodById = async (id) => {
+  const getBloodById = async (id:string) => {
     try {
       const response = await api.get(`${API_URL}/${id}`, authHeaders);
       return response.data;
@@ -39,7 +39,7 @@ export default function useBloodService() {
   };
 
   // Tạo mới blood
-  const createBlood = async (data) => {
+  const createBlood = async (data:any) => {
     try {
       const response = await api.post(API_URL, data, authHeaders);
       return response.data;

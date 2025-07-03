@@ -34,7 +34,7 @@ export default function useHealthService() {
     }
   };
 
-  const getHealthInfoByEmail = async (email) => {
+  const getHealthInfoByEmail = async (email:string) => {
     try {
       const response = await api.get(`${API_URL}/email`, {
         ...authHeaders,
@@ -47,7 +47,7 @@ export default function useHealthService() {
     }
   };
 
-  const getHealthInfoById = async (id) => {
+  const getHealthInfoById = async (id:string ) => {
     try {
       const response = await api.get(`${API_URL}/${id}`);
       return response.data;
@@ -57,7 +57,7 @@ export default function useHealthService() {
     }
   };
 
-  const createHealthInfo = async (data) => {
+  const createHealthInfo = async (data:any) => {
     try {
       const response = await api.post(API_URL, data, authHeaders);
       return response.data;
@@ -67,7 +67,7 @@ export default function useHealthService() {
     }
   };
 
-  const createHealthInfoAdmin = async (data) => {
+  const createHealthInfoAdmin = async (data:any) => {
     try {
       const response = await api.post(`${API_URL}/admin`, data, authHeaders);
       return response.data;
@@ -77,13 +77,17 @@ export default function useHealthService() {
     }
   };
 
-const updateHealthInfo = async (data) => {
+const updateHealthInfo = async (data:any) => {
   try {
     const formData = new FormData();
 
     Object.entries(data).forEach(([key, value]) => {
       if (value !== undefined && value !== null) {
-        formData.append(key, value);
+        if (value instanceof Blob) {
+          formData.append(key, value);
+        } else {
+          formData.append(key, String(value));
+        }
       }
     });
 
@@ -102,7 +106,7 @@ const updateHealthInfo = async (data) => {
 };
 
 
-const updateHealthInfoAdmin = async (id, formData) => {
+const updateHealthInfoAdmin = async (id:string, formData:any) => {
   try {
     const response = await api.patch(`${API_URL}/${id}/admin`, formData, {
       headers: {
@@ -120,7 +124,7 @@ const updateHealthInfoAdmin = async (id, formData) => {
 
 
 
-  const deleteHealthInfo = async (id) => {
+  const deleteHealthInfo = async (id:string) => {
     try {
       const response = await api.delete(`${API_URL}/${id}`, authHeaders);
       return response.data;

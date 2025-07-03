@@ -18,7 +18,7 @@ interface UserAuthStore {
 }
 
 export const useAuth = create<UserAuthStore>((set, get) => ({
-  token: localStorage.getItem("token"),
+  token: localStorage.getItem("token") || "",
   user: JSON.parse(localStorage.getItem("user") || "null"),
   setAuthToken: (token) => {
     localStorage.setItem("token", token);
@@ -31,7 +31,7 @@ export const useAuth = create<UserAuthStore>((set, get) => ({
   clearAuth: () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    set({ token: null, user: null });
+    set({ token: "", user: null });
   },
   isAuthenticated: () => {
     const { token, user } = get();

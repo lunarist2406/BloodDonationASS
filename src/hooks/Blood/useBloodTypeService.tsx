@@ -25,7 +25,7 @@ export default function useBloodTypeService() {
   };
 
   // Lấy nhóm máu theo ID
-  const getBloodTypeById = async (id) => {
+  const getBloodTypeById = async (id:string) => {
     try {
       const response = await api.get(`${API_URL}/${id}`);
       return response.data;
@@ -36,7 +36,7 @@ export default function useBloodTypeService() {
   };
 
   // Tạo mới nhóm máu
-  const createBloodType = async (data) => {
+  const createBloodType = async (data:any ) => {
     try {
       const response = await api.post(API_URL, data);
       return response.data;
@@ -47,7 +47,7 @@ export default function useBloodTypeService() {
   };
 
   // Cập nhật nhóm máu theo ID
-  const updateBloodType = async (id, data) => {
+  const updateBloodType = async (id:string , data:any) => {
     try {
       const response = await api.put(`${API_URL}/${id}`, data);
       return response.data;

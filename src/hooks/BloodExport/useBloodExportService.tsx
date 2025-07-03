@@ -14,7 +14,7 @@ export default function useBloodExportService() {
 
   const getExportBloods = async (current = 1, pageSize = 10, qs = "") => {
     try {
-      const params = { current, pageSize };
+      const params: Record<string, any> = { current, pageSize };
       if (qs) params.qs = qs;
 
       const res = await api.get(API_BASE_URL, {
@@ -29,7 +29,7 @@ export default function useBloodExportService() {
     }
   };
 
-  const getExportBloodById = async (id) => {
+  const getExportBloodById = async (id:string ) => {
     try {
       const res = await api.get(`${API_BASE_URL}/${id}`, authHeaders);
       return res.data;
@@ -39,7 +39,7 @@ export default function useBloodExportService() {
     }
   };
 
-  const createExportBlood = async (data) => {
+  const createExportBlood = async (data:any) => {
     try {
       const res = await api.post(API_BASE_URL, data, authHeaders);
       return res.data;
@@ -49,7 +49,7 @@ export default function useBloodExportService() {
     }
   };
 
-  const updateExportBlood = async (id, data) => {
+  const updateExportBlood = async (id:string, data:any) => {
     try {
       const res = await api.put(`${API_BASE_URL}/${id}`, data, authHeaders);
       return res.data;
@@ -59,7 +59,7 @@ export default function useBloodExportService() {
     }
   };
 
-  const deleteExportBlood = async (id) => {
+  const deleteExportBlood = async (id:string) => {
     try {
       const res = await api.delete(`${API_BASE_URL}/${id}`, authHeaders);
       return res.data;
@@ -69,7 +69,7 @@ export default function useBloodExportService() {
     }
   };
 
-  const getUserById = async (id) => {
+  const getUserById = async (id:string) => {
     try {
       const res = await api.get(`/api/v1/users/${id}`, authHeaders);
       return res.data;
@@ -79,7 +79,7 @@ export default function useBloodExportService() {
     }
   };
 
-  const getBloodById = async (id) => {
+  const getBloodById = async (id:string) => {
     try {
       const res = await api.get(`/api/v1/bloods/${id}`, authHeaders);
       return res.data;
@@ -89,7 +89,7 @@ export default function useBloodExportService() {
     }
   };
 
-  const getStorageById = async (id) => {
+  const getStorageById = async (id:string) => {
     try {
       const res = await api.get(`/api/v1/storages/${id}`, authHeaders);
       return res.data;

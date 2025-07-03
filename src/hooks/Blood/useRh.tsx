@@ -15,7 +15,7 @@ export default function useRh() {
   };
 
   // Lấy nhóm Rh theo ID
-  const getRhById = async (id) => {
+  const getRhById = async (id:string) => {
     try {
       const response = await api.get(`${API_URL}/${id}`);
       return response.data;
@@ -26,7 +26,7 @@ export default function useRh() {
   };
 
   // Tạo nhóm Rh mới
-  const createRh = async (data) => {
+  const createRh = async (data:any) => {
     try {
       const response = await api.post(API_URL, data);
       return response.data;
@@ -37,7 +37,7 @@ export default function useRh() {
   };
 
   // Cập nhật nhóm Rh
-  const updateRh = async (id, data) => {
+  const updateRh = async (id:string, data:any) => {
     try {
       const response = await api.patch(`${API_URL}/${id}`, data);
       return response.data;
@@ -48,7 +48,7 @@ export default function useRh() {
   };
 
   // Xóa nhóm Rh (nếu API hỗ trợ)
-  const deleteRh = async (id) => {
+  const deleteRh = async (id:string) => {
     try {
       const response = await api.delete(`${API_URL}/${id}`);
       return response.data;

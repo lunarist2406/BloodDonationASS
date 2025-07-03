@@ -38,7 +38,7 @@ interface FilterState {
 
 type UseBloodDonationFilterOptions = {
   distanceKm: number;
-  selectedCenter: number;
+  selectedCenter: string ;
 };
 
 export const useBloodDonationFilter = (
@@ -48,7 +48,7 @@ export const useBloodDonationFilter = (
   const [filterState, setFilterState] = useState<FilterState>({
     selectedTypes: [],
     distanceKm: options.distanceKm,
-    selectedCenter: options.selectedCenter,
+    selectedCenter: options.selectedCenter || null ,
   });
   const [filteredData, setFilteredData] = useState<BloodDonationData[]>(allData);
   const [error, setError] = useState<string | null>(null);

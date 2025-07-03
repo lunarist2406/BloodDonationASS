@@ -1,4 +1,3 @@
-import { PieChartOutlined } from "@ant-design/icons";
 import TableStorage from "./TableStorage";
 import ChartStorage from "./ChartStorage";
 import { motion } from "framer-motion";

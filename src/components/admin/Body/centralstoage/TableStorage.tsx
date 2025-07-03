@@ -9,7 +9,7 @@ import {
   Tooltip,
   Card,
 } from "antd";
-import { IconEye, IconEdit, IconTrash, IconRefresh } from "@tabler/icons-react";
+import { IconEye, IconTrash, IconRefresh } from "@tabler/icons-react";
 
 import dayjs from "dayjs";
 import useStorage from "../../../../hooks/storage/useStorage";
