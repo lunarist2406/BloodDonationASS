@@ -44,6 +44,7 @@ export default function FormRegisterReceiveEmergency({ onSuccess }: FormRegister
 const [centers, setCenters] = useState<Center[]>([]);
   const [bloods, setBloods] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [selectedCenter, setSelectedCenter] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -301,7 +302,7 @@ const payload = {
                 onChange={handleChange}
                 className={inputStyle}
                 placeholder="Nhập số lượng (ml)"
-                min={50}
+                min={150}
               />
             </div>
           </div>
@@ -328,22 +329,23 @@ const payload = {
 
         {/* Trung tâm */}
         <div className={inputWrapper}>
-          <label className="block font-semibold mb-1">Chọn Trung Tâm Hiến Máu</label>
-          <Select
-            value={formData.centralBlood_id || undefined}
-            onChange={(value) => handleSelectChange(value, "centralBlood_id")}
-            className="w-full"
-            placeholder="Chọn trung tâm"
-            loading={loading}
-            allowClear
-          >
-            {centers.map((center: any) => (
-              <Option key={center.centralBlood_id} value={center.centralBlood_id}>
-                {center.centralBlood_name} - {center.centralBlood_address}
-              </Option>
-            ))}
-          </Select>
-        </div>
+  <label className="block font-semibold mb-1">Chọn Trung Tâm Hiến Máu</label>
+  <Select
+    value={selectedCenter}
+    onChange={(value) => setSelectedCenter(value)}
+    className="w-full"
+    placeholder="Chọn trung tâm"
+    loading={loading}
+    allowClear
+  >
+    {centers.map((center: any) => (
+      <Option key={center.centralBlood_id} value={center.centralBlood_id}>
+        {center.centralBlood_name} - {center.centralBlood_address}
+      </Option>
+    ))}
+  </Select>
+</div>
+
 
         <div className="flex justify-center">
           <button

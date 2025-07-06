@@ -45,64 +45,63 @@ export default function Login() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setIsLoading(true);
+ const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setError("");
+  setIsLoading(true);
 
-    if (!email || !password) {
-      setError("Vui lòng nhập đầy đủ email và mật khẩu");
-      setIsLoading(false);
-      return;
+  if (!email || !password) {
+    setError("Vui lòng nhập đầy đủ email và mật khẩu");
+    setIsLoading(false);
+    return;
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    setError("Email không hợp lệ");
+    setIsLoading(false);
+    return;
+  }
+
+  try {
+    const loginData = {
+      username: email.trim(),
+      password: password.trim(),
+    };
+
+    console.log("Sending login request with data:", loginData);
+
+    const response = await api.post<LoginResponse>(
+      "/api/v1/auth/login",
+      loginData
+    );
+
+    console.log("Full login response:", response);
+    console.log("Login response data:", response.data);
+    console.log("Data object:", response.data.data);
+
+    if (response.data?.data?.access_token) {
+      const data = response.data?.data.user;
+      console.log("Token found:", response.data.data.access_token);
+      setAuthToken(response.data.data.access_token);
+      setUser(data);
+      const fullname = response.data.data.user.fullname?.trim() || "";
+      const lastWord = fullname.split(" ").pop() || "";
+      navigate(`/${encodeURIComponent(lastWord)}`);
+    } else {
+      console.error("Token not found in response:", response.data);
+      setError("Không nhận được token từ server");
     }
+  } catch (err: any) {
+    console.error("Login error:", err);
+    const message =
+      err?.response?.data?.message || "Email hoặc mật khẩu không chính xác";
+    setError(message);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setError("Email không hợp lệ");
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      const loginData = {
-        username: email.trim(),
-        password: password.trim(),
-      };
-
-      console.log("Sending login request with data:", loginData);
-
-      const response = await api.post<LoginResponse>(
-        "/api/v1/auth/login",
-        loginData
-      );
-
-      console.log("Full login response:", response);
-      console.log("Login response data:", response.data);
-      console.log("Data object:", response.data.data);
-      if (response.data?.data?.access_token) {
-        const data = response.data?.data.user
-        console.log("Token found:", response.data.data.access_token);
-        setAuthToken(response.data.data.access_token);
-        setUser(data);
-        const fullname = response.data.data.user.fullname?.trim() || "";
-        const lastWord = fullname.split(" ").pop() || "";
-        navigate(`/${encodeURIComponent(lastWord)}`);
-      } else {
-        console.error("Token not found in response:", response.data);
-        setError("Không nhận được token từ server");
-      }
-    } catch (err: unknown) {
-      console.error("Login error:", err);
-
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("Email hoặc mật khẩu không chính xác");
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleRegister = () => {
     navigate("register");

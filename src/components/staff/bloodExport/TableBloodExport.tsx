@@ -313,6 +313,7 @@ const columns: ColumnsType<any> = [
             <Select
               className="w-full"
               value={editing.status}
+              disabled={editing.status === "COMPLETED"}
               onChange={(value) => setEditing({ ...editing, status: value })}
             >
               {statusOptions.map((status) => (

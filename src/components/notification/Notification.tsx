@@ -24,27 +24,36 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps & { userId
 
   // Lấy danh sách thông báo khi mount
   useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        const res = await api.get('/api/v1/notifications', {
-          params: { current: 1, pageSize: 10, qs: '' },
-        });
-        // Map dữ liệu từ BE sang FE
-        setNotifications(
-          res.data.data.result.map((n: any) => ({
-            id: n.notification_id,
-            message: n.message,
-            type: n.type,
-            isRead: n.is_read,
-            createdAt: new Date(n.created_at),
-          }))
-        );
-      } catch (err) {
-        // Xử lý lỗi nếu cần
-      }
-    };
-    fetchNotifications();
-  }, []);
+  const fetchNotifications = async () => {
+    try {
+      const res = await api.get('/api/v1/notifications', {
+        params: { current: 1, pageSize: 100, qs: '' },
+      });
+
+      const userStr = localStorage.getItem('user');
+      const user = userStr ? JSON.parse(userStr) : null;
+      const userId = user?.user_id;
+
+      if (!userId) return;
+
+      const filtered = res?.data?.data.result
+        .filter((n: any) => n.user_id === userId)
+        .map((n: any) => ({
+          id: n.notification_id,
+          message: n.message,
+          type: n.type,
+          isRead: n.is_read,
+          createdAt: new Date(n.created_at),
+        }));
+
+      setNotifications(filtered);
+    } catch (err) {
+      console.error("Lỗi khi fetch noti:", err);
+    }
+  };
+  fetchNotifications();
+}, []);
+
 
   // Kết nối socket và lắng nghe thông báo mới
   useEffect(() => {
