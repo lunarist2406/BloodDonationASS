@@ -33,6 +33,7 @@ export default function FormHealth() {
   const [healthData, setHealthData] = useState<any>(null);
   const [fileList, setFileList] = useState<RcFile[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedValues, setSelectedValues] = useState<string[]>([]);
 
   const { userData } = useUser();
   const { getHealthInfoByUser, createHealthInfo, updateHealthInfo } =
@@ -226,21 +227,59 @@ export default function FormHealth() {
         </div>
 
         <Form.Item
-          name="medical_history"
-          label={<span className="flex items-center gap-2 mb-2"><IconHeartRateMonitor size={20} /> Tiền sử bệnh</span>}
-        >
-          <Select
-            mode="multiple"
-            placeholder="Chọn bệnh lý"
-            options={[
-              { label: "Tiểu đường", value: "Tiểu đường" },
-              { label: "Tim mạch", value: "Tim mạch" },
-              { label: "Hô hấp", value: "Hô hấp" },
-              { label: "Khác", value: "Khác" },
-              { label: "Không có tiền sử bệnh", value: "Không có tiền sử bệnh" },
-            ]}
-          />
-        </Form.Item>
+  name="medical_history"
+  label={
+    <span className="flex items-center gap-2 mb-2">
+      <IconHeartRateMonitor size={20} /> Tiền sử bệnh
+    </span>
+  }
+>
+  <Select
+    mode="multiple"
+    placeholder="Chọn bệnh lý"
+    value={selectedValues}
+    onChange={(values) => {
+      if (values.includes("Không có tiền sử bệnh")) {
+        setSelectedValues(["Không có tiền sử bệnh"]);
+        form.setFieldsValue({ medical_history: ["Không có tiền sử bệnh"] });
+      } else {
+        const filtered = values.filter(
+          (value) => value !== "Không có tiền sử bệnh"
+        );
+        setSelectedValues(filtered);
+        form.setFieldsValue({ medical_history: filtered });
+      }
+    }}
+    options={[
+      {
+        label: "Tiểu đường",
+        value: "Tiểu đường",
+        disabled: selectedValues.includes("Không có tiền sử bệnh"),
+      },
+      {
+        label: "Tim mạch",
+        value: "Tim mạch",
+        disabled: selectedValues.includes("Không có tiền sử bệnh"),
+      },
+      {
+        label: "Hô hấp",
+        value: "Hô hấp",
+        disabled: selectedValues.includes("Không có tiền sử bệnh"),
+      },
+      {
+        label: "Khác",
+        value: "Khác",
+        disabled: selectedValues.includes("Không có tiền sử bệnh"),
+      },
+      {
+        label: "Không có tiền sử bệnh",
+        value: "Không có tiền sử bệnh",
+        disabled: selectedValues.length > 0 && !selectedValues.includes("Không có tiền sử bệnh"),
+      },
+    ]}
+  />
+</Form.Item>
+
 
         <div className="flex gap-2 mb-3">
           <Form.Item
@@ -295,10 +334,11 @@ export default function FormHealth() {
                   <button
                     type="button"
                     onClick={() => handleRemoveImage(idx)}
-                    className="absolute top-1 right-1 bg-black bg-opacity-50 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center"
+                    className="absolute top-1 right-1 bg-opacity-50 rounded-full w-5 h-5 text-xs flex items-center justify-center"
+                    style={{ backgroundColor: "rgba(255, 0, 0, 0.7)", color: "white", cursor: "pointer" }}
                     title="Xóa ảnh"
                   >
-                    ×
+                    X
                   </button>
                 </div>
               ))}

@@ -155,7 +155,7 @@ export default function TableDonateBlood() {
           </Title>
           <div className="grid grid-cols-1 gap-2 mb-4">
             <div>
-              <span className="text-red-300 font-medium">
+              <span className="text-red-600 font-medium">
                 Thời gian đăng ký:
               </span>{" "}
               <span className="text-red-700">
@@ -163,17 +163,17 @@ export default function TableDonateBlood() {
               </span>
             </div>
             <div>
-              <span className="text-red-300 font-medium">Giới tính:</span>{" "}
+              <span className="text-red-600 font-medium">Giới tính:</span>{" "}
               <span className="text-red-700">
-                {item.gender === "male"
+                {item.gender.toLowerCase() === "male"
                   ? "Nam"
-                  : item.gender === "female"
+                  : item.gender.toLowerCase() === "female"
                   ? "Nữ"
                   : item.gender}
               </span>
             </div>
             <div>
-              <span className="text-red-300 font-medium">Ngày hiến máu:</span>{" "}
+              <span className="text-red-600 font-medium">Ngày hiến máu:</span>{" "}
               <span className="text-red-700">
                 {item.dateDonate
                   ? new Date(item.dateDonate).toLocaleDateString("vi-VN")
@@ -237,7 +237,7 @@ export default function TableDonateBlood() {
       ))}
 
       <Button onClick={fetchData} className="mt-4" type="primary" danger block>
-        Reload Đơn Đăng Ký
+        Tải lại Đơn Đăng Ký
       </Button>
     </motion.div>
   );

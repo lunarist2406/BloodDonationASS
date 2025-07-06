@@ -60,12 +60,15 @@ export default function FormRegisterBlood({onSuccess}: FormRegisterBloodProps) {
       message.success("Đăng ký hiến máu thành công!");
 
        onSuccess?.();
-    } catch (err:any) {
+    } catch (err: any) {
       console.error("Lỗi đăng ký hiến máu:", err);
-      message.error("Lỗi đăng ký hiến máu: " + (err.message || ""));
+      const errorMessage =
+        err?.response?.data?.message || "Đã xảy ra lỗi khi đăng ký hiến máu.";
+
+      message.error("Lỗi đăng ký hiến máu: " + errorMessage);
     } finally {
-      setLoading(false);
-    }
+        setLoading(false);
+      }
   };
 
   const inputStyle =
@@ -220,6 +223,7 @@ export default function FormRegisterBlood({onSuccess}: FormRegisterBloodProps) {
             className="w-full"
             placeholder="Chọn địa điểm"
             loading={loading}
+            allowClear
           >
             {centers.map((center:any) => (
               <Option
@@ -246,7 +250,7 @@ export default function FormRegisterBlood({onSuccess}: FormRegisterBloodProps) {
             <DatePicker
               className="w-full pl-10"
               showTime
-              format="YYYY-MM-DD HH:mm"
+              format="YYYY-MM-DD"
               value={selectedDate}
               onChange={(date) => setSelectedDate(date)}
               disabledDate={(current) =>
