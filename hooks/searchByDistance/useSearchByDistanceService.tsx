@@ -2,8 +2,6 @@ import api from "@/config/axiosInstance";
 import { useAuth } from "../auth/useAuthContext";
 import { SearchByCentralDistanceDTO, SearchByCurrentPosDTO, SearchByDistanceDTO } from "./useSearchByDistanceFilter";
 
-
-
 const API_URL = "/api/v1/search";
 // service layer controlling API
 export default function useSearchByDistanceService() {

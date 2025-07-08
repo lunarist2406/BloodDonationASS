@@ -36,8 +36,8 @@ export default function MobileSearchApp() {
   }, [user, distanceKm, getData])
 
   useEffect(() => {
-    if (data.length > 0) {
-      setOriginalData(data)
+  if (data.length > 0 && originalData.length === 0) {
+    setOriginalData(data)
     }
   }, [data])
 
