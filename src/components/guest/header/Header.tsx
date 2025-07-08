@@ -43,6 +43,8 @@ const DropdownLink = ({
 export default function GuestHeader() {
   const { isAuthenticated, user, clearAuth } = useAuth();
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
+
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
@@ -68,6 +70,9 @@ export default function GuestHeader() {
 const handleMarkAllAsRead = () => {
   setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
 };
+  useEffect(() => {
+  document.body.style.overflow = showMobileMenu ? "hidden" : "auto";
+}, [showMobileMenu]);
 
   useEffect(() => {
     if (isAuthenticated() && isMember) {
@@ -127,7 +132,7 @@ const handleMarkAllAsRead = () => {
   }, [showDropdown]);
 
   const renderMemberLinks = () => (
-    <div className="grid grid-cols-5  p-5">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 p-5">
       <motion.div className="space-y-2">
         <motion.h3
           className="font-bold flex items-center"
@@ -208,7 +213,7 @@ const handleMarkAllAsRead = () => {
         <img
           src={img1}
           alt="promo"
-          className="w-full h-38 object-cover rounded-md"
+          className="hidden lg:block w-full aspect-video object-cover rounded-md"
         />
       </motion.div>
     </div>
@@ -274,15 +279,38 @@ const handleMarkAllAsRead = () => {
           >
             <img src={logo} alt="logo" width={50} height={50} />
           </div>
-          <div
+            <div
             className="flex items-center space-x-2 cursor-pointer"
             onClick={() => setShowDropdown(!showDropdown)}
-          >
+            >
             <span className="font-bold text-xl">LUNARIST</span>
-            {(isMember || isAdmin() || isStaff()) && (
+            {/* Show IconChevronDown on desktop, hamburger on mobile */}
+            <span className="hidden lg:inline">
+              {(isMember || isAdmin() || isStaff()) && (
               <IconChevronDown size={25} />
-            )}
-          </div>
+              )}
+            </span>
+            <span className="inline lg:hidden">
+              <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowMobileMenu(!showMobileMenu);
+              }}
+              className="text-white"
+              >
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+              </button>
+            </span>
+            </div>
+
         </div>
 
         {isAuthenticated() && (
@@ -294,7 +322,10 @@ const handleMarkAllAsRead = () => {
                 onMarkAllAsRead={handleMarkAllAsRead}
                 userId={user?.user_id || ""}
               />
+              
             )}
+
+
             <span className="text-white">Xin chào, {fullname}</span>
             <motion.button
               onClick={handleSignOut}
@@ -320,13 +351,36 @@ const handleMarkAllAsRead = () => {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="absolute top-full left-0 w-full bg-white text-black shadow-lg z-50 px-20 rounded-md"
+            className="hidden lg:block absolute top-full left-0 w-full bg-white text-black shadow-lg z-50 px-4 md:px-10 lg:px-20 rounded-md"
           >
             {isMember && renderMemberLinks()}
             {isAdmin() && renderAdminLinks()}
             {isStaff() && renderStaffLinks()}
           </motion.div>
         )}
+        {/* Mobile Menu Drawer */}
+        <AnimatePresence>
+          {showMobileMenu && (
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ duration: 0.3 }}
+              className="fixed inset-0 z-50 bg-white text-black p-6 overflow-y-auto lg:hidden"
+            >
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-bold">Menu</h2>
+                <button onClick={() => setShowMobileMenu(false)}>❌</button>
+              </div>
+
+              {/* Optional: Bạn có thể render Member, Admin, Staff ở đây */}
+              {isMember && renderMemberLinks()}
+              {isAdmin() && renderAdminLinks()}
+              {isStaff() && renderStaffLinks()}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
       </AnimatePresence>
     </header>
   );
