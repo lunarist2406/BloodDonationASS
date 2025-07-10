@@ -83,7 +83,7 @@ export default function LoginScreen() {
               />
               <TextInput
                 style={styles.input}
-                placeholder="Username or Email"
+                placeholder="Email"
                 keyboardType="email-address"
                 autoCapitalize="none"
                 value={email}
@@ -101,7 +101,7 @@ export default function LoginScreen() {
               />
               <TextInput
                 style={styles.input}
-                placeholder="Password"
+                placeholder="Mật khẩu"
                 secureTextEntry={!showPassword}
                 value={password}
                 onChangeText={setPassword}
@@ -135,9 +135,9 @@ export default function LoginScreen() {
             </TouchableOpacity>
 
             <View style={styles.registerWrapper}>
-              <Text style={styles.registerPrompt}>Already have an account? </Text>
+              <Text style={styles.registerPrompt}>Chưa có tài khoản? </Text>
               <TouchableOpacity onPress={() => router.push("/(auth)/register")}>
-                <Text style={styles.registerText}>LOGIN</Text>
+                <Text style={styles.registerText}>ĐĂNG KÝ</Text>
               </TouchableOpacity>
             </View>
           </View>

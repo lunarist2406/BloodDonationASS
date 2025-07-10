@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   View,
   Text,
@@ -8,31 +8,58 @@ import {
   Alert,
   StatusBar,
   Switch,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
-import { router } from 'expo-router';
-import { useAuth } from '@/hooks/auth/useAuthContext';
-import { useHealth } from '@/hooks/HealthInfor/useUser';
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { Image } from "expo-image";
+import { router } from "expo-router";
+import { useAuth } from "@/hooks/auth/useAuthContext";
+import { useHealth } from "@/hooks/HealthInfor/useUser";
+import { getLocationAllowed, setLocationAllowed } from "@/hooks/location/useLocationAllowedStore";
+import { ToastAndroid } from "react-native";
+import * as Location from "expo-location";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function SettingScreen() {
   const { logout } = useAuth();
   const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);
   const [locationEnabled, setLocationEnabled] = React.useState(true);
-  const {userHealth} = useHealth();
-  console.log("User Health:",userHealth)
+  const { userHealth } = useHealth();
+  console.log("User Health:", userHealth);
   const handleLogoutConfirmed = async () => {
     await logout();
-    console.log('Logged out');
+    console.log("Logged out");
     router.push("/(auth)/login");
   };
 
+  const handleCheckLocation = async () => {
+  if (!getLocationAllowed()) {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+
+    if (status !== "granted") {
+      ToastAndroid.show("Bạn đã từ chối truy cập vị trí.", ToastAndroid.SHORT);
+      setLocationEnabled(false);
+      setLocationAllowed(false);
+      return;
+    } else {
+      setLocationAllowed(true);
+    }
+  }
+
+  setLocationEnabled(true);
+};
+
+useFocusEffect(
+  React.useCallback(() => {
+    handleCheckLocation();
+  }, [])
+);
+
   const handleLogout = () => {
-    Alert.alert('Xác nhận', 'Bạn có chắc muốn đăng xuất không?', [
-      { text: 'Huỷ', style: 'cancel' },
+    Alert.alert("Xác nhận", "Bạn có chắc muốn đăng xuất không?", [
+      { text: "Huỷ", style: "cancel" },
       {
-        text: 'Đăng xuất',
-        style: 'destructive',
+        text: "Đăng xuất",
+        style: "destructive",
         onPress: handleLogoutConfirmed,
       },
     ]);
@@ -40,110 +67,112 @@ export default function SettingScreen() {
 
   const settingSections = [
     {
-      title: 'Tài khoản',
+      title: "Tài khoản",
       items: [
         {
-          icon: 'person-outline',
-          label: 'Thông tin cá nhân',
-          subtitle: 'Cập nhật thông tin của bạn',
-          onPress: () => console.log('Profile'),
+          icon: "person-outline",
+          label: "Thông tin cá nhân",
+          subtitle: "Cập nhật thông tin của bạn",
+          onPress: () => console.log("Profile"),
         },
         {
-          icon: 'shield-checkmark-outline',
-          label: 'Bảo mật',
-          subtitle: 'Mật khẩu và xác thực',
-          onPress: () => console.log('Security'),
+          icon: "shield-checkmark-outline",
+          label: "Bảo mật",
+          subtitle: "Mật khẩu và xác thực",
+          onPress: () => console.log("Security"),
         },
         {
-          icon: 'card-outline',
-          label: 'Phương thức thanh toán',
-          subtitle: 'Quản lý thẻ và ví điện tử',
-          onPress: () => console.log('Payment'),
+          icon: "card-outline",
+          label: "Phương thức thanh toán",
+          subtitle: "Quản lý thẻ và ví điện tử",
+          onPress: () => console.log("Payment"),
         },
       ],
     },
     {
-      title: 'Hoạt động',
+      title: "Hoạt động",
       items: [
         {
-          icon: 'time-outline',
-          label: 'Lịch sử hiến máu',
-          subtitle: 'Xem lịch sử hiến máu của bạn',
-          onPress: () => console.log('Donation History'),
+          icon: "time-outline",
+          label: "Lịch sử hiến máu",
+          subtitle: "Xem lịch sử hiến máu của bạn",
+          onPress: () => console.log("Donation History"),
         },
         {
-          icon: 'medical-outline',
-          label: 'Lịch sử nhận máu',
-          subtitle: 'Xem lịch sử nhận máu',
-          onPress: () => console.log('Receive History'),
+          icon: "medical-outline",
+          label: "Lịch sử nhận máu",
+          subtitle: "Xem lịch sử nhận máu",
+          onPress: () => console.log("Receive History"),
         },
         {
-          icon: 'heart-outline',
-          label: 'Thông tin sức khỏe',
-          subtitle: 'Cập nhật tình trạng sức khỏe',
-          onPress: () => console.log('Health Info'),
+          icon: "heart-outline",
+          label: "Thông tin sức khỏe",
+          subtitle: "Cập nhật tình trạng sức khỏe",
+          onPress: () => console.log("Health Info"),
         },
       ],
     },
     {
-      title: 'Cài đặt ứng dụng',
+      title: "Cài đặt ứng dụng",
       items: [
         {
-          icon: 'notifications-outline',
-          label: 'Thông báo',
-          subtitle: 'Quản lý thông báo push',
+          icon: "notifications-outline",
+          label: "Thông báo",
+          subtitle: "Quản lý thông báo push",
           isSwitch: true,
           value: notificationsEnabled,
           onToggle: setNotificationsEnabled,
         },
         {
-          icon: 'location-outline',
-          label: 'Vị trí',
-          subtitle: 'Cho phép truy cập vị trí',
+          icon: "location-outline",
+          label: "Vị trí",
+          subtitle: "Cho phép truy cập vị trí",
           isSwitch: true,
           value: locationEnabled,
-          onToggle: setLocationEnabled,
+          onToggle: () => {
+              handleCheckLocation();
+          },
         },
         {
-          icon: 'language-outline',
-          label: 'Ngôn ngữ',
-          subtitle: 'Tiếng Việt',
-          onPress: () => console.log('Language'),
+          icon: "language-outline",
+          label: "Ngôn ngữ",
+          subtitle: "Tiếng Việt",
+          onPress: () => console.log("Language"),
         },
         {
-          icon: 'moon-outline',
-          label: 'Giao diện tối',
-          subtitle: 'Chế độ ban đêm',
-          onPress: () => console.log('Dark Mode'),
+          icon: "moon-outline",
+          label: "Giao diện tối",
+          subtitle: "Chế độ ban đêm",
+          onPress: () => console.log("Dark Mode"),
         },
       ],
     },
     {
-      title: 'Hỗ trợ',
+      title: "Hỗ trợ",
       items: [
         {
-          icon: 'help-circle-outline',
-          label: 'Trung tâm trợ giúp',
-          subtitle: 'FAQ và hướng dẫn',
-          onPress: () => console.log('Help'),
+          icon: "help-circle-outline",
+          label: "Trung tâm trợ giúp",
+          subtitle: "FAQ và hướng dẫn",
+          onPress: () => console.log("Help"),
         },
         {
-          icon: 'chatbubble-outline',
-          label: 'Liên hệ hỗ trợ',
-          subtitle: 'Chat với đội ngũ hỗ trợ',
-          onPress: () => console.log('Contact'),
+          icon: "chatbubble-outline",
+          label: "Liên hệ hỗ trợ",
+          subtitle: "Chat với đội ngũ hỗ trợ",
+          onPress: () => console.log("Contact"),
         },
         {
-          icon: 'star-outline',
-          label: 'Đánh giá ứng dụng',
-          subtitle: 'Để lại đánh giá trên store',
-          onPress: () => console.log('Rate App'),
+          icon: "star-outline",
+          label: "Đánh giá ứng dụng",
+          subtitle: "Để lại đánh giá trên store",
+          onPress: () => console.log("Rate App"),
         },
         {
-          icon: 'document-text-outline',
-          label: 'Điều khoản sử dụng',
-          subtitle: 'Chính sách và điều khoản',
-          onPress: () => console.log('Terms'),
+          icon: "document-text-outline",
+          label: "Điều khoản sử dụng",
+          subtitle: "Chính sách và điều khoản",
+          onPress: () => console.log("Terms"),
         },
       ],
     },
@@ -153,7 +182,6 @@ export default function SettingScreen() {
     <>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton}>
@@ -166,7 +194,9 @@ export default function SettingScreen() {
         {/* User Profile Card */}
         <View style={styles.profileCard}>
           <Image
-            source={{ uri: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face' }}
+            source={{
+              uri: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face",
+            }}
             style={styles.profileImage}
           />
           <View style={styles.profileInfo}>
@@ -207,8 +237,8 @@ export default function SettingScreen() {
                     <Switch
                       value={item.value}
                       onValueChange={item.onToggle}
-                      trackColor={{ false: '#e0e0e0', true: '#E91E63' }}
-                      thumbColor={item.value ? '#fff' : '#f4f3f4'}
+                      trackColor={{ false: "#e0e0e0", true: "#E91E63" }}
+                      thumbColor={item.value ? "#fff" : "#f4f3f4"}
                     />
                   ) : (
                     <Ionicons name="chevron-forward" size={20} color="#ccc" />
@@ -243,17 +273,17 @@ export default function SettingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: "#f8f9fa",
   },
   header: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     paddingTop: 50,
     paddingHorizontal: 20,
     paddingBottom: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    shadowColor: '#000',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -264,20 +294,20 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 20,
-    fontWeight: '700',
-    color: '#333',
+    fontWeight: "700",
+    color: "#333",
   },
   placeholder: {
     width: 40,
   },
   profileCard: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     margin: 20,
     borderRadius: 20,
     padding: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    shadowColor: '#000',
+    flexDirection: "row",
+    alignItems: "center",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -294,29 +324,29 @@ const styles = StyleSheet.create({
   },
   profileName: {
     fontSize: 18,
-    fontWeight: '700',
-    color: '#333',
+    fontWeight: "700",
+    color: "#333",
     marginBottom: 4,
   },
   profileEmail: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
     marginBottom: 8,
   },
   bloodTypeContainer: {
-    backgroundColor: '#E91E63',
+    backgroundColor: "#E91E63",
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 4,
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
   },
   bloodTypeText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   editProfileButton: {
-    backgroundColor: '#fce4ec',
+    backgroundColor: "#fce4ec",
     borderRadius: 20,
     padding: 10,
   },
@@ -325,33 +355,33 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
     marginLeft: 20,
     marginBottom: 10,
   },
   sectionCard: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     marginHorizontal: 20,
     borderRadius: 15,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 3,
   },
   settingItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: "#f0f0f0",
   },
   lastItem: {
     borderBottomWidth: 0,
   },
   settingIcon: {
-    backgroundColor: '#fce4ec',
+    backgroundColor: "#fce4ec",
     borderRadius: 10,
     padding: 8,
     marginRight: 15,
@@ -361,24 +391,24 @@ const styles = StyleSheet.create({
   },
   settingLabel: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
     marginBottom: 2,
   },
   settingSubtitle: {
     fontSize: 13,
-    color: '#666',
+    color: "#666",
   },
   logoutButton: {
-    backgroundColor: '#E91E63',
+    backgroundColor: "#E91E63",
     marginHorizontal: 20,
     borderRadius: 15,
     padding: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     marginBottom: 20,
-    shadowColor: '#E91E63',
+    shadowColor: "#E91E63",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -388,22 +418,22 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   logoutText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   versionContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 20,
   },
   versionText: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
     marginBottom: 2,
   },
   versionSubtext: {
     fontSize: 12,
-    color: '#999',
+    color: "#999",
   },
   bottomSpacing: {
     height: 20,
