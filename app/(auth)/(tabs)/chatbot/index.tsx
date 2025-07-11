@@ -11,6 +11,7 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
 } from "react-native";
+import Markdown from 'react-native-markdown-display';
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { io, Socket } from "socket.io-client";
@@ -171,10 +172,18 @@ export default function ChatbotInterface() {
                 <Text
                   style={[
                     styles.messageText,
-                    message.sender === "user" && styles.userText,
                   ]}
                 >
-                  {message.content}
+<Markdown
+  style={{
+    body: {
+      color: message.sender === "user" ? "white" : "#111827",
+      fontSize: 14,
+    },
+  }}
+>
+  {message.content}
+</Markdown>
                 </Text>
                 {!message.id.startsWith("typing_") && (
                   <Text
@@ -269,9 +278,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     borderWidth: 1,
     borderColor: "#E5E7EB",
-  },
-  userText: {
-    color: "white",
   },
   messageText: {
     color: "#111827",
