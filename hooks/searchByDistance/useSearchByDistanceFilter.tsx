@@ -38,7 +38,7 @@ interface FilterState {
 
 type UseBloodDonationFilterOptions = {
   distanceKm: number;
-  selectedCenter: number;
+  selectedCenter: string | null;
 };
 
 export const useSearchByDistanceFilter = (

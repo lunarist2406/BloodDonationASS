@@ -17,6 +17,7 @@ import useCentral from "@/hooks/central/useCentral";
 import useSearchByDistanceService from "@/hooks/searchByDistance/useSearchByDistanceService";
 import { Picker } from "@react-native-picker/picker";
 import CenterPicker from "./centerPicker";
+import { getLocationAllowed, setLocationAllowed } from "@/hooks/location/useLocationAllowedStore";
 
 interface FilterInformationUIProps {
   selectedTypes: string[];
@@ -51,55 +52,59 @@ export default function FilterInformationUI({
   const [showPicker, setShowPicker] = useState(false);
 
   const handleUseLocationChange = async (checked: boolean) => {
-    if (!checked) {
-      onCenterChange(null);
-      setUseCurrentLocation(false);
-      onUseCurrentLocationChange?.(null);
-      setData(originalData);
-      return;
-    }
+  if (!checked) {
+    onCenterChange(null);
+    setUseCurrentLocation(false);
+    onUseCurrentLocationChange?.(null);
+    setData(originalData);
+    return;
+  }
 
-    if (selectedCenter) {
-      onCenterChange(null);
-    }
-
-    setLoadingLocation(true);
-
+  if (!getLocationAllowed()) {
     const { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== "granted") {
       ToastAndroid.show("Bạn đã từ chối truy cập vị trí.", ToastAndroid.SHORT);
       setUseCurrentLocation(false);
-      setLoadingLocation(false);
+      setLocationAllowed(false);
       return;
+    } else {
+      setLocationAllowed(true);
     }
+  }
 
-    try {
-      const location = await Location.getCurrentPositionAsync({});
-      const { latitude, longitude } = location.coords;
-      setUseCurrentLocation(true);
-      onUseCurrentLocationChange?.({ lat: latitude, lng: longitude });
-      const objectSearch = {
-        lat: latitude,
-        lng: longitude,
-        radiusInKm: distanceKm || 10,
-      };
-      const response = await searchByCurrentPosition(objectSearch);
-      if (response && response.data) {
-        setData(response.data);
-      } else {
-        ToastAndroid.show("Lỗi dữ liệu trả về.", ToastAndroid.SHORT);
-      }
-    } catch (err) {
-      ToastAndroid.show(
-        "Không thể lấy vị trí. Vui lòng thử lại.",
-        ToastAndroid.SHORT
-      );
-      setUseCurrentLocation(false);
-      onUseCurrentLocationChange?.(null);
-    } finally {
-      setLoadingLocation(false);
+  if (selectedCenter) {
+    onCenterChange(null);
+  }
+
+  setLoadingLocation(true);
+
+  try {
+    const location = await Location.getCurrentPositionAsync({});
+    const { latitude, longitude } = location.coords;
+
+    setUseCurrentLocation(true);
+    onUseCurrentLocationChange?.({ lat: latitude, lng: longitude });
+
+    const objectSearch = {
+      lat: latitude,
+      lng: longitude,
+      radiusInKm: distanceKm || 10,
+    };
+
+    const response = await searchByCurrentPosition(objectSearch);
+    if (response && response.data) {
+      setData(response.data);
+    } else {
+      ToastAndroid.show("Lỗi dữ liệu trả về.", ToastAndroid.SHORT);
     }
-  };
+  } catch (err) {
+    ToastAndroid.show("Không thể lấy vị trí. Vui lòng thử lại.", ToastAndroid.SHORT);
+    setUseCurrentLocation(false);
+    onUseCurrentLocationChange?.(null);
+  } finally {
+    setLoadingLocation(false);
+  }
+};
 
   const handleAllowClear = () => {
     setShowPicker(false);

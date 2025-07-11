@@ -1,110 +1,325 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import React, { useEffect, useRef, useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  Keyboard,
+  TouchableWithoutFeedback,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { io, Socket } from "socket.io-client";
+import { useAuth } from "@/hooks/auth/useAuthContext";
 
-import { Collapsible } from '@/components/Collapsible';
-import { ExternalLink } from '@/components/ExternalLink';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { IconSymbol } from '@/components/ui/IconSymbol';
+interface Message {
+  id: string;
+  content: string;
+  sender: "user" | "bot";
+  timestamp: Date;
+}
 
-export default function TabTwoScreen() {
+export default function ChatbotInterface() {
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: "1",
+      content:
+        "Xin chào! Tôi là trợ lý AI của LUNARIST 🩸\n\nTôi có thể giúp bạn tìm hiểu về quy trình hiến máu, tìm kiếm trung tâm hiến máu gần nhất, hoặc trả lời các câu hỏi về sức khỏe liên quan đến hiến máu.\n\nBạn cần hỗ trợ gì?",
+      sender: "bot",
+      timestamp: new Date(),
+    },
+  ]);
+  const [inputMessage, setInputMessage] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+  const scrollViewRef = useRef<ScrollView>(null);
+  const typingInterval = useRef<NodeJS.Timeout | null>(null);
+  const socketRef = useRef<Socket | null>(null);
+  const isCanceledRef = useRef(false);
+
+  const suggestions = [
+    "Làm sao để đăng ký hiến máu?",
+    "Hiến máu xong bao lâu thì được hiến lại?",
+    "Nhóm máu A có thể cho nhóm nào?",
+    "Tôi muốn tìm nơi hiến máu gần nhất.",
+  ];
+
+  const { user } = useAuth();
+  const socketURL = `${process.env.EXPO_PUBLIC_API_URL_M}/chatbot`;
+
+  useEffect(() => {
+    if (!socketRef.current && socketURL) {
+      socketRef.current = io(socketURL, {
+        transports: ["websocket"],
+        auth: {
+          userID: user?.user_id || "anonymous",
+        },
+      });
+
+      socketRef.current.on("aiReply", (data: { message: string }) => {
+        if (isCanceledRef.current) return;
+        stopTypingAnimation();
+        setMessages((prev) => [
+          ...prev.filter((msg) => !msg.id.startsWith("typing_")),
+          {
+            id: Date.now().toString(),
+            content: data.message,
+            sender: "bot",
+            timestamp: new Date(),
+          },
+        ]);
+      });
+
+      socketRef.current.on("connect_error", (err) => {
+        console.error("Socket connect error:", err);
+      });
+    }
+
+    const keyboardDidShow = Keyboard.addListener("keyboardDidShow", () => {
+      setTimeout(() => {
+        scrollViewRef.current?.scrollToEnd({ animated: true });
+      }, 100);
+    });
+
+    return () => {
+      socketRef.current?.disconnect();
+      keyboardDidShow.remove();
+    };
+  }, []);
+
+  const startTypingAnimation = () => {
+    isCanceledRef.current = false;
+    setIsTyping(true);
+    let dots = ".";
+    const id = "typing_" + Date.now();
+    setMessages((prev) => [
+      ...prev,
+      { id, content: dots, sender: "bot", timestamp: new Date() },
+    ]);
+
+    typingInterval.current = setInterval(() => {
+      dots = dots.length === 3 ? "." : dots + ".";
+      setMessages((prev) =>
+        prev.map((msg) => (msg.id === id ? { ...msg, content: dots } : msg))
+      );
+    }, 500) as unknown as NodeJS.Timeout;
+  };
+
+  const stopTypingAnimation = () => {
+    isCanceledRef.current = true;
+    setIsTyping(false);
+    if (typingInterval.current) {
+      clearInterval(typingInterval.current);
+      typingInterval.current = null;
+    }
+    setMessages((prev) => prev.filter((msg) => !msg.id.startsWith("typing_")));
+  };
+
+  const handleSendMessage = () => {
+    if (!inputMessage.trim()) return;
+
+    const content = inputMessage.trim();
+    const message: Message = {
+      id: Date.now().toString() + Math.random().toString(36).substring(2, 9),
+      content,
+      sender: "user",
+      timestamp: new Date(),
+    };
+
+    setMessages((prev) => [...prev, message]);
+    setInputMessage("");
+
+    socketRef.current?.emit("askAI", { message: content });
+    startTypingAnimation();
+  };
+
+  const handleSuggestionClick = (text: string) => {
+    setInputMessage(text);
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={
-        <IconSymbol
-          size={310}
-          color="#808080"
-          name="chevron.left.forwardslash.chevron.right"
-          style={styles.headerImage}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Explore</ThemedText>
-      </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
-      <Collapsible title="File-based routing">
-        <ThemedText>
-          This app has two screens:{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-        </ThemedText>
-        <ThemedText>
-          The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-          sets up the tab navigator.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Android, iOS, and web support">
-        <ThemedText>
-          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-        </ThemedText>
-      </Collapsible>
-      <Collapsible title="Images">
-        <ThemedText>
-          For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-          different screen densities
-        </ThemedText>
-        <Image source={require('@/assets/images/react-logo.png')} style={{ alignSelf: 'center' }} />
-        <ExternalLink href="https://reactnative.dev/docs/images">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Custom fonts">
-        <ThemedText>
-          Open <ThemedText type="defaultSemiBold">app/_layout.tsx</ThemedText> to see how to load{' '}
-          <ThemedText style={{ fontFamily: 'SpaceMono' }}>
-            custom fonts such as this one.
-          </ThemedText>
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/versions/latest/sdk/font">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Light and dark mode components">
-        <ThemedText>
-          This template has light and dark mode support. The{' '}
-          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-          what the user&apos;s current color scheme is, and so you can adjust UI colors accordingly.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Animations">
-        <ThemedText>
-          This template includes an example of an animated component. The{' '}
-          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-          the powerful <ThemedText type="defaultSemiBold">react-native-reanimated</ThemedText>{' '}
-          library to create a waving hand animation.
-        </ThemedText>
-        {Platform.select({
-          ios: (
-            <ThemedText>
-              The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-              component provides a parallax effect for the header image.
-            </ThemedText>
-          ),
-        })}
-      </Collapsible>
-    </ParallaxScrollView>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "android" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "android" ? 0 : -48}
+    >
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.container}>
+          <ScrollView
+            ref={scrollViewRef}
+            contentContainerStyle={styles.scrollContentContainer}
+            keyboardShouldPersistTaps="handled"
+            onContentSizeChange={() =>
+              setTimeout(() => {
+                scrollViewRef.current?.scrollToEnd({ animated: true });
+              }, 100)
+            }
+          >
+            {messages.map((message) => (
+              <View
+                key={message.id}
+                style={[
+                  styles.messageBubble,
+                  message.sender === "user"
+                    ? styles.userBubble
+                    : styles.botBubble,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.messageText,
+                    message.sender === "user" && styles.userText,
+                  ]}
+                >
+                  {message.content}
+                </Text>
+                {!message.id.startsWith("typing_") && (
+                  <Text
+                    style={[
+                      styles.timestampText,
+                      message.sender === "user" && styles.userTimestampText,
+                    ]}
+                  >
+                    {message.timestamp.toLocaleTimeString("vi-VN", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </Text>
+                )}
+              </View>
+            ))}
+          </ScrollView>
+
+          <View style={styles.suggestionsContainer}>
+                {suggestions.map((question, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    style={styles.suggestionButton}
+                    onPress={() => handleSuggestionClick(question)}
+                  >
+                    <Text style={styles.suggestionText}>{question}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <View>
+              {/* Input and Button */}
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="Nhập tin nhắn..."
+                  value={inputMessage}
+                  onChangeText={setInputMessage}
+                  onSubmitEditing={handleSendMessage}
+                  returnKeyType="send"
+                />
+                <TouchableOpacity
+                  onPress={isTyping ? stopTypingAnimation : handleSendMessage}
+                  style={styles.sendButton}
+                  disabled={!inputMessage.trim() && !isTyping}
+                >
+                  <Ionicons
+                    name={isTyping ? "close" : "send"}
+                    size={20}
+                    color="white"
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </TouchableWithoutFeedback>
+        </View>
+      </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
+  safeArea: {
+    paddingBottom: -48,
+    flex: 1,
+    backgroundColor: "#F3F4F6",
   },
-  titleContainer: {
-    flexDirection: 'row',
+  container: {
+    flex: 1,
+    justifyContent: "space-between",
+  },
+  scrollContentContainer: {
+    padding: 16,
+    paddingBottom: 24,
+  },
+  messageBubble: {
+    padding: 12,
+    borderRadius: 16,
+    marginBottom: 12,
+    maxWidth: "80%",
+  },
+  userBubble: {
+    alignSelf: "flex-end",
+    backgroundColor: "#EC4899",
+  },
+  userTimestampText: {
+    color: "#fffd",
+  },
+  botBubble: {
+    alignSelf: "flex-start",
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+  },
+  userText: {
+    color: "white",
+  },
+  messageText: {
+    color: "#111827",
+    fontSize: 14,
+  },
+  timestampText: {
+    fontSize: 10,
+    color: "#6B7280",
+    marginTop: 4,
+    alignSelf: "flex-end",
+  },
+  suggestionsContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    paddingHorizontal: 15,
+    paddingBottom: 8,
+    paddingTop: 8,
     gap: 8,
   },
-});
+  suggestionButton: {
+    backgroundColor: "#E5E7EB",
+    borderRadius: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  suggestionText: {
+    fontSize: 13,
+    color: "#111827",
+  },
+  inputContainer: {
+    flexDirection: "row",
+    padding: 12,
+    borderTopWidth: 1,
+    borderColor: "#E5E7EB",
+    backgroundColor: "#FFFFFF",
+    alignItems: "center",
+  },
+  textInput: {
+    flex: 1,
+    height: 40,
+    backgroundColor: "#F9FAFB",
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    marginRight: 8,
+  },
+  sendButton: {
+    backgroundColor: "#EC4899",
+    padding: 10,
+    borderRadius: 20,
+  },
+}); 
