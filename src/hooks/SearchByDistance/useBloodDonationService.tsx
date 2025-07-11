@@ -2,7 +2,7 @@ import { api } from "../../components/config/axios/axiosInstance";
 import type { SearchByCentralDistanceDTO, SearchByCurrentPosDTO, SearchByDistanceDTO } from "./useBloodDonationFilter";
 import { useAuth } from "../User/useAuth";
 
-const API_URL = "http://localhost:3000/api/v1/search";
+const API_URL = "/api/v1/search";
 // service layer controlling API
 export default function useBloodDonationService() {
   const { token } = useAuth();

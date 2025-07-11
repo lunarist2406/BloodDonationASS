@@ -1,7 +1,7 @@
 import { api } from "../../components/config/axios/axiosInstance";
 import { useAuth } from "../User/useAuth";
 
-const API_URL = "http://localhost:3000/api/v1/infor-health";
+const API_URL = "/api/v1/infor-health";
 
 export default function useHealthService() {
   const { token } = useAuth();

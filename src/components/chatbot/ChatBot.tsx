@@ -20,7 +20,7 @@ const suggestions = [
 ];
 
 const user = JSON.parse(localStorage.getItem('user') || '{}');
-const socket: Socket = io('http://localhost:3000/chatbot', {
+const socket: Socket = io('https://blooddonation-be-production.up.railway.app/chatbot', {
   transports: ['websocket'],
   auth: {
     userID: user?.user_id || 'anonymous'

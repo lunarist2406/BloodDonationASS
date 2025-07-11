@@ -1,6 +1,6 @@
 import {api} from '../../components/config/axios/axiosInstance';
 
-const API_URL = 'http://localhost:3000/api/v1/rhs';
+const API_URL = "/api/v1/rhs";
 
 export default function useRh() {
   // Lấy tất cả nhóm Rh (có phân trang)

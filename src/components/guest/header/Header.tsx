@@ -48,13 +48,12 @@ export default function GuestHeader() {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
-  const role = user?.role || "";
   const fullname = user?.fullname?.trim() || "";
   const encodedName = fullname.replace(/\s+/g, "-").toLowerCase();
 
-  const isAdmin = () => role === "ADMIN";
-  const isStaff = () => role === "STAFF";
-  const isMember = role === "MEMBER";
+    const isMember = user?.role === "MEMBER";
+    const isAdmin = user?.role === "ADMIN";
+    const isStaff = user?.role === "STAFF";
 
 
 
@@ -77,7 +76,7 @@ const handleMarkAllAsRead = () => {
   useEffect(() => {
     if (isAuthenticated() && isMember) {
       // Kết nối socket khi là MEMBER
-      socketRef.current = io("http://localhost:3000/notification", {
+      socketRef.current = io("https://blooddonation-be-production.up.railway.app/notification", {
         transports: ["websocket"],
         auth: {
           userId: user?.user_id || "anonymous",
@@ -286,7 +285,7 @@ const handleMarkAllAsRead = () => {
             <span className="font-bold text-xl">LUNARIST</span>
             {/* Show IconChevronDown on desktop, hamburger on mobile */}
             <span className="hidden lg:inline">
-              {(isMember || isAdmin() || isStaff()) && (
+              {(isMember || isAdmin || isStaff) && (
               <IconChevronDown size={25} />
               )}
             </span>
@@ -354,8 +353,8 @@ const handleMarkAllAsRead = () => {
             className="hidden lg:block absolute top-full left-0 w-full bg-white text-black shadow-lg z-50 px-4 md:px-10 lg:px-20 rounded-md"
           >
             {isMember && renderMemberLinks()}
-            {isAdmin() && renderAdminLinks()}
-            {isStaff() && renderStaffLinks()}
+            {isAdmin && renderAdminLinks()}
+            {isStaff && renderStaffLinks()}
           </motion.div>
         )}
         {/* Mobile Menu Drawer */}
@@ -375,8 +374,8 @@ const handleMarkAllAsRead = () => {
 
               {/* Optional: Bạn có thể render Member, Admin, Staff ở đây */}
               {isMember && renderMemberLinks()}
-              {isAdmin() && renderAdminLinks()}
-              {isStaff() && renderStaffLinks()}
+              {isAdmin && renderAdminLinks()}
+              {isStaff && renderStaffLinks()}
             </motion.div>
           )}
         </AnimatePresence>

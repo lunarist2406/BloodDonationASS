@@ -18,6 +18,7 @@ interface UserAuthStore {
 }
 
 export const useAuth = create<UserAuthStore>((set, get) => ({
+  
   token: localStorage.getItem("token") || "",
   user: JSON.parse(localStorage.getItem("user") || "null"),
   setAuthToken: (token) => {
@@ -41,4 +42,9 @@ export const useAuth = create<UserAuthStore>((set, get) => ({
     const user = get().user;
     return user?.role === role;
   },
+  syncFromLocalStorage: () => {
+  const token = localStorage.getItem("token") || "";
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+  set({ token, user });
+},
 }));

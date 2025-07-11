@@ -5,7 +5,7 @@ import { io, Socket } from 'socket.io-client';
 import type { Notification, NotificationDropdownProps } from './types/notification';
 import { api } from '../config/axios/axiosInstance';
 
-const SOCKET_URL = "http://localhost:3000/noti"; // Đổi thành URL backend của bạn
+const SOCKET_URL = "https://blooddonation-be-production.up.railway.app/noti"; // Đổi thành URL backend của bạn
 
 export const NotificationDropdown: React.FC<NotificationDropdownProps & { userId: string }> = ({
   onMarkAsRead,

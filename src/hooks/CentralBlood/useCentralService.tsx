@@ -1,7 +1,7 @@
 import { api } from "../../components/config/axios/axiosInstance";
 import { useAuth } from "../User/useAuth";
 
-const API_URL = "http://localhost:3000/api/v1/central-blood";
+const API_URL = "/api/v1/central-blood";
 
 export default function useCentralService() {
   const { token } = useAuth();

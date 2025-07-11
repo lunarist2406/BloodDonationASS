@@ -1,7 +1,7 @@
 import { api } from "../../components/config/axios/axiosInstance";
 import { useAuth } from "../User/useAuth";
 
-const API_URL = "http://localhost:3000/api/v1/bloods";
+const API_URL = "/api/v1/bloods";
 
 export default function useBloodService() {
   const { token } = useAuth();

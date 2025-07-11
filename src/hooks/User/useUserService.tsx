@@ -1,7 +1,7 @@
 import { api } from "../../components/config/axios/axiosInstance";
 import { useAuth } from "./useAuth";
 
-const API_URL = "http://localhost:3000/api/v1/users";
+const API_URL = "/api/v1/users";
 
 
 export default function useUserService() {

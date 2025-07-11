@@ -1,7 +1,7 @@
 import { api } from "../../components/config/axios/axiosInstance";
 import { useAuth } from "../User/useAuth";
 
-const API_BASE_URL = "http://localhost:3000/api/v1/export-bloods";
+const API_BASE_URL = "/api/v1/export-bloods";
 
 export default function useBloodExportService() {
   const { token } = useAuth();

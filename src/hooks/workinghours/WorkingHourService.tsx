@@ -1,7 +1,7 @@
 import { api } from "../../components/config/axios/axiosInstance";
 
 
-const API_URL = "http://localhost:3000/api/v1/working-hours";
+const API_URL = "/api/v1/working-hours";
 
 // Lấy tất cả giờ làm việc
 export const getAllWorkingHours = async (token: string) => {
