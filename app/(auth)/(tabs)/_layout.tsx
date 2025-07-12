@@ -6,11 +6,13 @@ import { HapticTab } from "@/components/HapticTab";
 import TabBarBackground from "@/components/ui/TabBarBackground";
 import { Ionicons } from "@expo/vector-icons";
 import { NotificationProvider } from "@/hooks/notification/NotificationContext";
+import { LocationPermissionProvider } from "@/hooks/location/locationPermissionContext";
 
 export default function TabLayout() {
   const redColor = "#8B0000"; // đỏ đậm
 
   return (
+    <LocationPermissionProvider>
     <NotificationProvider>
       <Tabs
         screenOptions={{
@@ -83,5 +85,6 @@ export default function TabLayout() {
         />
       </Tabs>
     </NotificationProvider>
+    </LocationPermissionProvider>
   );
 }

@@ -31,10 +31,6 @@ interface FilterState {
   selectedCenter: string | null;
 }
 
-interface FilterState {
-  selectedTypes: string[];
-  selectedCenter: string | null;
-}
 
 type UseBloodDonationFilterOptions = {
   distanceKm: number;

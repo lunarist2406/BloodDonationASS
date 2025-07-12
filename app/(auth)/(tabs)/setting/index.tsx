@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import {
   View,
   Text,
@@ -8,21 +8,26 @@ import {
   Alert,
   StatusBar,
   Switch,
+  ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { useAuth } from "@/hooks/auth/useAuthContext";
 import { useHealth } from "@/hooks/HealthInfor/useUser";
-import { getLocationAllowed, setLocationAllowed } from "@/hooks/location/useLocationAllowedStore";
 import { ToastAndroid } from "react-native";
 import * as Location from "expo-location";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect, useIsFocused } from "@react-navigation/native";
+import { useLocationCache } from "@/hooks/location/useCurrentLocation";
+import { useLocationPermission } from "@/hooks/location/locationPermissionContext";
 
 export default function SettingScreen() {
   const { logout } = useAuth();
   const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);
-  const [locationEnabled, setLocationEnabled] = React.useState(true);
+  const { setLocationCache, getLocationCache } = useLocationCache();
+  const [locationEnabled, setLocationEnabled] = React.useState(false);
+  const { locationAllowed, setLocationAllowed } = useLocationPermission();
+  const [loadingLocation, setLoadingLocation] = React.useState(false);
   const { userHealth } = useHealth();
   console.log("User Health:", userHealth);
   const handleLogoutConfirmed = async () => {
@@ -32,26 +37,34 @@ export default function SettingScreen() {
   };
 
   const handleCheckLocation = async () => {
-  if (!getLocationAllowed()) {
-    const { status } = await Location.requestForegroundPermissionsAsync();
+  setLoadingLocation(true);
 
-    if (status !== "granted") {
+  const { status } = await Location.getForegroundPermissionsAsync();
+
+  if (status !== "granted") {
+    const request = await Location.requestForegroundPermissionsAsync();
+    if (request.status !== "granted") {
       ToastAndroid.show("Bạn đã từ chối truy cập vị trí.", ToastAndroid.SHORT);
-      setLocationEnabled(false);
+      setLoadingLocation(false);
       setLocationAllowed(false);
       return;
-    } else {
-      setLocationAllowed(true);
     }
   }
 
+  setLocationAllowed(true);
   setLocationEnabled(true);
+  setLoadingLocation(false);
 };
 
 useFocusEffect(
-  React.useCallback(() => {
-    handleCheckLocation();
-  }, [])
+  useCallback(() => {
+    const syncLocationPermission = async () => {
+      const { status } = await Location.getForegroundPermissionsAsync();
+      setLocationEnabled(status === "granted" && locationAllowed);
+    };
+
+    syncLocationPermission();
+  }, [locationAllowed])
 );
 
   const handleLogout = () => {
@@ -130,8 +143,21 @@ useFocusEffect(
           isSwitch: true,
           value: locationEnabled,
           onToggle: () => {
+            if (!locationEnabled) {
               handleCheckLocation();
+            } else {
+              setLocationEnabled(false);
+              setLocationAllowed(false);
+            }
           },
+          renderExtra: () =>
+            loadingLocation ? (
+              <ActivityIndicator
+                style={{ marginLeft: 12 }}
+                size="small"
+                color="#E91E63"
+              />
+            ) : null,
         },
         {
           icon: "language-outline",
@@ -233,16 +259,22 @@ useFocusEffect(
                     <Text style={styles.settingLabel}>{item.label}</Text>
                     <Text style={styles.settingSubtitle}>{item.subtitle}</Text>
                   </View>
-                  {item.isSwitch ? (
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
                     <Switch
                       value={item.value}
+                      disabled={item.label === "Vị trí" && loadingLocation}
                       onValueChange={item.onToggle}
                       trackColor={{ false: "#e0e0e0", true: "#E91E63" }}
                       thumbColor={item.value ? "#fff" : "#f4f3f4"}
                     />
-                  ) : (
-                    <Ionicons name="chevron-forward" size={20} color="#ccc" />
-                  )}
+                    {item.label === "Vị trí" && loadingLocation && (
+                      <ActivityIndicator
+                        size="small"
+                        color="#E91E63"
+                        style={{ marginLeft: 8 }}
+                      />
+                    )}
+                  </View>
                 </TouchableOpacity>
               ))}
             </View>
