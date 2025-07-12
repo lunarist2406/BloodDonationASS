@@ -6,7 +6,6 @@ import {
   MailOutlined,
   LockOutlined,
   PhoneOutlined,
-  EnvironmentOutlined,
 } from "@ant-design/icons";
 import logo from "../../../assets/logo.png";
 import backgroundImage from "../../../assets/background.png";
