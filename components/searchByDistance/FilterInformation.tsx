@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -15,9 +15,8 @@ import { ToastAndroid } from "react-native";
 import type { BloodDonationData } from "@/hooks/searchByDistance/useSearchByDistanceFilter";
 import useCentral from "@/hooks/central/useCentral";
 import useSearchByDistanceService from "@/hooks/searchByDistance/useSearchByDistanceService";
-import { Picker } from "@react-native-picker/picker";
 import CenterPicker from "./centerPicker";
-import { getLocationAllowed, setLocationAllowed } from "@/hooks/location/useLocationAllowedStore";
+import { useLocationPermission } from "@/hooks/location/locationPermissionContext";
 
 interface FilterInformationUIProps {
   selectedTypes: string[];
@@ -31,6 +30,8 @@ interface FilterInformationUIProps {
   ) => void;
   setData: (data: BloodDonationData[]) => void;
   originalData: BloodDonationData[];
+  useCurrentLocation: boolean,
+  setUseCurrentLocation: (isUse: boolean) => void;
 }
 
 export default function FilterInformationUI({
@@ -42,13 +43,15 @@ export default function FilterInformationUI({
   onCenterChange,
   onUseCurrentLocationChange,
   setData,
+  useCurrentLocation,
+  setUseCurrentLocation,
   originalData,
 }: FilterInformationUIProps) {
   const { central } = useCentral();
   const { searchByCurrentPosition, searchByCentralDistance } =
     useSearchByDistanceService();
-  const [useCurrentLocation, setUseCurrentLocation] = useState(false);
   const [loadingLocation, setLoadingLocation] = useState(false);
+  const { locationAllowed, setLocationAllowed } = useLocationPermission();
   const [showPicker, setShowPicker] = useState(false);
 
   const handleUseLocationChange = async (checked: boolean) => {
@@ -60,14 +63,14 @@ export default function FilterInformationUI({
     return;
   }
 
-  if (!getLocationAllowed()) {
+  if (!locationAllowed) {
     const { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== "granted") {
       ToastAndroid.show("Bạn đã từ chối truy cập vị trí.", ToastAndroid.SHORT);
       setUseCurrentLocation(false);
       setLocationAllowed(false);
       return;
-    } else {
+    }else{
       setLocationAllowed(true);
     }
   }
@@ -84,6 +87,7 @@ export default function FilterInformationUI({
 
     setUseCurrentLocation(true);
     onUseCurrentLocationChange?.({ lat: latitude, lng: longitude });
+    console.warn("lat: " + latitude + ",lng: " + longitude);
 
     const objectSearch = {
       lat: latitude,
@@ -136,6 +140,19 @@ export default function FilterInformationUI({
       );
     }
   };
+
+  useEffect(() => {
+    if(!locationAllowed){
+      setUseCurrentLocation(false);
+    }
+  }, [locationAllowed])
+
+  useEffect(() => {
+    if (!useCurrentLocation && !selectedCenter) {
+      setData(originalData); 
+      onUseCurrentLocationChange?.(null);
+    }
+  }, [useCurrentLocation, selectedCenter, originalData]);
 
   const roleOptions = [
     { key: "hien", label: "Hiến máu", icon: "heart", color: "#EC4899" },
