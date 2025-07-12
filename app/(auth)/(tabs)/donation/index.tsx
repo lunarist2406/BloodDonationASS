@@ -214,27 +214,27 @@ function AllUsersTable({ searchText, sortBy, sortOrder }: any) {
     setLoading(false);
   };
 
-  const users = (allDonateBloods || []).map((d) => {
-    const userInfo = d.infor_health?.user_id;
-    return {
-      id: d.donate_id,
-      name: userInfo?.fullname || '—',
-      bloodType: d.blood_id.blood_id,
-      phone: userInfo?.email || '—',
-      gender: userInfo?.gender,
-      avatar: `https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 70) + 1}`,
-      status:
-        d.status_donate === 'COMPLETED'
-          ? 'donated'
-          : d.status_regist === 'PENDING'
-          ? 'registered'
-          : 'inactive',
-      lastActivity: d.date_donate,
-      registrationDate: d.date_register,
-      location: d.centralBlood_id.centralBlood_name,
-      scheduledDate: d.status_regist === 'PENDING' ? d.date_donate : undefined,
-    };
-  });
+    const users = (allDonateBloods || []).map((d) => {
+      const userInfo = d.infor_health?.user_id;
+      return {
+        id: d.donate_id,
+        name: userInfo?.fullname || '—',
+        bloodType: d.blood_id.blood_id,
+        phone: userInfo?.email || '—',
+        gender: userInfo?.gender,
+        avatar: `https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 70) + 1}`,
+        status:
+          d.status_donate === 'COMPLETED'
+            ? 'donated'
+            : d.status_regist === 'PENDING'
+            ? 'registered'
+            : 'inactive',
+        lastActivity: d.date_donate,
+        registrationDate: d.date_register,
+        location: d.centralBlood_id?.centralBlood_name || 'Không xác định',
+        scheduledDate: d.status_regist === 'PENDING' ? d.date_donate : undefined,
+      };
+    });
 
   const filtered = users.filter(
     (u) =>
@@ -1264,17 +1264,19 @@ export function ConfirmForm({ onBack, onSubmit }: { onBack: () => void; onSubmit
           <Ionicons name="calendar" size={20} color="#E91E63" style={styles.inputIcon} />
           <Text style={styles.textInput}>{selectedDate.toLocaleDateString()}</Text>
         </TouchableOpacity>
-        {showDatePicker && (
-          <DateTimePicker
-        value={selectedDate}
-        mode="date"
-        display="default"
-        onChange={(event, date) => {
-          setShowDatePicker(false);
-          if (date) setSelectedDate(date);
-        }}
-          />
-        )}
+          {showDatePicker && (
+            <DateTimePicker
+              value={selectedDate}
+              mode="date"
+              display="default"
+              minimumDate={new Date(new Date().setDate(new Date().getDate() + 1))} // Từ ngày mai trở đi
+              onChange={(event, date) => {
+                setShowDatePicker(false);
+                if (date) setSelectedDate(date);
+              }}
+            />
+          )}
+
       </View>
 
       {/* Chọn trung tâm hiến máu */}
