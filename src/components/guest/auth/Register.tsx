@@ -6,7 +6,6 @@ import {
   MailOutlined,
   LockOutlined,
   PhoneOutlined,
-  EnvironmentOutlined,
 } from "@ant-design/icons";
 import logo from "../../../assets/logo.png";
 import backgroundImage from "../../../assets/background.png";
@@ -52,8 +51,6 @@ export default function Register() {
       city: "TP.HCM",
       district: "",
       ward: "",
-      road: "",
-      house_number: ""
     },
   });
 
@@ -119,23 +116,6 @@ const handleSubmit = async (values:any) => {
   const selectedWard = wards.find(w => w.code === values.location.ward);
 
   try {
-    // await api.post("/api/v1/auth/register", {
-    //   email: values.email,
-    //   password: values.password,
-    //   fullname: values.fullName,
-    //   role_name: formData.role_name,
-    //   gender: values.gender,
-    //   phone: values.phone,
-    //   dob: values.dob ? moment(values.dob).format("YYYY-MM-DD") : "",
-    //   location: {
-    //     ipAddress: formData.location.ipAddress,
-    //     city: selectedProvince?.name || "",
-    //     district: selectedDistrict?.name || "",
-    //     ward: selectedWard?.name || "",
-    //     road: values.location.road || "",
-    //     house_number: values.location.house_number || ""
-    //   }
-    // });
     const registerData = {
       email: values.email,
       password: values.password,
@@ -149,16 +129,12 @@ const handleSubmit = async (values:any) => {
         city: selectedProvince?.name || "",
         district: selectedDistrict?.name || "",
         ward: selectedWard?.name || "",
-        road: values.location.road || "",
-        house_number: values.location.house_number || ""
       }
   };
 
   console.log("registerData gửi lên:", registerData);
 console.log("Địa chỉ đầy đủ:", [
-  registerData.location.house_number,
-  registerData.location.road,
-  registerData.location.ward,
+    registerData.location.ward,
   registerData.location.district,
   registerData.location.city
 ].filter(Boolean).join(', '));
@@ -391,26 +367,7 @@ console.log("Địa chỉ đầy đủ:", [
   </Select>
 </Form.Item>
 
-<Form.Item
-  label="Số nhà"
-  name={['location', 'house_number']}
->
-  <Input
-    prefix={<EnvironmentOutlined />}
-    placeholder="Số nhà"
-    size="middle"
-  />
-</Form.Item>
-<Form.Item
-  label="Tên đường"
-  name={['location', 'road']}
->
-  <Input
-    prefix={<EnvironmentOutlined />}
-    placeholder="Tên đường"
-    size="middle"
-  />
-</Form.Item>
+
             </div>
 
             {error && (
