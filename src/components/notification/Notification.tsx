@@ -39,11 +39,13 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps & { userId
         .filter((n: any) => n.user_id === userId)
         .map((n: any) => ({
           id: n.notification_id,
+          title: n.title,
           message: n.message,
           type: n.type,
           isRead: n.is_read,
           createdAt: new Date(n.created_at),
         }));
+
 
       setNotifications(filtered);
     } catch (err) {
@@ -68,6 +70,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps & { userId
       setNotifications(prev => [
         {
           id: payload.notification_id,
+          title: payload.title,
           message: payload.message,
           type: payload.type,
           isRead: false,
@@ -123,7 +126,7 @@ const handleMarkAllAsRead = async () => {
       return;
     }
 
-    const response = await api.patch(`/api/v1/notifications/mark-all-read`,{},
+    const response = await api.patch(`/api/v1/notifications/mark-read-all`,{},
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -160,14 +163,21 @@ const handleMarkAllAsRead = async () => {
     };
   }, [showNotifications]);
 
-  const getNotificationColor = (type: Notification['type']) => {
-    switch (type) {
-      case 'success': return 'bg-green-500';
-      case 'warning': return 'bg-yellow-500';
-      case 'error': return 'bg-red-500';
-      default: return 'bg-blue-500';
-    }
-  };
+  const getNotificationColor = (type: string) => {
+  switch (type) {
+    case 'BOOKING_DONATE_SUCCESS':
+    case 'BOOKING_RECEIVE_SUCCESS':
+      return 'bg-green-500';
+    case 'CANCELLED_DONATE_SCHEDULE':
+    case 'CANCELLED_RECEIVE_SCHEDULE':
+      return 'bg-yellow-500';
+    case 'REMINDER':
+      return 'bg-blue-500';
+    default:
+      return 'bg-gray-400';
+  }
+};
+
 
   const formatNotificationTime = (date: Date) => {
     const now = new Date();
@@ -236,6 +246,7 @@ const handleMarkAllAsRead = async () => {
                   >
                     <span className={`mt-1 w-3 h-3 rounded-full ${getNotificationColor(notification.type)}`} />
                     <div>
+                      <p className="text-sm font-semibold text-gray-900">{notification.title}</p>
                       <p className="text-sm text-gray-800">{notification.message}</p>
                       <p className="text-xs text-gray-400 mt-1">{formatNotificationTime(notification.createdAt)}</p>
                     </div>
