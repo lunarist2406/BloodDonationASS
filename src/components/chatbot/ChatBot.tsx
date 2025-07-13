@@ -13,10 +13,10 @@ const hoverMessages = [
 ];
 
 const suggestions = [
-  'Làm sao để đăng ký hiến máu?',
-  'Hiến máu xong bao lâu thì được hiến lại?',
-  'Nhóm máu A có thể cho nhóm nào?',
-  'Tôi muốn tìm nơi hiến máu gần nhất.',
+  'Xem thông tin cá nhân của tôi',
+  'Tình trạng sức khỏe của tôi như thế nào?',
+  'Có bao nhiêu trung tâm hiến máu?',
+  'Tìm trung tâm hiến máu gần tôi nhất',
 ];
 
 const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -65,14 +65,19 @@ const ChatBot: React.FC = () => {
   }, [chat, loading]);
 
   const handleSendMessage = () => {
-    if (!input.trim()) return;
+  if (!input.trim()) return;
 
-    const message = input.trim();
-    setChat((prev) => [...prev, { sender: 'user', text: message }]);
-    setInput('');
-    setLoading(true);
-    socket.emit('askAI', { message });
-  };
+  const message = input.trim();
+  setChat((prev) => [...prev, { sender: 'user', text: message }]);
+  setInput('');
+  setLoading(true);
+
+  socket.emit('askAI', {
+    user_ID: user?.user_id || 'anonymous',
+    message,
+  });
+};
+
 
   // Không render chatbot nếu đang ở trang cần ẩn
   if (shouldHideChatBot) {
@@ -97,9 +102,13 @@ const ChatBot: React.FC = () => {
 
       <div className={cx('chat-popup', isOpen && 'open')}>
         <div className={cx('chat-header')}>
-          <span>Trợ lý hiến máu</span>
-          <FaTimes className={cx('close-btn')} onClick={toggleChat} />
-        </div>
+  <span>Trợ lý hiến máu</span>
+  <div className={cx('chat-header-actions')}>
+    <button onClick={() => setChat([])} className={cx('clear-btn')}>🗑 Xóa</button>
+    <FaTimes className={cx('close-btn')} onClick={toggleChat} />
+  </div>
+</div>
+
 
         <div className={cx('chat-content')}>
           {chat.map((msg, idx) => (

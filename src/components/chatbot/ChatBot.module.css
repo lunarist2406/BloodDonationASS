@@ -219,3 +219,18 @@
     opacity: 1;
   }
 }
+
+
+.clear-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  margin-right: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: color 0.2s;
+}
+
+.clear-btn:hover {
+  color: #ff4d4f;
+}
