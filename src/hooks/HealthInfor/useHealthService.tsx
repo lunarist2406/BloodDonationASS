@@ -59,7 +59,23 @@ export default function useHealthService() {
 
   const createHealthInfo = async (data:any) => {
     try {
-      const response = await api.post(API_URL, data, authHeaders);
+      const formData = new FormData();
+
+    Object.entries(data).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        if (value instanceof Blob) {
+          formData.append(key, value);
+        } else {
+          formData.append(key, String(value));
+        }
+      }
+    });
+      const response = await api.post(API_URL, data, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+      },
+    });
       return response.data;
     } catch (error) {
       console.error("Lỗi khi tạo mới thông tin sức khỏe:", error);
