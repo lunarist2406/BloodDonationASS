@@ -1,6 +1,6 @@
 import { Checkbox, Divider, message, Select, Slider } from "antd";
 import useCentral from "../../../../hooks/CentralBlood/useCentral";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useBloodDonationService from "../../../../hooks/SearchByDistance/useBloodDonationService";
 import type {
   BloodDonationData,
@@ -14,10 +14,10 @@ interface FilterInformationUIProps {
   onTypeChange: (types: string[]) => void;
   onDistanceChange: (distance: number) => void;
   onCenterChange: (center: string | null) => void;
-  onUseCurrentLocationChange?: (
-    coords: { lat: number; lng: number } | null
-  ) => void;
+  onUseCurrentLocationChange: (coords: { lat: number; lng: number } | null) => void;
+  onFilterModeChange: (mode: "default" | "location" | "central") => void;
   setData: (data: BloodDonationData[]) => void;
+  setOriginalData: (data: BloodDonationData[]) => void;
   originalData: BloodDonationData[];
 }
 
@@ -29,7 +29,9 @@ export const FilterInformationUI = ({
   onDistanceChange,
   onCenterChange,
   onUseCurrentLocationChange,
+  onFilterModeChange,
   setData,
+  setOriginalData,
   originalData,
 }: FilterInformationUIProps) => {
   const { central } = useCentral();
@@ -39,6 +41,7 @@ export const FilterInformationUI = ({
 
   const handleCenterChange = async (center: string | null) => {
     onCenterChange(center);
+    onFilterModeChange(center ? "central" : "default");
 
     if (!center) {
       setData(originalData);
@@ -46,7 +49,7 @@ export const FilterInformationUI = ({
     }
 
     setUseCurrentLocation(false);
-    onUseCurrentLocationChange?.(null);
+    onUseCurrentLocationChange(null);
 
     try {
       const response = await searchByCentralDistance({
@@ -55,6 +58,7 @@ export const FilterInformationUI = ({
       });
 
       setData(response.data);
+      setOriginalData(response.data);
     } catch (err) {
       message.error("Không thể tìm theo trung tâm. Vui lòng thử lại.");
     }
@@ -63,14 +67,16 @@ export const FilterInformationUI = ({
   const handleAllowClear = () => {
     onCenterChange(null);
     setUseCurrentLocation(false);
-    onUseCurrentLocationChange?.(null);
+    onUseCurrentLocationChange(null);
+    onFilterModeChange("default");
     setData(originalData);
   };
 
   const handleUseLocationChange = async (checked: boolean) => {
     if (!checked) {
       setUseCurrentLocation(false);
-      onUseCurrentLocationChange?.(null);
+      onUseCurrentLocationChange(null);
+      onFilterModeChange("default");
       setData(originalData);
       return;
     }
@@ -85,17 +91,17 @@ export const FilterInformationUI = ({
       async (position) => {
         const { latitude, longitude } = position.coords;
         setUseCurrentLocation(true);
-        onUseCurrentLocationChange?.({ lat: latitude, lng: longitude });
-        console.log("lat", latitude);
-        console.log("lng", longitude);
+        onUseCurrentLocationChange({ lat: latitude, lng: longitude });
+        onFilterModeChange("location");
+
         const objectSearch: SearchByCurrentPosDTO = {
           lat: latitude,
           lng: longitude,
-          radiusInKm: distanceKm || 10,
+          radiusInKm: distanceKm,
         };
         const response = await searchByCurrentPosition(objectSearch);
-        console.log(response.data);
         setData(response.data);
+        setOriginalData(response.data);
       },
       (error) => {
         setUseCurrentLocation(false);
@@ -104,7 +110,8 @@ export const FilterInformationUI = ({
         } else {
           message.error("Không thể lấy vị trí. Vui lòng thử lại.");
         }
-        onUseCurrentLocationChange?.(null);
+        onUseCurrentLocationChange(null);
+        onFilterModeChange("default");
       }
     );
   };
