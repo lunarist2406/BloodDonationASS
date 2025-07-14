@@ -19,15 +19,6 @@ const suggestions = [
   'Tìm trung tâm hiến máu gần tôi nhất',
 ];
 
-const user = JSON.parse(localStorage.getItem('user') || '{}');
-const socket: Socket = io('https://blooddonation-be-production.up.railway.app/chatbot', {
-  transports: ['websocket'],
-  auth: {
-    userID: user?.user_id || 'anonymous'
-  },
-});
-
-// Danh sách các trang không hiển thị chatbot
 const hiddenPages = ['/', '/register', '/verify-code', '/forgot-password'];
 
 const ChatBot: React.FC = () => {
@@ -37,52 +28,75 @@ const ChatBot: React.FC = () => {
   const [chat, setChat] = useState<{ sender: 'bot' | 'user'; text: string }[]>([]);
   const [loading, setLoading] = useState(false);
 
+  const socketRef = useRef<Socket | null>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const location = useLocation();
 
-  // Kiểm tra xem có nên ẩn chatbot không
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
   const shouldHideChatBot = hiddenPages.includes(location.pathname);
 
   const toggleChat = () => setIsOpen((prev) => !prev);
 
   useEffect(() => {
-    socket.on('aiReply', (data: { message: string }) => {
+    // Khởi tạo socket mới mỗi khi userId thay đổi
+    const newSocket = io('https://blooddonation-be-production.up.railway.app/chatbot', {
+      transports: ['websocket'],
+      auth: {
+        userID: user?.user_id || 'anonymous',
+      },
+    });
+
+    socketRef.current = newSocket;
+
+    newSocket.on('aiReply', (data: { message: string }) => {
       setLoading(false);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
       setChat((prev) => [...prev, { sender: 'bot', text: data.message }]);
     });
 
-    socket.on('connect_error', (err) => {
+    newSocket.on('connect_error', (err) => {
       console.error('Socket connect error:', err);
     });
 
     return () => {
-      socket.off('aiReply');
+      newSocket.disconnect();
+      socketRef.current = null;
     };
-  }, []);
+  }, [user?.user_id]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chat, loading]);
 
   const handleSendMessage = () => {
-  if (!input.trim()) return;
+    if (!input.trim()) return;
 
-  const message = input.trim();
-  setChat((prev) => [...prev, { sender: 'user', text: message }]);
-  setInput('');
-  setLoading(true);
+    const message = input.trim();
+    setChat((prev) => [...prev, { sender: 'user', text: message }]);
+    setInput('');
+    setLoading(true);
 
-  socket.emit('askAI', {
-    user_ID: user?.user_id || 'anonymous',
-    message,
-  });
-};
+    socketRef.current?.emit('askAI', { message });
 
+    // Tự động ngắt loading nếu chờ quá lâu
+    timeoutRef.current = setTimeout(() => {
+      setLoading(false);
+      setChat((prev) => [
+        ...prev,
+        { sender: 'bot', text: '⏳ Xin lỗi, phản hồi bị chậm. Vui lòng thử lại!' },
+      ]);
+    }, 15000);
+  };
 
-  // Không render chatbot nếu đang ở trang cần ẩn
-  if (shouldHideChatBot) {
-    return null;
-  }
+  const handleClearChat = () => {
+    setChat([]);
+    setLoading(false);
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+  };
+
+  // Không hiển thị nếu ở trang không phù hợp
+  if (shouldHideChatBot) return null;
 
   return (
     <div className={cx('chatbot')}>
@@ -102,13 +116,12 @@ const ChatBot: React.FC = () => {
 
       <div className={cx('chat-popup', isOpen && 'open')}>
         <div className={cx('chat-header')}>
-  <span>Trợ lý hiến máu</span>
-  <div className={cx('chat-header-actions')}>
-    <button onClick={() => setChat([])} className={cx('clear-btn')}>🗑 Xóa</button>
-    <FaTimes className={cx('close-btn')} onClick={toggleChat} />
-  </div>
-</div>
-
+          <span>Trợ lý hiến máu</span>
+          <div className={cx('chat-header-actions')}>
+            <button onClick={handleClearChat} className={cx('clear-btn')}>🗑 Xóa</button>
+            <FaTimes className={cx('close-btn')} onClick={toggleChat} />
+          </div>
+        </div>
 
         <div className={cx('chat-content')}>
           {chat.map((msg, idx) => (
