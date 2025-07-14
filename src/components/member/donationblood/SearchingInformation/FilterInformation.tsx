@@ -1,6 +1,6 @@
 import { Checkbox, Divider, message, Select, Slider } from "antd";
 import useCentral from "../../../../hooks/CentralBlood/useCentral";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import useBloodDonationService from "../../../../hooks/SearchByDistance/useBloodDonationService";
 import type {
   BloodDonationData,
@@ -61,6 +61,7 @@ export const FilterInformationUI = ({
       setOriginalData(response.data);
     } catch (err) {
       message.error("Không thể tìm theo trung tâm. Vui lòng thử lại.");
+      console.error("Lỗi khi tìm kiếm theo trung tâm:", err);
     }
   };
 
