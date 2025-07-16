@@ -6,7 +6,7 @@ const API_URL = "/api/v1/infor-health";
 
 export const HealthContext = createContext(null);
 
-export const HealthProvider = ({ children }) => {
+export const HealthProvider = ({ children }:any) => {
   const { token } = useAuth();
 
   const [healthList, setHealthList] = useState([]);

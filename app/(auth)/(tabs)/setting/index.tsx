@@ -20,6 +20,7 @@ import * as Location from "expo-location";
 import { useFocusEffect, useIsFocused } from "@react-navigation/native";
 import { useLocationCache } from "@/hooks/location/useCurrentLocation";
 import { useLocationPermission } from "@/hooks/location/locationPermissionContext";
+import { useBloodContext } from "@/hooks/Blood/useBlood";
 
 export default function SettingScreen() {
   const { logout } = useAuth();
@@ -29,7 +30,10 @@ export default function SettingScreen() {
   const { locationAllowed, setLocationAllowed } = useLocationPermission();
   const [loadingLocation, setLoadingLocation] = React.useState(false);
   const { userHealth } = useHealth();
-  console.log("User Health:", userHealth);
+  const { bloodList} = useBloodContext();
+   console.log("User Health:", userHealth);
+   console.log("Blood List:", bloodList);
+  // console.log("Blood List:", bloodList);
   const handleLogoutConfirmed = async () => {
     await logout();
     console.log("Logged out");
@@ -226,11 +230,25 @@ useFocusEffect(
             style={styles.profileImage}
           />
           <View style={styles.profileInfo}>
-            <Text style={styles.profileName}>Ayushman Kumar</Text>
-            <Text style={styles.profileEmail}>ayushman@example.com</Text>
-            <View style={styles.bloodTypeContainer}>
-              <Text style={styles.bloodTypeText}>A+</Text>
+            <Text style={styles.profileName}>{userHealth?.user_id?.fullname}</Text>
+            <Text style={styles.profileEmail}>{userHealth?.user_id?.email}</Text>
+                       <View style={styles.bloodTypeContainer}>
+                  <Text style={styles.bloodTypeText}>
+                  {
+                    (() => {
+                    const blood = bloodList?.find(
+                      (b) => b.blood_id === userHealth?.blood_id?.blood_id
+                    );
+                    if (blood) {
+                      return `${blood.blood_type_id?.blood_name}${blood.rh_id?.blood_Rh}`;
+                    }
+                    return userHealth?.blood_id?.blood_id || "";
+                    })()
+                  }
+                  </Text>
             </View>
+
+
           </View>
           <TouchableOpacity style={styles.editProfileButton}>
             <Ionicons name="create-outline" size={20} color="#E91E63" />

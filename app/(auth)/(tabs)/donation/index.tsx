@@ -17,6 +17,7 @@ import {
   View
 } from 'react-native';
 
+import { useBloodContext } from '@/hooks/Blood/useBlood';
 import useCentral from '@/hooks/central/useCentral';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
@@ -30,7 +31,6 @@ export default function DonationScreen() {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [showSortModal, setShowSortModal] = useState(false);
-
   return (
     <>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
@@ -170,7 +170,7 @@ export default function DonationScreen() {
           onClose={() => setShowSortModal(false)}
           sortBy={sortBy}
           sortOrder={sortOrder}
-          onSortChange={(newSortBy, newSortOrder) => {
+          onSortChange={(newSortBy:any, newSortOrder:any) => {
             setSortBy(newSortBy);
             setSortOrder(newSortOrder);
             setShowSortModal(false);
@@ -383,7 +383,7 @@ function DonatedUsersTable({ searchText }: { searchText: string }) {
   const { donateHistory, getDonateHistoryByUser } = useDonateBlood();
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDonation, setSelectedDonation] = useState<any>(null);
-
+  const { bloodList} = useBloodContext();
   // Tự động load dữ liệu khi component mount
   useEffect(() => {
   const interval = setInterval(() => {
@@ -549,7 +549,21 @@ function DonatedUsersTable({ searchText }: { searchText: string }) {
                   Huyết áp: {selectedDonation.infor_health?.blood_pressure} mmHg
                 </Text>
                 <Text style={{ color: '#666', marginBottom: 4 }}>
-                  Nhóm máu: {selectedDonation.infor_health?.blood_id?.blood_id}
+                  Nhóm máu: {
+                  (() => {
+                    // Lấy blood_id của đơn
+                    const bloodId = selectedDonation.blood_id?.blood_id;
+                    // Lấy bloodList từ hook
+                    // (hook đã được khai báo ở trên: const { bloodList } = useBloodContext();)
+                    const blood = Array.isArray(bloodList)
+                    ? bloodList.find((b) => b.blood_id === bloodId)
+                    : null;
+                    // Hiển thị theo format gốc, ví dụ: A(-)
+                    return blood
+                    ? `${blood.blood_type_id?.blood_name || ''}(${blood.rh_id?.blood_Rh || ''})`
+                    : 'Không xác định';
+                  })()
+                  }
                 </Text>
                 <Text style={{ color: '#666', marginBottom: 4 }}>
                   Tình trạng: {selectedDonation.infor_health?.status_health}
@@ -582,6 +596,7 @@ function RegisteredUsersTable({ searchText, sortBy, sortOrder }: any) {
   const { donateHistory, getDonateHistoryByUser } = useDonateBlood();
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDonation, setSelectedDonation] = useState<any>(null);
+  const { bloodList } = useBloodContext();
   useEffect(() => {
   const interval = setInterval(() => {
     getDonateHistoryByUser();
@@ -667,7 +682,17 @@ function RegisteredUsersTable({ searchText, sortBy, sortOrder }: any) {
                   Ngày đăng ký: {new Date(item.date_register).toLocaleDateString('vi-VN')}
                 </Text>
                 <Text style={{ color: '#999' }}>
-                  Nhóm máu: {item.infor_health?.blood_id?.blood_id}
+                  Nhóm máu: {
+                  (() => {
+                  const bloodId = item.blood_id?.blood_id;
+                  const blood = Array.isArray(bloodList)
+                    ? bloodList.find((b) => b.blood_id === bloodId)
+                    : null;
+                  return blood
+                    ? `${blood.blood_type_id?.blood_name || ''}(${blood.rh_id?.blood_Rh || ''})`
+                    : 'Không xác định';
+                  })()
+                }
                 </Text>
               </View>
             </View>
@@ -747,7 +772,21 @@ function RegisteredUsersTable({ searchText, sortBy, sortOrder }: any) {
                   Huyết áp: {selectedDonation.infor_health?.blood_pressure} mmHg
                 </Text>
                 <Text style={{ color: '#666', marginBottom: 4 }}>
-                  Nhóm máu: {selectedDonation.infor_health?.blood_id?.blood_id}
+                  Nhóm máu: {
+                  (() => {
+                    // Lấy blood_id của đơn
+                    const bloodId = selectedDonation.blood_id?.blood_id;
+                    // Lấy bloodList từ hook
+                    // (hook đã được khai báo ở trên: const { bloodList } = useBloodContext();)
+                    const blood = Array.isArray(bloodList)
+                    ? bloodList.find((b) => b.blood_id === bloodId)
+                    : null;
+                    // Hiển thị theo format gốc, ví dụ: A(-)
+                    return blood
+                    ? `${blood.blood_type_id?.blood_name || ''}(${blood.rh_id?.blood_Rh || ''})`
+                    : 'Không xác định';
+                  })()
+                  }
                 </Text>
                 <Text style={{ color: '#666', marginBottom: 4 }}>
                   Tình trạng: {selectedDonation.infor_health?.status_health}
@@ -995,35 +1034,6 @@ function UserInfoForm({ onNext, onBack }: { onNext: () => void; onBack: () => vo
           <TextInput style={styles.textInput} value={user?.email} editable={false} />
         </View>
       </View>
-
-      {/* Số nhà và đường */}
-      <View style={styles.inputRow}>
-        <View style={styles.inputHalf}>
-          <Text style={styles.inputLabel}>Số nhà *</Text>
-          <View style={styles.inputContainer}>
-            <Ionicons name="home-outline" size={20} color="#E91E63" style={styles.inputIcon} />
-            <TextInput
-              style={styles.textInput}
-              value={user?.location_id?.house_number || ''}
-              editable={false}
-            />
-          </View>
-        </View>
-
-        <View style={styles.inputHalf}>
-          <Text style={styles.inputLabel}>Đường *</Text>
-          <View style={styles.inputContainer}>
-            <Ionicons name="navigate-outline" size={20} color="#E91E63" style={styles.inputIcon} />
-            <TextInput
-              style={styles.textInput}
-              value={user?.location_id?.road || ''}
-              editable={false}
-            />
-          </View>
-        </View>
-      </View>
-
-      {/* Quận và Thành Phố */}
       <View style={styles.inputRow}>
         <View style={styles.inputHalf}>
           <Text style={styles.inputLabel}>Quận *</Text>
@@ -1038,7 +1048,7 @@ function UserInfoForm({ onNext, onBack }: { onNext: () => void; onBack: () => vo
         </View>
 
         <View style={styles.inputHalf}>
-          <Text style={styles.inputLabel}>Thành Phố *</Text>
+          <Text style={styles.inputLabel}>Thành Phố </Text>
           <View style={styles.inputContainer}>
             <Ionicons name="map-outline" size={20} color="#E91E63" style={styles.inputIcon} />
             <TextInput
@@ -1061,6 +1071,7 @@ function UserInfoForm({ onNext, onBack }: { onNext: () => void; onBack: () => vo
 // Health Info Form Component (giữ nguyên)
 function HealthInfoForm({ onBack, onNext }: { onBack: () => void; onNext: () => void }) {
   const { userHealth } = useHealth();
+  const { bloodList} = useBloodContext();
 
   return (
     <View style={styles.formContainer}>
@@ -1128,7 +1139,16 @@ function HealthInfoForm({ onBack, onNext }: { onBack: () => void; onNext: () => 
         <Ionicons name="water-outline" size={20} color="#E91E63" style={styles.inputIcon} />
         <TextInput
           style={styles.textInput}
-          value={userHealth?.blood_id?.blood_id || ''}
+          value={
+                (() => {
+                  const bloodId = userHealth?.blood_id?.blood_id;
+                  if (!bloodId || !Array.isArray(bloodList)) return '';
+                  const blood = bloodList.find((b) => b.blood_id === bloodId);
+                  return blood
+                    ? `${blood.blood_type_id?.blood_name || ''}(${blood.rh_id?.blood_Rh || ''})`
+                    : '';
+                })()
+              }
           editable={false}
         />
           </View>

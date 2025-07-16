@@ -262,7 +262,7 @@ function AllUsersTable({ searchText, sortBy, sortOrder }: any) {
   const getStatusInfo = (status: string) => {
     switch (status) {
       case 'Receiver':
-        return { color: '#4CAF50', text: 'Đã hiến máu', icon: 'checkmark-circle' };
+        return { color: '#4CAF50', text: 'Đã nhận máu', icon: 'checkmark-circle' };
       case 'registered':
         return { color: '#FF9800', text: 'Đã đăng ký', icon: 'time' };
       default:
@@ -287,7 +287,7 @@ function AllUsersTable({ searchText, sortBy, sortOrder }: any) {
     <View style={styles.tableContainer}>
       <View style={[styles.tableHeader, { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }]}>
         <View>
-          <Text style={styles.tableTitle}>Danh Sách Người Hiến Máu</Text>
+          <Text style={styles.tableTitle}>Danh Sách Người Nhận Máu</Text>
           <Text style={styles.tableSubtitle}>{filtered.length} người</Text>
         </View>
         <TouchableOpacity onPress={handleReload} style={{ backgroundColor: '#E91E63', padding: 8, borderRadius: 8 }}>
@@ -300,7 +300,7 @@ function AllUsersTable({ searchText, sortBy, sortOrder }: any) {
           <Text style={styles.statNumber}>
             {users.filter((u) => u.status === 'Receiver').length}
           </Text>
-          <Text style={styles.statLabel}>Đã hiến máu</Text>
+          <Text style={styles.statLabel}>Đã nhận máu</Text>
         </View>
         <View style={styles.statCard}>
           <Text style={styles.statNumber}>
@@ -893,7 +893,7 @@ function RegisterModal({ visible, onClose }: { visible: boolean; onClose: () => 
           {/* Header */}
           <View style={styles.modalHeader}>
             <View style={styles.modalHandle} />
-            <Text style={styles.modalTitle}>Đăng ký hiến máu</Text>
+            <Text style={styles.modalTitle}>Đăng ký nhận máu</Text>
             <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
               <Ionicons name="close" size={24} color="#333" />
             </TouchableOpacity>
@@ -1024,32 +1024,6 @@ function UserInfoForm({ onNext, onBack }: { onNext: () => void; onBack: () => vo
         </View>
       </View>
 
-      {/* Số nhà và đường */}
-      <View style={styles.inputRow}>
-        <View style={styles.inputHalf}>
-          <Text style={styles.inputLabel}>Số nhà *</Text>
-          <View style={styles.inputContainer}>
-            <Ionicons name="home-outline" size={20} color="#E91E63" style={styles.inputIcon} />
-            <TextInput
-              style={styles.textInput}
-              value={user?.location_id?.house_number || ''}
-              editable={false}
-            />
-          </View>
-        </View>
-
-        <View style={styles.inputHalf}>
-          <Text style={styles.inputLabel}>Đường *</Text>
-          <View style={styles.inputContainer}>
-            <Ionicons name="navigate-outline" size={20} color="#E91E63" style={styles.inputIcon} />
-            <TextInput
-              style={styles.textInput}
-              value={user?.location_id?.road || ''}
-              editable={false}
-            />
-          </View>
-        </View>
-      </View>
 
       {/* Quận và Thành Phố */}
       <View style={styles.inputRow}>
@@ -1158,14 +1132,14 @@ function HealthInfoForm({ onBack, onNext }: { onBack: () => void; onNext: () => 
             <TextInput
               style={styles.textInput}
               value={
-          (() => {
-            const bloodId = userHealth?.blood_id?.blood_id;
-            if (!bloodId || !Array.isArray(bloodList)) return '';
-            const blood = bloodList.find((b) => b.blood_id === bloodId);
-            return blood
-              ? `${blood.blood_type_id?.blood_name || ''}(${blood.rh_id?.blood_Rh || ''})`
-              : '';
-          })()
+                (() => {
+                  const bloodId = userHealth?.blood_id?.blood_id;
+                  if (!bloodId || !Array.isArray(bloodList)) return '';
+                  const blood = bloodList.find((b) => b.blood_id === bloodId);
+                  return blood
+                    ? `${blood.blood_type_id?.blood_name || ''}(${blood.rh_id?.blood_Rh || ''})`
+                    : '';
+                })()
               }
               editable={false}
             />
@@ -1173,9 +1147,8 @@ function HealthInfoForm({ onBack, onNext }: { onBack: () => void; onNext: () => 
         </View>
       </View>
       <View style={styles.inputRow}>
-        {/* Lần hiến máu gần nhất và Tình trạng sức khỏe trên cùng 1 dòng */}
         <View style={styles.inputHalf}>
-          <Text style={styles.inputLabel}>Lần hiến máu gần nhất</Text>
+          <Text style={styles.inputLabel}>Lần nhận máu gần nhất</Text>
           <View style={styles.inputContainer}>
         <Ionicons name="calendar-outline" size={20} color="#E91E63" style={styles.inputIcon} />
         <TextInput
@@ -1213,10 +1186,8 @@ function HealthInfoForm({ onBack, onNext }: { onBack: () => void; onNext: () => 
         </View>
       </View>
 
-      {/* Lần hiến máu gần nhất */}
 
 
-      {/* Ảnh giấy khám sức khỏe */}
       {userHealth?.img_health && (
         <View style={styles.inputGroup}>
           <Text style={styles.inputLabel}>Ảnh giấy khám sức khỏe</Text>
@@ -1420,7 +1391,6 @@ function ConfirmForm({ onBack, onSubmit }: { onBack: () => void; onSubmit: () =>
         </View>
       </View>
 
-      {/* Trung tâm hiến máu */}
       <View style={styles.inputGroup}>
         <Text style={styles.inputLabel}>Trung tâm hiến máu</Text>
         <View style={[styles.inputContainer, { minHeight: 60 }]}>
