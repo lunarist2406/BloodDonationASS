@@ -139,7 +139,7 @@ export default function TableDonateBlood() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="bg-white p-6 rounded-xl shadow-lg"
+      className="bg-white p-6 rounded-xl shadow-lg h-full"
     >
       <Title level={3} style={{ color: "#d32f2f", marginBottom: 24 }}>
         Đơn Gần Nhất đang chờ duyệt

@@ -192,43 +192,6 @@ const payload = {
           </div>
         </div>
 
-        <div className="flex gap-4">
-          <div className="w-1/2">
-            <label className="block font-semibold mb-1">Số nhà</label>
-            <Input
-              value={userData?.data.location_id?.house_number || ""}
-              className={inputStyle}
-              disabled
-            />
-          </div>
-          <div className="w-1/2">
-            <label className="block font-semibold mb-1">Đường</label>
-            <Input
-              value={userData?.data.location_id?.road || ""}
-              className={inputStyle}
-              disabled
-            />
-          </div>
-        </div>
-
-        <div className="flex gap-4">
-          <div className="w-1/2">
-            <label className="block font-semibold mb-1">Quận</label>
-            <Input
-              value={userData?.data.location_id?.district || ""}
-              className={inputStyle}
-              disabled
-            />
-          </div>
-          <div className="w-1/2">
-            <label className="block font-semibold mb-1">Thành phố</label>
-            <Input
-              value={userData?.data.location_id?.city || ""}
-              className={inputStyle}
-              disabled
-            />
-          </div>
-        </div>
 
           {/* Mức độ ưu tiên và Thời gian nhận */}
           <div className="flex gap-4 mt-4">

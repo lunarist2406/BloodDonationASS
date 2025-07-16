@@ -154,35 +154,7 @@ export default function FormRegisterBlood({onSuccess}: FormRegisterBloodProps) {
             />
           </div>
         </div>
-        <div className="flex gap-4">
-          <div className="w-1/2">
-            <label className="block font-semibold mb-1">Số nhà </label>
-            <div className="relative">
-              <motion.div
-                initial={{ opacity: 0, y: -4 }}
-                animate={{ opacity: 1, y: 0 }}
-              ></motion.div>
-              <Input
-                type="tel"
-                name="phone"
-                value={userData?.data.location_id.house_number || ""}
-                className={inputStyle}
-                disabled
-              />
-            </div>
-          </div>
 
-          <div className="w-1/2">
-            <label className="block font-semibold mb-1">Đường</label>
-            <Input
-              type="email"
-              name="email"
-              value={userData?.data.location_id.road || ""}
-              className={inputStyle}
-              disabled
-            />
-          </div>
-        </div>
         <div className="flex gap-4">
           <div className="w-1/2">
             <label className="block font-semibold mb-1">Quận</label>

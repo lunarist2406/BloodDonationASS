@@ -215,7 +215,7 @@ const [centers, setCenters] = useState([]);
   ];
 
   return (
-    <div className="p-4 bg-white rounded shadow">
+    <div className="p-4 bg-white rounded shadow flex flex-col h-full">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold text-red-700 flex items-center gap-2">
           <IconUserCheck size={22}/> Đơn Nhận Máu Đã Tạo
@@ -233,9 +233,8 @@ const [centers, setCenters] = useState([]);
         scroll={{ x: "max-content" }}
         rowClassName={() => "hover:bg-red-50"}
         size="middle"
-        style={{minHeight:535}}
       />
-      <div className="mt-4 flex justify-center">
+      <div className="mt-auto pt-4 flex justify-center">
         <Pagination
           current={pagination.current}
           pageSize={pagination.pageSize}
