@@ -14,7 +14,7 @@ import { api } from "../../../config/axios/axiosInstance";
 
 
 export default function RegisterBloodTable({ refresh }: { refresh?: boolean }) {
-  const { getDonateHistoryByUser } = useDonateBloodService();
+  const { getDonateHistoryByUser,deleteDonateBlood } = useDonateBloodService();
   const { getBloodById } = useBloodService();
 
   const [data, setData] = useState<any[]>([]);
@@ -135,11 +135,7 @@ export default function RegisterBloodTable({ refresh }: { refresh?: boolean }) {
               cancelText: "Không",
               onOk: async () => {
                 try {
-                  await api.patch(`/api/v1/donate-bloods/cancel-donate-schedule/${record.key}`,{},{
-                    headers: {
-                      Authorization: `Bearer ${localStorage.getItem("token")}`,
-                    },
-                  });
+                  await deleteDonateBlood(record.key)
                   message.success("Huỷ đăng ký thành công!");
                   fetchData(pagination.current, pagination.pageSize);
                 } catch (err) {

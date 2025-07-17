@@ -44,7 +44,6 @@ export default function FormRegisterReceiveEmergency({ onSuccess }: FormRegister
 const [centers, setCenters] = useState<Center[]>([]);
   const [bloods, setBloods] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [selectedCenter, setSelectedCenter] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -68,12 +67,12 @@ const [centers, setCenters] = useState<Center[]>([]);
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-const handleSelectChange = (value:any, field:any) => {
-  setFormData((prev) => ({
-    ...prev,
-    [field]: field === "centralBlood_id" ? String(value) : value,
-  }));
-};
+  const handleSelectChange = (value:any, field:any) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: field === "centralBlood_id" ? String(value) : value,
+    }));
+  };
 
 
   const handleSubmit = async (e:any) => {
@@ -81,17 +80,18 @@ const handleSelectChange = (value:any, field:any) => {
     const { blood_id, date_receiver, ml, unit, centralBlood_id } = formData;
 
     if (!blood_id || !date_receiver || !ml || !unit || !centralBlood_id) {
+      console.error("Thông tin không đầy đủ:", formData);
       return message.error("Vui lòng điền đầy đủ thông tin.");
     }
 
-const payload = {
-  blood_id,
-  date_receiver: date_receiver.toISOString(),
-  ml: parseInt(ml),
-  unit: parseInt(unit),
-  type: formData.type,
-  centralBlood_id: String(centralBlood_id), // ép string ở đây luôn nếu muốn chắc ăn
-};
+  const payload = {
+    blood_id,
+    date_receiver: date_receiver.toISOString(),
+    ml: parseInt(ml),
+    unit: parseInt(unit),
+    type: formData.type,
+    centralBlood_id: String(centralBlood_id), // ép string ở đây luôn nếu muốn chắc ăn
+  };
 
 
     try {
@@ -291,23 +291,24 @@ const payload = {
 
 
         {/* Trung tâm */}
-        <div className={inputWrapper}>
-  <label className="block font-semibold mb-1">Chọn Trung Tâm Hiến Máu</label>
-  <Select
-    value={selectedCenter}
-    onChange={(value) => setSelectedCenter(value)}
-    className="w-full"
-    placeholder="Chọn trung tâm"
-    loading={loading}
-    allowClear
-  >
-    {centers.map((center: any) => (
-      <Option key={center.centralBlood_id} value={center.centralBlood_id}>
-        {center.centralBlood_name} - {center.centralBlood_address}
-      </Option>
-    ))}
-  </Select>
-</div>
+      <div className={inputWrapper}>
+        <label className="block font-semibold mb-1">Chọn Trung Tâm Hiến Máu</label>
+        <Select
+          value={formData.centralBlood_id || undefined}
+          onChange={(value) => handleSelectChange(value, "centralBlood_id")}
+          className="w-full"
+          placeholder="Chọn trung tâm"
+          loading={loading}
+          allowClear
+        >
+          {centers.map((center: any) => (
+            <Option key={String(center.centralBlood_id)} value={String(center.centralBlood_id)}>
+              {center.centralBlood_name} - {center.centralBlood_address}
+            </Option>
+          ))}
+        </Select>
+      </div>
+
 
 
         <div className="flex justify-center">

@@ -40,7 +40,7 @@ export default function ReceiverTable({ refresh }: { refresh?: boolean }) {
   const [editData, setEditData] = useState<any>(null);
 //   const [bloodOptions, setBloodOptions] = useState<any[]>([]);
 
-  const { getReceiverHistoryById, updateReceiver } = useReceiverService();
+  const { getReceiverHistoryById, updateReceiver,deleteReceiver } = useReceiverService();
   const { getBloodById, getAllBloods } = useBloodService();
   const {getAllCentral} = useCentralService();
   const [bloods, setBloods] = useState([]);
@@ -135,7 +135,7 @@ const [centers, setCenters] = useState([]);
     setIsModalOpen(false);
     setSelectedRecord(null);
   };
-
+  
   const handleEditSubmit = async (values: any) => {
     try {
       const updatedPayload = {
@@ -144,6 +144,8 @@ const [centers, setCenters] = useState([]);
         user_id: typeof editData.user_id === "object" ? editData.user_id.user_id : editData.user_id,
         centralBlood_id: String(values.centralBlood_id),
         date_receiver: values.date_receiver?.toISOString(),
+      ml: Number(values.ml),
+      unit: Number(values.unit),
       };
 
 
@@ -157,7 +159,17 @@ const [centers, setCenters] = useState([]);
       message.error("Cập nhật thất bại!");
     }
   };
+  const handleDelete = async (record :any) =>{
+    try{
+        await deleteReceiver(record.receiver_id);
+        message.success("Đã hủy đơn thành công!");
+        fetchData(pagination.current, pagination.pageSize);
+    }catch(err:any){
+        console.error("Lỗi hủy đơn:", err);
+        message.error("Hủy đơn thất bại: " + err.message);
+    }
 
+  }
   const columns = [
     {
       title: <span className="flex items-center gap-1 text-red-800"><IconClock size={16}/> STT</span>,
@@ -209,6 +221,25 @@ const [centers, setCenters] = useState([]);
         <>
           <Button type="link" onClick={() => showDetailModal(record)}>Chi tiết</Button>
           <Button type="link" onClick={() => openEditModal(record)}>Chỉnh sửa</Button>
+          <Button
+            type="link"
+            danger
+            onClick={() => {
+              Modal.confirm({
+                title: "Bạn có chắc muốn hủy đơn này không?",
+                content: "Thao tác này không thể hoàn tác!",
+                okText: "Hủy đơn",
+                okType: "danger",
+                cancelText: "Thoát",
+                onOk: () => handleDelete(record.raw),
+              });
+            }}
+          >
+            Hủy đơn
+          </Button>
+
+
+
         </>
       ),
     },
@@ -288,8 +319,8 @@ const [centers, setCenters] = useState([]);
               date_receiver: editData.date_receiver ? dayjs(editData.date_receiver) : null,
               blood_id: editData.blood_id?.blood_id,
               priority: editData.priority,
-              ml: editData.ml,
-              unit: editData.unit,
+              ml: Number(editData.ml),
+              unit: Number(editData.unit),
             }}
           >
           <Form.Item name="centralBlood_id" label="Trung Tâm Hiến Máu">
