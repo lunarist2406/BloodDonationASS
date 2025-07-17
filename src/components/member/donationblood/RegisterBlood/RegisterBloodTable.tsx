@@ -10,7 +10,6 @@ import {
 } from "@tabler/icons-react";
 import useDonateBloodService from "../../../../hooks/RegistrationForm/useDonateBloodService";
 import useBloodService from "../../../../hooks/Blood/useBloodService";
-import { api } from "../../../config/axios/axiosInstance";
 
 
 export default function RegisterBloodTable({ refresh }: { refresh?: boolean }) {
